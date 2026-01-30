@@ -1,0 +1,7 @@
+services:
+  marti:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: marti:dev
+    command: bash -lc "echo 'MARTI compose OK' && sleep infinity"
