@@ -1,29 +1,44 @@
-name: ci
+name: CI
 
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
   pull_request:
 
 jobs:
   build-and-smoke:
     runs-on: ubuntu-latest
+
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
+      - name: Debug workspace
+        run: |
+          echo "PWD=$(pwd)"
+          echo "GITHUB_WORKSPACE=${GITHUB_WORKSPACE}"
+          ls -la
+          echo "---- workspace root ----"
+          ls -la "${GITHUB_WORKSPACE}"
+          echo "---- docker dir ----"
+          ls -la "${GITHUB_WORKSPACE}/docker" || true
+          echo "---- find Dockerfile ----"
+          find "${GITHUB_WORKSPACE}" -maxdepth 3 -type f -name "Dockerfile" -print
 
       - name: Build image (linux/amd64)
         run: |
           docker buildx build \
             --platform linux/amd64 \
             -t marti:ci \
-            -f docker/Dockerfile \
+            -f "${GITHUB_WORKSPACE}/docker/Dockerfile" \
             --load \
-            .
+            "${GITHUB_WORKSPACE}"
 
-      - name: Run smoke test
+      - name: Run smoke test inside container
         run: |
           docker run --rm --platform linux/amd64 \
-            -v "$PWD:/ws" -w /ws \
+            -v "${GITHUB_WORKSPACE}:/ws" -w /ws \
             marti:ci bash -lc './scripts/smoke_test.sh'
-
