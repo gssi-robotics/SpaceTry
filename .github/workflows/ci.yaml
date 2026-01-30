@@ -9,10 +9,21 @@ jobs:
   build-and-smoke:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Build image
-        run: ./scripts/build.sh
+      - name: Build image (linux/amd64)
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t marti:ci \
+            -f docker/Dockerfile \
+            --load \
+            .
 
-      - name: Smoke test
-        run: ./scripts/smoke_test.sh
+      - name: Run smoke test
+        run: |
+          docker run --rm --platform linux/amd64 \
+            -v "$PWD:/ws" -w /ws \
+            marti:ci bash -lc './scripts/smoke_test.sh'
+
