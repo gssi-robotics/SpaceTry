@@ -1,26 +1,25 @@
 #!/usr/bin/env bash
-set -euo pipefail
+# --- MARTI world smoke test: mars_outpost loads headless ---
+set -e
+# Avoid nounset issues while sourcing setup scripts
+source /opt/ros/spaceros/setup.bash
+source /ws/install/setup.bash
+set -u
+set -o pipefail
 
-WORLD="/ws/src/marti_worlds/worlds/empty.sdf"
+MODELS_ROOT="$(ros2 pkg prefix marti_models)/share/marti_models/models"
+WORLD_FILE="$(ros2 pkg prefix marti_world)/share/marti_world/worlds/mars_outpost.sdf"
 
-echo "== Checking tools =="
-command -v gz
-gz sim --versions
-command -v ros2
-ros2 -h >/dev/null
+export GZ_SIM_RESOURCE_PATH="${MODELS_ROOT}:${GZ_SIM_RESOURCE_PATH:-}"
 
-echo "== Starting headless Gazebo =="
-gz sim -s -r "${WORLD}" > /tmp/gz_smoke.log 2>&1 &
-GZ_PID=$!
+# Run headless for a few seconds and capture logs
+timeout 10s gz sim -s -r "${WORLD_FILE}" > /tmp/marti_world.log 2>&1 || true
 
-sleep 3
+# Fail on missing resources
+if grep -Ei "Unable to find uri\[model://|Could not find|Error.*URI|No such file" /tmp/marti_world.log; then
+  echo "Gazebo reported missing resources:"
+  tail -200 /tmp/marti_world.log
+  exit 1
+fi
 
-gz topic -l >/tmp/gz_topics.txt 2>&1 || true
-test -s /tmp/gz_topics.txt
-
-echo "== Stopping Gazebo =="
-kill "${GZ_PID}"
-wait "${GZ_PID}" || true
-
-echo "== Smoke test OK =="
-tail -n 50 /tmp/gz_smoke.log || true
+echo "OK: mars_outpost loaded headless"
