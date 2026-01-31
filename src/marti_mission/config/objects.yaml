@@ -1,0 +1,19 @@
+objects:
+  - id: outpost_habitat_01
+    type: outpost_asset
+  - id: outpost_comms_01
+    type: comms_asset
+  - id: dock_pad_01
+    type: docking_pad
+
+  - id: science_rock_01
+    type: science_target
+  - id: science_rock_02
+    type: science_target
+
+  - id: cache_a
+    type: sample_cache
+
+  - id: hazard_sandtrap_01
+    type: hazard
+    hazard_kind: sandtrap
