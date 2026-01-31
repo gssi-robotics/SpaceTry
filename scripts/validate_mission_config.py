@@ -107,7 +107,5 @@ def main() -> None:
     validate_waypoints(waypoints)
     validate_objects(objects, world_names)
 
-    print("OK: mission config validated against world")
-
 if __name__ == "__main__":
     main()
