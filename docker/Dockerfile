@@ -29,5 +29,10 @@ WORKDIR /ws
 COPY --chown=spaceros-user:spaceros-user . /ws
 RUN vcs import /ws/src < /ws/deps/marti.repos
 
+# Keep a copy of imported deps outside /ws so bind-mounting /ws won't hide them
+RUN mkdir -p /opt/marti_deps && \
+    rm -rf /opt/marti_deps/space_ros_demos && \
+    cp -a /ws/src/space_ros_demos /opt/marti_deps/space_ros_demos
+
 ENTRYPOINT ["/ws/docker/entrypoint.sh"]
 CMD ["bash", "-lc", "echo MARTI container OK && ls -la"]
