@@ -5,8 +5,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 USER root
 
 # Base tools + ros_gz
-RUN apt-get update && apt-get install -y --no-install-recommends \
+ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates \
+    git python3-vcstool \
     ros-jazzy-ros-gz \
     lsb-release wget gnupg \
  && rm -rf /var/lib/apt/lists/*
@@ -25,6 +26,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 USER spaceros-user
 
 WORKDIR /ws
-COPY . /ws
+COPY --chown=spaceros-user:spaceros-user . /ws
+RUN vcs import /ws/src < /ws/deps/marti.repos
+
 ENTRYPOINT ["/ws/docker/entrypoint.sh"]
 CMD ["bash", "-lc", "echo MARTI container OK && ls -la"]

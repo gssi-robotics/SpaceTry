@@ -1,0 +1,5 @@
+repositories:
+  space_ros_demos:
+    type: git
+    url: https://github.com/space-ros/demos.git
+    version: acf369b
