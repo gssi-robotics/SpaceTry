@@ -4,4 +4,6 @@ services:
       context: ..
       dockerfile: docker/Dockerfile
     image: marti:dev
+    volumes:
+      - ..:/ws
     command: bash -lc "echo 'MARTI compose OK' && sleep infinity"
