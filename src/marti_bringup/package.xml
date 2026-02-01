@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>marti_bringup</name>
+  <version>0.0.0</version>
+  <description>MARTI bringup and integration launch files.</description>
+
+  <maintainer email="you@example.com">MARTI</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+
+  <exec_depend>marti_world</exec_depend>
+  <exec_depend>marti_models</exec_depend>
+
+  <!-- Curiosity demo deps are brought in via space_ros_demos in src/ -->
+</package>
