@@ -1,6 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, SetEnvironmentVariable, ExecuteProcess
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
+from launch.conditions import IfCondition, UnlessCondition
 from ament_index_python.packages import get_package_share_directory
 import os
 
@@ -28,7 +29,12 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", new_gz_path),
         ExecuteProcess(
             cmd=gz_args_headless,
-            condition=None,
+            condition=IfCondition(headless),
+            output="screen"
+        ),
+        ExecuteProcess(
+            cmd=gz_args,
+            condition=UnlessCondition(headless),
             output="screen"
         ),
     ])
