@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>MARTI bringup and integration launch files.</description>
 
-  <maintainer email="you@example.com">MARTI</maintainer>
+  <maintainer email="todo@example.com">MARTI</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -15,5 +15,9 @@
   <exec_depend>marti_world</exec_depend>
   <exec_depend>marti_models</exec_depend>
 
-  <!-- Curiosity demo deps are brought in via space_ros_demos in src/ -->
+  <!-- Provided by Space ROS / ros_gz -->
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>ros_gz_sim</exec_depend>
+  <exec_depend>ros_gz_bridge</exec_depend>
+  <exec_depend>ros_gz_image</exec_depend>
 </package>
