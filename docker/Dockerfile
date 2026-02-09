@@ -42,6 +42,16 @@ if [ -f /opt/ros/spaceros/setup.bash ]; then
 fi
 EOF
 
+RUN cat >/etc/profile.d/marti_deps_link.sh <<'EOF'
+# MARTI: expose pinned Space ROS demos in /ws/src for colcon + ros2
+if [ -d /opt/marti_deps/space_ros_demos ]; then
+  mkdir -p /ws/src
+  if [ ! -e /ws/src/space_ros_demos ]; then
+    ln -s /opt/marti_deps/space_ros_demos /ws/src/space_ros_demos
+  fi
+fi
+EOF
+
 # prepare workspace dirs explicitly
 RUN mkdir -p /ws/src
 
