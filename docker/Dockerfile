@@ -56,12 +56,16 @@ RUN rm -rf /ws/src/space_ros_demos && \
     vcs import /ws/src < /ws/deps/marti.repos
 
 # Cache imported deps outside /ws so bind-mounting /ws won't hide them.
-# Also permanently ignore the duplicate curiosity_rover_demo package in the cached copy.
+# Permanently ignore the duplicate packages inside the cached copy.
 RUN mkdir -p /opt/marti_deps && \
     rm -rf /opt/marti_deps/space_ros_demos && \
     cp -a /ws/src/space_ros_demos /opt/marti_deps/space_ros_demos && \
-    mkdir -p /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/curiosity_rover_demo && \
-    touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/curiosity_rover_demo/COLCON_IGNORE
+    # Ignore the entire racs2 subtree (it contains a duplicate curiosity_rover_demo)
+    touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/COLCON_IGNORE && \
+    # And also ignore the duplicate package directory itself (belt + suspenders)
+    touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/curiosity_rover_demo/COLCON_IGNORE && \
+    # CRITICAL: remove the workspace copy inside the image to prevent duplicates
+    rm -rf /ws/src/space_ros_demos
 
 # Ignore all top-level demos except Curiosity rover (keeps MARTI build small and deterministic)
 RUN for d in /opt/marti_deps/space_ros_demos/*; do \
