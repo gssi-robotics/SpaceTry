@@ -3,7 +3,7 @@ project(marti_world)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY worlds launch config
+install(DIRECTORY worlds launch
   DESTINATION share/${PROJECT_NAME}
 )
 
