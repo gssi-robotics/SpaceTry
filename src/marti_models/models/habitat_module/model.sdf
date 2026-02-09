@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<sdf version="1.9">
+  <model name="habitat_module">
+    <static>true</static>
+    <link name="link">
+      <pose>0 0 0.5 0 0 0</pose>
+      <collision name="collision">
+        <geometry><box><size>3 2 1</size></box></geometry>
+      </collision>
+      <visual name="visual">
+        <geometry><box><size>3 2 1</size></box></geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

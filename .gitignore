@@ -14,3 +14,7 @@ log/
 __pycache__/
 *.pyc
 .venv/
+
+# Symlink
+src/space_ros_demos
+

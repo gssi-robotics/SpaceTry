@@ -1,0 +1,8 @@
+services:
+  marti:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: marti:dev
+    entrypoint: ["bash", "-lc"]
+    command: ["echo 'MARTI compose OK' && sleep infinity"]
