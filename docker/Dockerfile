@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates \
     git python3-vcstool \
     ros-jazzy-ros-gz \
+    ros-jazzy-gz-ros2-control \
     ros-jazzy-ros2-control \
     ros-jazzy-ros2-controllers \
     ros-jazzy-controller-manager \
@@ -74,6 +75,7 @@ RUN for d in /opt/marti_deps/space_ros_demos/*; do \
 
 # Ensure runtime user can read cached deps and work in /ws.
 RUN chown -R spaceros-user:spaceros-user /opt/marti_deps /ws
+RUN install -m 0644 /ws/docker/marti_ws_overlay.sh /etc/profile.d/marti_ws_overlay.sh
 
 # Drop privileges for runtime
 USER spaceros-user
