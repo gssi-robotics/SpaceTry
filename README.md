@@ -39,13 +39,24 @@ You should see:
 ### Run the environment
 
 Start a container shell using the provided script:
-````
+````bash
 ./scripts/run.sh
 ````
 
-Inside the container:
+Enter the container: 
+```bash
+docker exec -it docker-marti-1 bash 
 ```
+
+Insider the container, build:
+```bash
 source /opt/ros/spaceros/setup.bash
+source /etc/profile 
+colcon build --merge-install --event-handlers console_direct+
+```
+
+Insider the container, run:
+```bash
 source /ws/install/setup.bash
 ros2 launch marti_world mars_outpost.launch.py
 ```
