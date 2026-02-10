@@ -9,10 +9,6 @@ Course-grade Mars mission demo pack for Space ROS + Behavior Trees.
     * ```marti_world``` — Gazebo world(s)
     * ```marti_models``` — local Gazebo models
     * ```marti_mission``` — mission YAML configs
-    
-## Quick start (coming soon)
-- Build: `./scripts/build.sh`
-- Run:   `./scripts/run.sh`
 
 ## Quickstart (Docker-only)
 
