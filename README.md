@@ -39,6 +39,11 @@ Start a container shell using the provided script:
 ./scripts/run.sh
 ````
 
+Enter the container:
+```
+docker exec -it docker-marti-1 bash
+```
+
 Inside the container:
 ```
 source /opt/ros/spaceros/setup.bash
