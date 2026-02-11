@@ -1,0 +1,32 @@
+name: Validate SDF in Gazebo container
+
+on:
+  push:
+    branches: ["main", "dev", "gazebo-world"]
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/marti_world/worlds/mars_outpost.sdf"
+
+jobs:
+  container-check:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/gazebosim/gz-jetty:main
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version
+        run: |
+          set -euo pipefail
+          echo "gz version"
+          gz sdf --version
+
+      - name: Validate SDF
+        env:
+          SDF_PATH: |
+            ${{ github.workspace }}/src/marti_world
+            ${{ github.workspace }}/src/marti_world/worlds
+        run: |
+          set -euo pipefail
+          gz sdf -k src/marti_world/worlds/mars_outpost.sdf
