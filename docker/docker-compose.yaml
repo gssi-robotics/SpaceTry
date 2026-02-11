@@ -1,8 +1,27 @@
 services:
   marti:
+    # runtime: nvidia
+    environment:
+      - PYTHONUNBUFFERED=1 # important to show error messages if a ros service crashes!
+      - DISPLAY # for UI
+      - QT_X11_NO_MITSHM=1 #fix some QT bugs
+      - NVIDIA_VISIBLE_DEVICES=all # for docker-nvidia2
+      - NVIDIA_DRIVER_CAPABILITIES=all # for docker-nvidia2
+      - XDG_RUNTIME_DIR
+      - __NV_PRIME_RENDER_OFFLOAD=1
+      - __GLX_VENDOR_LIBRARY_NAME=nvidia
+      - XAUTHORITY=$XAUTHORITY
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw # for UI
+      - /run/user:/run/user:ro # for UI
+      - /home/$(whoami)/.Xauthority:/home/$(whoami)/.Xauthority:ro  # Mount XAUTHORITY file
+    network_mode: host
+    privileged: true # for UI
     build:
       context: ..
       dockerfile: docker/Dockerfile
     image: marti:dev
     entrypoint: ["bash", "-lc"]
     command: ["echo 'MARTI compose OK' && sleep infinity"]
+    
