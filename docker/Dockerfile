@@ -2,40 +2,60 @@ FROM osrf/space-ros:jazzy-2025.10.0
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-USER root
-
 # Space ROS in this image expects CycloneDDS; avoid FastDDS default selection from /opt/ros/jazzy
-ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp 
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_DISTRO=jazzy
+ENV USERNAME=spaceros-user
+ENV HOME=/home/spaceros-user
+ENV GZ_VERSION=harmonic
 
+USER root
 # Base tools + ros_gz + vcstool + git
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates \
     git python3-vcstool \
-    ros-jazzy-ros-gz \
-    ros-jazzy-gz-ros2-control \
-    ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers \
-    ros-jazzy-controller-manager \
-    ros-jazzy-control-msgs \
+    ros-${ROS_DISTRO}-ros-gz \
+    ros-${ROS_DISTRO}-gz-ros2-control \
+    ros-${ROS_DISTRO}-ros2-control \
+    ros-${ROS_DISTRO}-ros2-controllers \
+    ros-${ROS_DISTRO}-controller-manager \
+    ros-${ROS_DISTRO}-control-msgs \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
     lsb-release wget gnupg \
  && rm -rf /var/lib/apt/lists/*
 
-# Add OSRF Gazebo apt repo (for gz-harmonic)
-RUN wget -qO- https://packages.osrfoundation.org/gazebo.gpg \
-    | gpg --dearmor -o /usr/share/keyrings/gazebo-archive-keyring.gpg && \
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/gazebo-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" \
-    > /etc/apt/sources.list.d/gazebo-stable.list
+RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg\
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 
-# Install Gazebo Harmonic (provides `gz`)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gz-harmonic \
- && rm -rf /var/lib/apt/lists/*
+# Install Gazebo
+RUN apt-get update -qq && \
+    apt-get install -y \
+      gz-${GZ_VERSION} \
+      build-essential \
+      ros-${ROS_DISTRO}-rcl-interfaces\
+      ros-${ROS_DISTRO}-rclcpp\
+      ros-${ROS_DISTRO}-builtin-interfaces\
+      ros-${ROS_DISTRO}-ros-gz\
+      ros-${ROS_DISTRO}-sdformat-urdf\
+      ros-${ROS_DISTRO}-vision-msgs\
+      ros-${ROS_DISTRO}-actuator-msgs\
+      ros-${ROS_DISTRO}-image-transport\
+      ros-${ROS_DISTRO}-xacro\
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Rviz2
+RUN apt-get update -qq && \
+    apt-get install -y \
+      ros-${ROS_DISTRO}-rviz2 \
+      ros-${ROS_DISTRO}-moveit-ros-visualization \
+      ros-${ROS_DISTRO}-nav2-rviz-plugins && \
+    rm -rf /var/lib/apt/lists/*
 
 # Make every login shell (bash -l / bash -lc) see BOTH Jazzy (apt) and Space ROS
 RUN tee /etc/profile.d/marti_ros_env.sh >/dev/null <<'EOF' && chmod 0644 /etc/profile.d/marti_ros_env.sh
 # MARTI: ensure ROS Jazzy underlay + Space ROS overlay are always present
-if [ -f /opt/ros/jazzy/setup.bash ]; then
-  . /opt/ros/jazzy/setup.bash
+if [ -f /opt/ros/${ROS_DISTRO}/setup.bash ]; then
+  . /opt/ros/${ROS_DISTRO}/setup.bash
 fi
 if [ -f /opt/ros/spaceros/setup.bash ]; then
   . /opt/ros/spaceros/setup.bash
@@ -58,7 +78,7 @@ RUN mkdir -p /ws/src
 WORKDIR /ws
 
 # Copy repo into image. Chown so runtime user can work in /ws when not bind-mounted.
-COPY --chown=spaceros-user:spaceros-user . /ws
+COPY --chown=${USERNAME}:${USERNAME} . /ws
 
 # Import pinned Space ROS demos into the image workspace.
 RUN rm -rf /ws/src/space_ros_demos && \
@@ -88,11 +108,11 @@ RUN for d in /opt/marti_deps/space_ros_demos/*; do \
     touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/COLCON_IGNORE
 
 # Ensure runtime user can read cached deps and work in /ws.
-RUN chown -R spaceros-user:spaceros-user /opt/marti_deps /ws
+RUN chown -R ${USERNAME}:${USERNAME} /opt/marti_deps /ws
 RUN install -m 0644 /ws/docker/marti_ws_overlay.sh /etc/profile.d/marti_ws_overlay.sh
 
 # Drop privileges for runtime
-USER spaceros-user
+USER ${USERNAME}
 WORKDIR /ws
 
 ENTRYPOINT ["/ws/docker/entrypoint.sh"]
