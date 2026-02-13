@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: osrf/space-ros:latest
+      options: --user root
     steps:
       - uses: actions/checkout@v4
 
