@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<sdf version="1.9">
+<sdf version="1.8">
   <world name="mars_outpost">
 
   <!-- 3D Scene -->
@@ -31,6 +31,22 @@
           <property key="showTitleBar" type="bool">false</property>
         </gz-gui>
       </plugin>
+      <plugin filename="InteractiveViewControl" name="Interactive view control">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="ImageDisplay" name="Image Display">
+        <gz-gui>
+          <property key="state" type="string">floating</property>
+        </gz-gui>
+      </plugin> 
+      
     </gui>
 
     <!-- Basic physics -->
@@ -38,7 +54,16 @@
       filename="gz-sim-physics-system"
       name="gz::sim::systems::Physics">
     </plugin>
-    <physics name="1ms" type="ignored"/>
+
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
 
     <!-- Sunlight (no external model dependency) -->
     <light type="directional" name="sun">
@@ -55,82 +80,59 @@
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 
-    <!-- Ground plane (no external model dependency) -->
-    <model name="ground">
-      <static>true</static>
-      <link name="link">
-        <collision name="collision">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>200 200</size>
-            </plane>
-          </geometry>
-        </collision>
-        <visual name="visual">
-          <geometry>
-            <plane>
-              <normal>0 0 1</normal>
-              <size>200 200</size>
-            </plane>
-          </geometry>
-        </visual>
-      </link>
-    </model>
-
     <!-- Outpost -->
-    <include>
-      <name>outpost_habitat_01</name>
-      <uri>model://habitat_module</uri>
-      <pose>0 0 0 0 0 0</pose>
+    <!-- <include>
+      <name>Station</name>
+      <uri>
+      https://fuel.gazebosim.org/1.0/OpenRobotics/models/International Space Station (half)
+      </uri>
     </include>
 
     <include>
-      <name>outpost_comms_01</name>
-      <uri>model://comms_tower</uri>
-      <pose>5 0 0 0 0 0</pose>
+      <name>Gateway</name>
+      <uri>
+      https://fuel.gazebosim.org/1.0/OpenRobotics/models/Radio tower
+      </uri>
     </include>
-
-    <include>
-      <name>dock_pad_01</name>
-      <uri>model://dock_pad_marker</uri>
-      <pose>2 -3 0 0 0 0</pose>
-    </include>
+   
 
     <!-- Science targets -->
-    <include>
-      <name>science_rock_01</name>
-      <uri>model://rock_01</uri>
-      <pose>12 4 0 0 0 0</pose>
-    </include>
 
-    <include>
-      <name>science_rock_02</name>
-      <uri>model://rock_01</uri>
-      <pose>15 6 0 0 0 0</pose>
-    </include>
-
-    <include>
-      <name>science_rock_03</name>
-      <uri>model://rock_01</uri>
-      <pose>11 8 0 0 0 0</pose>
-    </include>
 
     <!-- Cache -->
-    <include>
-      <name>cache_a</name>
-      <uri>model://sample_cache</uri>
-      <pose>8 -6 0 0 0 0</pose>
-    </include>
 
     <!-- Hazard patch -->
     <include>
-      <name>hazard_sandtrap_01</name>
-      <uri>model://hazard_sandtrap</uri>
-      <pose>10 0 0 0 0 0</pose>
+      <name>Rock 01</name>
+      <uri>
+      https://fuel.gazebosim.org/1.0/OpenRobotics/models/Medium Rock Fall 3
+      </uri>
     </include>
+
+    <include>
+      <name>Rock 02</name>
+      <uri>
+      https://fuel.gazebosim.org/1.0/Cole/models/Ocean Rock 07
+      </uri>
+    </include>
+
+    <include>
+      <name>Rock 03</name>
+      <uri>
+      https://fuel.gazebosim.org/1.0/Cole/models/Ocean Rock 01
+      </uri>
+    </include>
+    -->
+ 
 
   <!-- Martian Gravity-->
     <gravity>0 0 -3.711</gravity>
+
+  <include>
+    <uri>model://curiosity_path</uri>
+    <name>curiosity_path</name>
+    <pose>0 0 0 0 0 0</pose>
+  </include>
+
   </world>
 </sdf>
