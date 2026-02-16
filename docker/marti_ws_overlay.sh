@@ -13,3 +13,8 @@ fi
 if [ -f /ws/install/setup.bash ]; then
   . /ws/install/setup.bash
 fi
+
+# Pre-download Gazebo Fuel models on first run
+if [ -f "/ws/scripts/download_fuel_models.sh" ]; then
+  bash /ws/scripts/download_fuel_models.sh
+fi
