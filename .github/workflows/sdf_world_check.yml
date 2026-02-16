@@ -12,7 +12,7 @@ jobs:
   container-check:
     runs-on: ubuntu-latest
     container:
-      image: osrf/space-ros:latest
+      image: gazebo:latest
       options: --user root
     steps:
       - uses: actions/checkout@v4
