@@ -9,11 +9,12 @@ def generate_launch_description():
     headless = LaunchConfiguration("headless")
 
     models_root = os.path.join(get_package_share_directory("marti_models"), "models")
+    curiosity_models = os.path.join(get_package_share_directory("curiosity_gazebo"), "models")
     world_file = os.path.join(get_package_share_directory("marti_world"), "worlds", "mars_outpost.sdf")
 
-    # Prepend our models path to any existing resource path
+    # Prepend our models paths to any existing resource path
     gz_path = os.environ.get("GZ_SIM_RESOURCE_PATH", "")
-    new_gz_path = models_root if gz_path == "" else f"{models_root}:{gz_path}"
+    new_gz_path = f"{models_root}:{curiosity_models}" if gz_path == "" else f"{models_root}:{curiosity_models}:{gz_path}"
 
     gz_args = ["gz", "sim", "-r", world_file]
     # Headless server mode

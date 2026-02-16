@@ -81,49 +81,45 @@
     </light>
 
     <!-- Outpost -->
-    <!-- <include>
+    <include>
       <name>Station</name>
-      <uri>
-      https://fuel.gazebosim.org/1.0/OpenRobotics/models/International Space Station (half)
-      </uri>
+      <uri>model://ISS</uri>
+      <pose>120 40 -1 0 0 0</pose>
     </include>
 
     <include>
       <name>Gateway</name>
-      <uri>
-      https://fuel.gazebosim.org/1.0/OpenRobotics/models/Radio tower
-      </uri>
-    </include>
-   
+      <uri>model://tower</uri>
+      <pose>120 60 -1 0 0 0</pose>
+    </include>   
 
     <!-- Science targets -->
+    <include>
+      <name>science_rock_01</name>
+      <uri>model://science_rock</uri>
+      <pose>68 0 -5 0 0 0</pose>
+    </include>
+
+    <include>
+      <name>science_rock_02</name>
+      <uri>model://science_rock</uri>
+      <pose>20 0 -5 0 0 0</pose>
+    </include>
 
 
-    <!-- Cache -->
+    <include>
+      <name>science_rock_03</name>
+      <uri>model://science_rock</uri>
+      <pose>-20 0 -5 0 0 0</pose>
+    </include>
+
 
     <!-- Hazard patch -->
     <include>
-      <name>Rock 01</name>
-      <uri>
-      https://fuel.gazebosim.org/1.0/OpenRobotics/models/Medium Rock Fall 3
-      </uri>
+      <uri>model://block_island</uri>
+      <name>block_island</name>
+      <pose>-10 -50 0 0 0 0</pose>
     </include>
-
-    <include>
-      <name>Rock 02</name>
-      <uri>
-      https://fuel.gazebosim.org/1.0/Cole/models/Ocean Rock 07
-      </uri>
-    </include>
-
-    <include>
-      <name>Rock 03</name>
-      <uri>
-      https://fuel.gazebosim.org/1.0/Cole/models/Ocean Rock 01
-      </uri>
-    </include>
-    -->
- 
 
   <!-- Martian Gravity-->
     <gravity>0 0 -3.711</gravity>
