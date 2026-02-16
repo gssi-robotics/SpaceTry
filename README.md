@@ -58,6 +58,17 @@ ros2 launch marti_world mars_outpost.launch.py
 ```
 > The launch file configures Gazebo resource paths so local models resolve without manually exporting environment variables.
 
+## Validate Gazebo World (headless)
+Recommended to run in case changes are introduced in the world to prevent unecessary GitHub Actions quota usage (in case of errors).
+Inside the container, run:
+
+```bash
+source /opt/ros/spaceros/setup.bash
+source /etc/profile 
+colcon build --merge-install --event-handlers console_direct+
+GZ_SIM_RESOURCE_PATH=/ws/src/marti_models/models/:/ws/src/space_ros_demos/curiosity_rover/curiosity_gazebo/models timeout 5 gz sim -s src/marti_world/worlds/mars_outpost.sdf
+```
+
 ## Run MARTI with the Curiosity Mars Rover (GUI or headless)
 
 MARTI includes a bringup that launches:
