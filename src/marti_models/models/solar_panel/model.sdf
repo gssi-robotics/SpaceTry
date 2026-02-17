@@ -35,7 +35,7 @@
                 <geometry>
                     <mesh>
                         <uri>model://solar_panel/resources/solar_panel.glb</uri>
-                        <scale>0.02 0.02 0.02</scale>
+                        <scale>0.01 0.01 0.01</scale>
                     </mesh>
                 </geometry>
             </visual>
