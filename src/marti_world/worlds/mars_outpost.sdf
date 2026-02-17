@@ -83,43 +83,49 @@
     <!-- Outpost -->
     <include>
       <name>Station</name>
-      <uri>model://ISS</uri>
-      <pose>120 40 -1 0 0 0</pose>
+      <uri>model://station</uri>
+      <pose>145 50 -10.65 1.53 0 5.0</pose>
     </include>
 
     <include>
-      <name>Gateway</name>
-      <uri>model://tower</uri>
-      <pose>120 60 -1 0 0 0</pose>
-    </include>   
+      <name>solar_panel</name>
+      <uri>model://solar_panel</uri>
+      <pose>145 60 -10.7 1.60 0 0</pose>
+    </include>
 
     <!-- Science targets -->
     <include>
       <name>science_rock_01</name>
-      <uri>model://science_rock</uri>
-      <pose>68 0 -5 0 0 0</pose>
+      <uri>model://large_rocks</uri>
+      <pose>66.00 0 -12.40 -1.1 -0.10 3.07</pose>
     </include>
 
     <include>
       <name>science_rock_02</name>
-      <uri>model://science_rock</uri>
-      <pose>20 0 -5 0 0 0</pose>
+      <uri>model://large_rocks</uri>
+      <pose>50.10 -100 -20 0 0 0</pose>
     </include>
 
 
     <include>
       <name>science_rock_03</name>
-      <uri>model://science_rock</uri>
-      <pose>-20 0 -5 0 0 0</pose>
+      <uri>model://large_rocks</uri>
+      <pose>-120 40 7.70 1.20 -0.30 1.20</pose>
     </include>
 
+    <include>
+      <name>science_rock_04</name>
+      <uri>model://large_rocks</uri>
+      <pose>-120 -115 -15.50 0 -0.40 0</pose>
+    </include>
 
     <!-- Hazard patch -->
     <include>
       <uri>model://block_island</uri>
       <name>block_island</name>
-      <pose>-10 -50 0 0 0 0</pose>
+      <pose>-50 -70 0 0 0 1.50</pose>
     </include>
+
 
   <!-- Martian Gravity-->
     <gravity>0 0 -3.711</gravity>
