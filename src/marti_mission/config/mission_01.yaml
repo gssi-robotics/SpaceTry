@@ -5,6 +5,6 @@ objectives:
   - type: inspect
     target: science_rock_01
   - type: navigate
-    target: cache_a
+    target: solar_panel
   - type: return
-    target: outpost
+    target: outpost_habitat_01

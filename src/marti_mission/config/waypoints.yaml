@@ -1,22 +1,16 @@
 frame: world
 waypoints:
-  outpost:
-    x: 0.0
-    y: 0.0
+  outpost_habitat_01:
+    x: 145
+    y: 50
     yaw: 0.0
     tolerance: 1.0
 
-  dock_pad_01:
-    x: 2.0
-    y: -3.0
+  solar_panel:
+    x: 145
+    y: 60
     yaw: 0.0
     tolerance: 0.5
-
-  cache_a:
-    x: 8.0
-    y: -6.0
-    yaw: 0.0
-    tolerance: 1.0
 
   ridge:
     x: 12.0
