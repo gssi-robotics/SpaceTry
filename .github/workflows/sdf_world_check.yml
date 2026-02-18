@@ -1,0 +1,41 @@
+name: Validate SDF in Gazebo
+
+on:
+  push:
+    branches: ["main", "gazebo-world"]
+    paths:
+      - "**.sdf"
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "src/marti_world/worlds/mars_outpost.sdf"
+
+jobs:
+  container-check:
+    runs-on: ubuntu-latest
+    container:
+      image: gazebo:latest
+      options: --user root
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check version
+        run: |
+          set -eu
+          echo "gz version"
+          command -v gz
+          gz sdf --version
+
+      - name: Validate SDF
+        env:
+          GZ_SIM_RESOURCE_PATH: ${{ github.workspace }}/src/marti_models/models:$HOME/curiosity_ws/src/curiosity_gazebo/models:$HOME/curiosity_ws/src/curiosity_gazebo/curiosity_description
+        run: |
+          set -eu
+          # Use headless gz sim to load and validate the world with model resolution
+          timeout 5 gz sim -s src/marti_world/worlds/mars_outpost.sdf 2>&1 | tee /tmp/sim.log || SIM_EXIT=$?
+          # Check for model resolution failures
+          if grep -q "Unable to find uri\|Error Code 14" /tmp/sim.log; then
+            echo "ERROR: Failed to resolve all models in SDF"
+            exit 1
+          fi
+          echo "World SDF validated successfully"

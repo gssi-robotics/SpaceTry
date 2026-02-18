@@ -1,0 +1,140 @@
+<?xml version="1.0"?>
+<sdf version="1.8">
+  <world name="mars_outpost">
+
+  <!-- 3D Scene -->
+   <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.9 0.753 0.66 1</background>
+      <grid>false</grid>
+    </scene>  
+
+    <gui fullscreen="0">
+
+      <plugin filename="MinimalScene" name="3D View">
+        <gz-gui>
+          <title>3D View</title>
+          <property type="bool" key="showTitleBar">false</property>
+          <property type="string" key="state">docked</property>
+        </gz-gui>
+ 
+        <engine>ogre2</engine>
+        <scene>scene</scene>
+        <camera_pose>-5.0 0.0 -6.0 0.0 0.0 0.0</camera_pose>
+      </plugin>
+      <plugin filename="GzSceneManager" name="Scene Manager">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+      <plugin filename="InteractiveViewControl" name="Interactive view control">
+        <gz-gui>
+          <property key="resizable" type="bool">false</property>
+          <property key="width" type="double">5</property>
+          <property key="height" type="double">5</property>
+          <property key="state" type="string">floating</property>
+          <property key="showTitleBar" type="bool">false</property>
+        </gz-gui>
+      </plugin>
+
+      <plugin filename="ImageDisplay" name="Image Display">
+        <gz-gui>
+          <property key="state" type="string">floating</property>
+        </gz-gui>
+      </plugin> 
+      
+    </gui>
+
+    <!-- Basic physics -->
+    <plugin
+      filename="gz-sim-physics-system"
+      name="gz::sim::systems::Physics">
+    </plugin>
+
+    <plugin
+      filename="gz-sim-user-commands-system"
+      name="gz::sim::systems::UserCommands">
+    </plugin>
+
+    <plugin
+      filename="gz-sim-scene-broadcaster-system"
+      name="gz::sim::systems::SceneBroadcaster">
+    </plugin>
+
+    <!-- Sunlight (no external model dependency) -->
+    <light type="directional" name="sun">
+      <cast_shadows>true</cast_shadows>
+      <pose>0 0 10 0 0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+    </light>
+
+    <!-- Outpost -->
+    <include>
+      <name>outpost_habitat_01</name>
+      <uri>model://station</uri>
+      <pose>145 50 -10.65 1.53 0 5.0</pose>
+    </include>
+
+    <include>
+      <name>solar_panel</name>
+      <uri>model://solar_panel</uri>
+      <pose>145 60 -10.7 1.60 -0.10 0</pose>
+    </include>
+
+    <!-- Science targets -->
+    <include>
+      <name>science_rock_01</name>
+      <uri>model://large_rocks</uri>
+      <pose>66.00 0 -12.40 -1.1 -0.10 3.07</pose>
+    </include>
+
+    <include>
+      <name>science_rock_02</name>
+      <uri>model://large_rocks</uri>
+      <pose>50.10 -100 -20 0 0 0</pose>
+    </include>
+
+
+    <include>
+      <name>science_rock_03</name>
+      <uri>model://large_rocks</uri>
+      <pose>-120 40 7.70 1.20 -0.30 1.20</pose>
+    </include>
+
+    <include>
+      <name>science_rock_04</name>
+      <uri>model://large_rocks</uri>
+      <pose>-120 -115 -15.50 0 -0.40 0</pose>
+    </include>
+
+    <!-- Hazard patch -->
+    <include>
+      <uri>model://block_island</uri>
+      <name>block_island</name>
+      <pose>-50 -70 0 0 0 1.50</pose>
+    </include>
+
+
+  <!-- Martian Gravity-->
+    <gravity>0 0 -3.711</gravity>
+
+  <include>
+    <uri>model://curiosity_path</uri>
+    <name>curiosity_path</name>
+    <pose>0 0 0 0 0 0</pose>
+  </include>
+
+  </world>
+</sdf>

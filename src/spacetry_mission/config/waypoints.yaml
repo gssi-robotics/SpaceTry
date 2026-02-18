@@ -1,0 +1,25 @@
+frame: world
+waypoints:
+  outpost_habitat_01:
+    x: 145
+    y: 50
+    yaw: 0.0
+    tolerance: 1.0
+
+  solar_panel:
+    x: 145
+    y: 60
+    yaw: 0.0
+    tolerance: 0.5
+
+  ridge:
+    x: 12.0
+    y: 4.0
+    yaw: 0.0
+    tolerance: 1.0
+
+  safe_haven:
+    x: -5.0
+    y: -5.0
+    yaw: 0.0
+    tolerance: 1.0

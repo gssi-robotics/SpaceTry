@@ -1,0 +1,10 @@
+mission_id: mission_01
+objectives:
+  - type: navigate
+    target: ridge
+  - type: inspect
+    target: science_rock_01
+  - type: navigate
+    target: solar_panel
+  - type: return
+    target: outpost_habitat_01
