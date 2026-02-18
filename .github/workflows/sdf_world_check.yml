@@ -1,8 +1,10 @@
-name: Validate SDF in Gazebo container
+name: Validate SDF in Gazebo
 
 on:
   push:
     branches: ["main", "gazebo-world"]
+    paths:
+      - "**.sdf"
   workflow_dispatch:
   pull_request:
     paths:
