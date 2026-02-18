@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(marti_models)
+project(spacetry_models)
 
 find_package(ament_cmake REQUIRED)
 

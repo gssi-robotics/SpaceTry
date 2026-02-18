@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.8)
-project(marti_bringup)
+project(spacetry_world)
 
 find_package(ament_cmake REQUIRED)
 
-install(DIRECTORY launch
+install(DIRECTORY worlds launch
   DESTINATION share/${PROJECT_NAME}
 )
 

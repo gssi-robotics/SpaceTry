@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_NAME="${IMAGE_NAME:-marti:dev}"
+IMAGE_NAME="${IMAGE_NAME:-spacetry:dev}"
 PLATFORM="${PLATFORM:-linux/amd64}"
 
 docker buildx build --platform "${PLATFORM}" --load -f docker/Dockerfile -t "${IMAGE_NAME}" .

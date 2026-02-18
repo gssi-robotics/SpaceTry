@@ -1,13 +1,16 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>marti_models</name>
+  <name>spacetry_world</name>
   <version>0.0.0</version>
-  <description>MARTI Gazebo models</description>
+  <description>SpaceTry 🥐 Gazebo worlds and launch files</description>
 
   <maintainer email="TODO@TODO.com">TODO</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <exec_depend>ament_index_python</exec_depend>
+  <exec_depend>launch</exec_depend>
 
   <export>
     <build_type>ament_cmake</build_type>

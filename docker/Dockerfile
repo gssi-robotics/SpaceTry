@@ -52,8 +52,8 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/*
 
 # Make every login shell (bash -l / bash -lc) see BOTH Jazzy (apt) and Space ROS
-RUN tee /etc/profile.d/marti_ros_env.sh >/dev/null <<'EOF' && chmod 0644 /etc/profile.d/marti_ros_env.sh
-# MARTI: ensure ROS Jazzy underlay + Space ROS overlay are always present
+RUN tee /etc/profile.d/spacetry_ros_env.sh >/dev/null <<'EOF' && chmod 0644 /etc/profile.d/spacetry_ros_env.sh
+# SpaceTry: ensure ROS Jazzy underlay + Space ROS overlay are always present
 if [ -f /opt/ros/${ROS_DISTRO}/setup.bash ]; then
   . /opt/ros/${ROS_DISTRO}/setup.bash
 fi
@@ -62,12 +62,12 @@ if [ -f /opt/ros/spaceros/setup.bash ]; then
 fi
 EOF
 
-RUN cat >/etc/profile.d/marti_deps_link.sh <<'EOF'
-# MARTI: expose pinned Space ROS demos in /ws/src for colcon + ros2
-if [ -d /opt/marti_deps/space_ros_demos ]; then
+RUN cat >/etc/profile.d/spacetry_deps_link.sh <<'EOF'
+# SpaceTry: expose pinned Space ROS demos in /ws/src for colcon + ros2
+if [ -d /opt/spacetry_deps/space_ros_demos ]; then
   mkdir -p /ws/src
   if [ ! -e /ws/src/space_ros_demos ]; then
-    ln -s /opt/marti_deps/space_ros_demos /ws/src/space_ros_demos
+    ln -s /opt/spacetry_deps/space_ros_demos /ws/src/space_ros_demos
   fi
 fi
 EOF
@@ -83,37 +83,37 @@ COPY --chown=${USERNAME}:${USERNAME} . /ws
 # Import pinned Space ROS demos into the image workspace.
 RUN rm -rf /ws/src/space_ros_demos && \
     mkdir -p /ws/src && \
-    vcs import /ws/src < /ws/deps/marti.repos
+    vcs import /ws/src < /ws/deps/spacetry.repos
 
 # Cache imported deps outside /ws so bind-mounting /ws won't hide them.
 # Permanently ignore the duplicate packages inside the cached copy.
-RUN mkdir -p /opt/marti_deps && \
-    rm -rf /opt/marti_deps/space_ros_demos && \
-    cp -a /ws/src/space_ros_demos /opt/marti_deps/space_ros_demos && \
+RUN mkdir -p /opt/spacetry_deps && \
+    rm -rf /opt/spacetry_deps/space_ros_demos && \
+    cp -a /ws/src/space_ros_demos /opt/spacetry_deps/space_ros_demos && \
     # Ignore the entire racs2 subtree (it contains a duplicate curiosity_rover_demo)
-    touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/COLCON_IGNORE && \
+    touch /opt/spacetry_deps/space_ros_demos/racs2_demos_on_spaceros/COLCON_IGNORE && \
     # And also ignore the duplicate package directory itself (belt + suspenders)
-    touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/curiosity_rover_demo/COLCON_IGNORE && \
+    touch /opt/spacetry_deps/space_ros_demos/racs2_demos_on_spaceros/curiosity_rover_demo/COLCON_IGNORE && \
     # CRITICAL: remove the workspace copy inside the image to prevent duplicates
     rm -rf /ws/src/space_ros_demos
 
-# Ignore all top-level demos except Curiosity rover (keeps MARTI build small and deterministic)
-RUN for d in /opt/marti_deps/space_ros_demos/*; do \
+# Ignore all top-level demos except Curiosity rover (keeps SpaceTry build small and deterministic)
+RUN for d in /opt/spacetry_deps/space_ros_demos/*; do \
       bn="$(basename "$d")"; \
       if [ -d "$d" ] && [ "$bn" != "curiosity_rover" ]; then \
         touch "$d/COLCON_IGNORE"; \
       fi; \
     done && \
     # Also ignore the racs2 subtree inside cached demos (duplicate package names / extra deps)
-    touch /opt/marti_deps/space_ros_demos/racs2_demos_on_spaceros/COLCON_IGNORE
+    touch /opt/spacetry_deps/space_ros_demos/racs2_demos_on_spaceros/COLCON_IGNORE
 
 # Ensure runtime user can read cached deps and work in /ws.
-RUN chown -R ${USERNAME}:${USERNAME} /opt/marti_deps /ws
-RUN install -m 0644 /ws/docker/marti_ws_overlay.sh /etc/profile.d/marti_ws_overlay.sh
+RUN chown -R ${USERNAME}:${USERNAME} /opt/spacetry_deps /ws
+RUN install -m 0644 /ws/docker/spacetry_ws_overlay.sh /etc/profile.d/spacetry_ws_overlay.sh
 
 # Drop privileges for runtime
 USER ${USERNAME}
 WORKDIR /ws
 
 ENTRYPOINT ["/ws/docker/entrypoint.sh"]
-CMD ["bash", "-lc", "echo MARTI container OK && ls -la"]
+CMD ["bash", "-lc", "echo SpaceTry container OK && ls -la"]

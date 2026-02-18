@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>marti_bringup</name>
+  <name>spacetry_bringup</name>
   <version>0.0.0</version>
-  <description>MARTI bringup and integration launch files.</description>
+  <description>SpaceTry 🥐 bringup and integration launch files.</description>
 
-  <maintainer email="todo@example.com">MARTI</maintainer>
+  <maintainer email="todo@example.com">SpaceTry 🥐</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
@@ -12,8 +12,8 @@
   <depend>launch</depend>
   <depend>launch_ros</depend>
 
-  <exec_depend>marti_world</exec_depend>
-  <exec_depend>marti_models</exec_depend>
+  <exec_depend>spacetry_world</exec_depend>
+  <exec_depend>spacetry_models</exec_depend>
 
   <!-- Provided by Space ROS / ros_gz -->
   <exec_depend>robot_state_publisher</exec_depend>

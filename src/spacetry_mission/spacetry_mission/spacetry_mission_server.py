@@ -9,9 +9,9 @@ from ament_index_python.packages import get_package_share_directory
 
 class MissionServer(Node):
     def __init__(self):
-        super().__init__("marti_mission_server")
+        super().__init__("spacetry_mission_server")
 
-        pkg_share = get_package_share_directory("marti_mission")
+        pkg_share = get_package_share_directory("spacetry_mission")
         self._waypoints_path = f"{pkg_share}/config/waypoints.yaml"
         self._objects_path = f"{pkg_share}/config/objects.yaml"
 

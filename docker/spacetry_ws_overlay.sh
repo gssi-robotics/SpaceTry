@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# MARTI: container-wide environment hook (loaded by /etc/profile)
+# SpaceTry: container-wide environment hook (loaded by /etc/profile)
 
 # Ensure Gazebo can find ROS/Gazebo system plugins (gz_ros2_control, etc.)
 if [ -d /opt/ros/jazzy/lib ]; then

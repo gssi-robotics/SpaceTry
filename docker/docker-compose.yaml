@@ -21,7 +21,7 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    image: marti:dev
+    image: spacetry:dev
     entrypoint: ["bash", "-lc"]
-    command: ["echo 'MARTI compose OK' && sleep infinity"]
+    command: ["echo 'SpaceTry compose OK' && sleep infinity"]
     
