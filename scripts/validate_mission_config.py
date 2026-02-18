@@ -88,13 +88,13 @@ def validate_objects(objects_yaml: dict, world_names: set[str]) -> None:
 
 def main() -> None:
     # Require these env vars so this script always validates the *installed* artifacts
-    world_sdf = os.environ.get("MARTI_WORLD_SDF")
-    mission_config_dir = os.environ.get("MARTI_MISSION_CONFIG_DIR")
+    world_sdf = os.environ.get("SPACETRY_WORLD_SDF")
+    mission_config_dir = os.environ.get("SPACETRY_MISSION_CONFIG_DIR")
 
     if not world_sdf:
-        die("MARTI_WORLD_SDF env var not set")
+        die("SPACETRY_WORLD_SDF env var not set")
     if not mission_config_dir:
-        die("MARTI_MISSION_CONFIG_DIR env var not set")
+        die("SPACETRY_MISSION_CONFIG_DIR env var not set")
 
     world_path = Path(world_sdf)
     config_dir = Path(mission_config_dir)

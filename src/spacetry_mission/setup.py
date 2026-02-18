@@ -2,7 +2,7 @@ from setuptools import setup
 import os
 from glob import glob
 
-package_name = "marti_mission"
+package_name = "spacetry_mission"
 
 setup(
     name=package_name,
@@ -15,12 +15,12 @@ setup(
     ],
     install_requires=["setuptools", "pyyaml"],
     zip_safe=True,
-    maintainer="MARTI",
-    description="Mission config services for MARTI",
+    maintainer="SpaceTry 🥐",
+    description="Mission config services for SpaceTry 🥐",
     license="Apache-2.0",
     entry_points={
         "console_scripts": [
-            "marti_mission_server = marti_mission.marti_mission_server:main",
+            "spacetry_mission_server = spacetry_mission.spacetry_mission_server:main",
         ],
     },
 )

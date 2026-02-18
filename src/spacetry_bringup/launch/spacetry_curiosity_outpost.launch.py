@@ -1,7 +1,7 @@
 """
-MARTI bringup: Curiosity rover in the MARTI mars_outpost world.
+SpaceTry 🥐 bringup: Curiosity rover in the SpaceTry 🥐 mars_outpost world.
 
-- Read spawn pose from marti_mission/config/waypoints.yaml (dock_pad_01)
+- Read spawn pose from spacetry_mission/config/waypoints.yaml (dock_pad_01)
 - Launch mars_outpost
 - Spawn Curiosity via ros_gz_sim create (-param robot_description)
 - Start bridges + controllers
@@ -45,7 +45,7 @@ def _load_waypoint_pose(waypoints_yaml: str, waypoint_name: str):
         yaw = float(wp.get("yaw", 0.0))
         return (x, y, yaw)
     except Exception as e:
-        print(f"[marti_bringup] WARN: failed to read {waypoints_yaml}: {e}")
+        print(f"[spacetry_bringup] WARN: failed to read {waypoints_yaml}: {e}")
         return (0.0, 0.0, 0.0)
 
 
@@ -59,9 +59,9 @@ def generate_launch_description():
     spawn_yaw_offset = LaunchConfiguration("spawn_yaw_offset")
 
     # --- paths
-    marti_world_share = get_package_share_directory("marti_world")
-    marti_models_root = os.path.join(get_package_share_directory("marti_models"), "models")
-    marti_mission_cfg = os.path.join(get_package_share_directory("marti_mission"), "config", "waypoints.yaml")
+    spacetry_world_share = get_package_share_directory("spacetry_world")
+    spacetry_models_root = os.path.join(get_package_share_directory("spacetry_models"), "models")
+    spacetry_mission_cfg = os.path.join(get_package_share_directory("spacetry_mission"), "config", "waypoints.yaml")
 
     curiosity_gazebo_share = get_package_share_directory("curiosity_gazebo")
     curiosity_desc_share = get_package_share_directory("curiosity_description")
@@ -74,7 +74,7 @@ def generate_launch_description():
     robot_xml = doc.toxml()
     robot_description_param = {"robot_description": robot_xml}
 
-    # --- env: make sure Gazebo can find BOTH MARTI models + Curiosity models/meshes
+    # --- env: make sure Gazebo can find BOTH SpaceTry 🥐 models + Curiosity models/meshes
     env_gz_plugin = SetEnvironmentVariable(
         "GZ_SIM_SYSTEM_PLUGIN_PATH",
         os.pathsep.join(
@@ -89,16 +89,16 @@ def generate_launch_description():
         os.pathsep.join(
             [
                 os.environ.get("GZ_SIM_RESOURCE_PATH", ""),
-                marti_models_root,
+                spacetry_models_root,
                 os.path.join(curiosity_gazebo_share, "models"),
                 curiosity_desc_share,
             ]
         ),
     )
 
-    # --- launch MARTI world (your existing launch)
+    # --- launch SpaceTry 🥐 world (your existing launch)
     mars_outpost_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(marti_world_share, "launch", "mars_outpost.launch.py")),
+        PythonLaunchDescriptionSource(os.path.join(spacetry_world_share, "launch", "mars_outpost.launch.py")),
         launch_arguments={"headless": headless}.items(),
     )
 
@@ -117,11 +117,11 @@ def generate_launch_description():
     waypoint_name = "dock_pad_01"  # default
     try:
         # If user passes spawn_waypoint at runtime, it will override, but we keep the default stable.
-        waypoint_name = os.environ.get("MARTI_SPAWN_WAYPOINT", waypoint_name)
+        waypoint_name = os.environ.get("SPACETRY_SPAWN_WAYPOINT", waypoint_name)
     except Exception:
         pass
 
-    base_x, base_y, base_yaw = _load_waypoint_pose(marti_mission_cfg, waypoint_name)
+    base_x, base_y, base_yaw = _load_waypoint_pose(spacetry_mission_cfg, waypoint_name)
 
     # Spawn Curiosity via ros_gz_sim create using -param robot_description
     # ros_gz_sim/create.cpp shows -param reads XML from a ROS param on the create node, and -Y is yaw in radians. :contentReference[oaicite:0]{index=0}
@@ -227,7 +227,7 @@ def generate_launch_description():
             DeclareLaunchArgument(
                 "spawn_waypoint",
                 default_value="dock_pad_01",
-                description="Waypoint name in marti_mission/config/waypoints.yaml to spawn near.",
+                description="Waypoint name in spacetry_mission/config/waypoints.yaml to spawn near.",
             ),
             DeclareLaunchArgument(
                 "spawn_z",

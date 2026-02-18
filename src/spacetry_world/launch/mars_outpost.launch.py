@@ -8,9 +8,9 @@ import os
 def generate_launch_description():
     headless = LaunchConfiguration("headless")
 
-    models_root = os.path.join(get_package_share_directory("marti_models"), "models")
+    models_root = os.path.join(get_package_share_directory("spacetry_models"), "models")
     curiosity_models = os.path.join(get_package_share_directory("curiosity_gazebo"), "models")
-    world_file = os.path.join(get_package_share_directory("marti_world"), "worlds", "mars_outpost.sdf")
+    world_file = os.path.join(get_package_share_directory("spacetry_world"), "worlds", "mars_outpost.sdf")
 
     # Prepend our models paths to any existing resource path
     gz_path = os.environ.get("GZ_SIM_RESOURCE_PATH", "")

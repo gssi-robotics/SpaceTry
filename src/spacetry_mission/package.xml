@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="3">
-  <name>marti_mission</name>
+  <name>spacetry_mission</name>
   <version>0.0.0</version>
-  <description>MARTI mission configuration and tooling</description>
+  <description>SpaceTry 🥐 mission configuration and tooling</description>
 
   <maintainer email="TODO@TODO.com">TODO</maintainer>
   <license>Apache-2.0</license>
