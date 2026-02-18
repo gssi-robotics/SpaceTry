@@ -1,6 +1,5 @@
-# SpaceTry 🥐 — Mars Autonomous Rover Training Infrastructure
-
-Course-grade Mars mission demo pack for Space ROS + Behavior Trees.
+# SpaceTry 🥐 — <u>Space</u> <u>T</u>raining <u>R</u>over Autonom<u>Y</u>
+SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees. 
 
 ## Project layout (reference)
 * ```docker/``` — Dockerfile + compose + entrypoint
