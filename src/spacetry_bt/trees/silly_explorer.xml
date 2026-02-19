@@ -1,4 +1,4 @@
-<root main_tree_to_execute="MainTree">
+<root BTCPP_format="4" main_tree_to_execute="MainTree">
   <BehaviorTree ID="MainTree">
     <Fallback name="Root">
 
@@ -33,14 +33,14 @@
           <!-- "Scan": wiggle mast + arm -->
           <CallEmptyService service="/mast_open"/>
           <CallEmptyService service="/open_arm"/>
-          <Sleep duration_s="0.8"/>
+          <SleepRos duration_s="0.8"/>
           <CallEmptyService service="/mast_rotate"/>
-          <Sleep duration_s="0.8"/>
+          <SleepRos duration_s="0.8"/>
           <CallEmptyService service="/close_arm"/>
           <CallEmptyService service="/mast_close"/>
 
           <!-- Keep tree RUNNING unless the 'found' branch triggers -->
-          <Sleep duration_s="0.1"/>
+          <SleepRos duration_s="0.1"/>
         </Sequence>
 
       </ReactiveFallback>

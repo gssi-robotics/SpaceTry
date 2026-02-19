@@ -1,5 +1,6 @@
 #include <behaviortree_cpp/bt_factory.h>
 #include <behaviortree_cpp/loggers/bt_cout_logger.h>
+#include <behaviortree_cpp/actions/sleep_node.h>
 #include <rclcpp/rclcpp.hpp>
 
 #include "spacetry_bt/nodes_ros.hpp"
@@ -30,7 +31,7 @@ int main(int argc, char** argv) {
 
   BT::BehaviorTreeFactory factory;
   factory.registerNodeType<spacetry_bt::CallEmptyService>("CallEmptyService");
-  factory.registerNodeType<spacetry_bt::Sleep>("Sleep");
+  factory.registerNodeType<spacetry_bt::Sleep>("SleepRos");
   factory.registerNodeType<spacetry_bt::TimedMotion>("TimedMotion");
   factory.registerNodeType<spacetry_bt::ObstacleTooClose>("ObstacleTooClose");
   factory.registerNodeType<spacetry_bt::PickRandomTurn>("PickRandomTurn");
