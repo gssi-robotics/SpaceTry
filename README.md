@@ -40,7 +40,7 @@ Start a container shell using the provided script:
 
 Enter the container: 
 ```bash
-docker exec -it docker-marti-1 bash 
+docker exec -it docker-spacetry-1 bash 
 ```
 
 Insider the container, build:
