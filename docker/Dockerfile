@@ -51,6 +51,12 @@ RUN apt-get update -qq && \
       ros-${ROS_DISTRO}-nav2-rviz-plugins && \
     rm -rf /var/lib/apt/lists/*
 
+# Install BehaviorTree.CPP
+RUN apt-get update -qq && \
+    apt-get install -y \
+      ros-${ROS_DISTRO}-behaviortree-cpp\
+    && rm -rf /var/lib/apt/lists/*
+
 # Make every login shell (bash -l / bash -lc) see BOTH Jazzy (apt) and Space ROS
 RUN tee /etc/profile.d/spacetry_ros_env.sh >/dev/null <<'EOF' && chmod 0644 /etc/profile.d/spacetry_ros_env.sh
 # SpaceTry: ensure ROS Jazzy underlay + Space ROS overlay are always present
