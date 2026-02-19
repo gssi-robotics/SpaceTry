@@ -126,12 +126,20 @@ BT::NodeStatus ObstacleTooClose::tick() {
   return (m < threshold_) ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
 }
 
+PickRandomTurn::PickRandomTurn(const std::string& name, const BT::NodeConfig& config)
+: BT::SyncActionNode(name, config)
+{}
+
 BT::NodeStatus PickRandomTurn::tick() {
   static thread_local std::mt19937 rng{std::random_device{}()};
   std::uniform_int_distribution<int> d(0, 1);
   setOutput("dir", d(rng) == 0 ? std::string("left") : std::string("right"));
   return BT::NodeStatus::SUCCESS;
 }
+
+RandomSuccess::RandomSuccess(const std::string& name, const BT::NodeConfig& config)
+: BT::ConditionNode(name, config)
+{}
 
 BT::NodeStatus RandomSuccess::tick() {
   double p = getInput<double>("probability").value_or(0.1);
