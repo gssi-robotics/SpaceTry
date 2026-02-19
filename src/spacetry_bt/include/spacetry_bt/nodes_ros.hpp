@@ -26,7 +26,7 @@ class Sleep : public BT::StatefulActionNode {
 public:
   Sleep(const std::string& name, const BT::NodeConfiguration& cfg);
   static BT::PortsList providedPorts() {
-    return { BT::InputPort<double>("duration_s", 0.5) };
+    return { BT::InputPort<double>("duration_s", 0.5, "Duration in seconds") };
   }
   BT::NodeStatus onStart() override;
   BT::NodeStatus onRunning() override;
@@ -47,8 +47,8 @@ public:
   static BT::PortsList providedPorts() {
     return {
       BT::InputPort<std::string>("start_service"),
-      BT::InputPort<std::string>("stop_service", "/move_stop"),
-      BT::InputPort<double>("duration_s", 5.0)
+      BT::InputPort<std::string>("stop_service", "/move_stop", "ROS name (topic/service)"),
+      BT::InputPort<double>("duration_s", 5.0, "Duration in seconds")
     };
   }
   BT::NodeStatus onStart() override;
@@ -72,8 +72,8 @@ public:
   ObstacleTooClose(const std::string& name, const BT::NodeConfiguration& cfg);
   static BT::PortsList providedPorts() {
     return {
-      BT::InputPort<std::string>("topic", "/scan"),
-      BT::InputPort<double>("threshold_m", 1.0)
+      BT::InputPort<std::string>("topic", "/scan", "ROS name (topic/service)"),
+      BT::InputPort<double>("threshold_m", 1.0, "Obstacle threshold (meters)")
     };
   }
   BT::NodeStatus tick() override;
@@ -107,7 +107,7 @@ class RandomSuccess : public BT::ConditionNode {
 public:
   RandomSuccess(const std::string& name, const BT::NodeConfiguration& cfg);
   static BT::PortsList providedPorts() {
-    return { BT::InputPort<double>("probability", 0.1) };
+    return { BT::InputPort<double>("probability", 0.1, "Success probability [0..1]") };
   }
   BT::NodeStatus tick() override;
 };
