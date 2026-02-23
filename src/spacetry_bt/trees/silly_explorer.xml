@@ -1,0 +1,49 @@
+<root BTCPP_format="4" main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <Fallback name="Root">
+
+      <!-- SUCCESS path: "found sample" (stub), then take a 'photo' placeholder -->
+      <Sequence name="IfFoundThenDone">
+        <RandomSuccess probability="0.08"/>
+        <!-- placeholder for now: you can later replace with real CapturePhoto -->
+        <CallEmptyService service="/mast_open"/>
+        <CallEmptyService service="/mast_close"/>
+      </Sequence>
+
+      <!-- Otherwise, keep exploring -->
+      <ReactiveFallback name="ExploreOrAvoid">
+
+        <!-- Obstacle avoidance -->
+        <Sequence name="AvoidObstacle">
+          <ObstacleTooClose topic="/scan" threshold_m="1.0"/>
+          <CallEmptyService service="/move_stop"/>
+          <PickRandomTurn dir="{turn_dir}"/>
+          <SelectTurnService dir="{turn_dir}" service="{turn_srv}"/>
+          <TimedMotion start_service="{turn_srv}" stop_service="/move_stop" duration_s="1.2"/>
+        </Sequence>
+
+        <!-- Exploration cycle -->
+        <Sequence name="ExploreCycle">
+          <PickRandomTurn dir="{turn_dir}"/>
+          <SelectTurnService dir="{turn_dir}" service="{turn_srv}"/>
+          <TimedMotion start_service="{turn_srv}" stop_service="/move_stop" duration_s="0.8"/>
+
+          <TimedMotion start_service="/move_forward" stop_service="/move_stop" duration_s="5.0"/>
+
+          <!-- "Scan": wiggle mast + arm -->
+          <CallEmptyService service="/mast_open"/>
+          <CallEmptyService service="/open_arm"/>
+          <SleepRos duration_s="0.8"/>
+          <CallEmptyService service="/mast_rotate"/>
+          <SleepRos duration_s="0.8"/>
+          <CallEmptyService service="/close_arm"/>
+          <CallEmptyService service="/mast_close"/>
+
+          <!-- Keep tree RUNNING unless the 'found' branch triggers -->
+          <SleepRos duration_s="0.1"/>
+        </Sequence>
+
+      </ReactiveFallback>
+    </Fallback>
+  </BehaviorTree>
+</root>
