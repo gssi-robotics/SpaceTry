@@ -217,6 +217,21 @@ def generate_launch_description():
         )
     )
 
+
+    # --- LiDAR obstacle direction (front/left/right topics for BT)
+    obstacle_direction = Node(
+        package="spacetry_perception",
+        executable="obstacle_direction_node",
+        name="obstacle_direction",
+        output="screen",
+        parameters=[{
+            "use_sim_time": True,
+            "scan_topic": "/scan",
+            "base_frame": "base_link",
+            "threshold_m": 10.0,
+        }],
+    )
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
@@ -258,6 +273,7 @@ def generate_launch_description():
             odom_node,
             ros_gz_bridge,
             image_bridge,
+            obstacle_direction,
             # Controller chain
             RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[set_hardware_interface_active])),
             RegisterEventHandler(OnProcessExit(target_action=set_hardware_interface_active, on_exit=[load_joint_state_broadcaster])),
