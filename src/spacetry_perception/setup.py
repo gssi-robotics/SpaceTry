@@ -1,6 +1,11 @@
 from setuptools import setup
+from pathlib import Path
 
 package_name = 'spacetry_perception'
+
+# Robustness: ensure the ament resource marker exists even if missing in the repo
+Path('resource').mkdir(exist_ok=True)
+(Path('resource') / package_name).touch(exist_ok=True)
 
 setup(
     name=package_name,
