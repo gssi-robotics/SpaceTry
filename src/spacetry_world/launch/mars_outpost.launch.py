@@ -16,7 +16,7 @@ def generate_launch_description():
     gz_path = os.environ.get("GZ_SIM_RESOURCE_PATH", "")
     new_gz_path = f"{models_root}:{curiosity_models}" if gz_path == "" else f"{models_root}:{curiosity_models}:{gz_path}"
 
-    gz_args = ["gz", "sim", "-r", world_file]
+    gz_args = ["gz", "sim", "-r", "-v 4","--render-engine-server", "ogre2", world_file]
     # Headless server mode
     # -s starts server-only; still fine even if headless=0, but keep switch explicit
     gz_args_headless = ["gz", "sim", "-s", "-r", world_file]
