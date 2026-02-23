@@ -52,8 +52,17 @@
     </gui>
 
     <!-- Physics: 4 ms step (vs 1 ms default) = 4x fewer iterations, still fine for rover nav -->
-    <physics name="mars_physics" type="ode">
-      <max_step_size>0.004</max_step_size>
+    <physics type="ode">
+      <ode>
+        <solver>
+          <type>quick</type>
+        </solver>
+        <constraints>
+          <contact_max_correcting_vel>0.1</contact_max_correcting_vel>
+          <contact_surface_layer>0.0001</contact_surface_layer>
+        </constraints>
+      </ode>
+      <max_step_size>0.004</max_step_size> <!-- 0.01 -->
       <real_time_factor>1.0</real_time_factor>
       <real_time_update_rate>250</real_time_update_rate>
     </physics>
@@ -75,7 +84,7 @@
 
     <!-- Sunlight (no external model dependency) -->
     <light type="directional" name="sun">
-      <cast_shadows>true</cast_shadows>
+      <cast_shadows>false</cast_shadows>
       <pose>0 0 10 0 0 0</pose>
       <diffuse>0.8 0.8 0.8 1</diffuse>
       <specular>0.2 0.2 0.2 1</specular>
@@ -92,45 +101,28 @@
     <include>
       <name>outpost_habitat_01</name>
       <uri>model://station</uri>
-      <pose>145 50 -10.65 1.53 0 5.0</pose>
+      <pose>60 -5 -10.65 1.53 0 5.0</pose>
+       <pose>66.00 0 -10.80 -1.1 -0.10 3.07</pose>
     </include>
 
     <include>
       <name>solar_panel</name>
       <uri>model://solar_panel</uri>
-      <pose>145 60 -8.7 1.60 -0.40 0</pose>
+      <pose>60 1 -9.0 1.60 -0.60 0.30</pose>
     </include>
 
     <!-- Science targets -->
     <include>
       <name>science_rock_01</name>
       <uri>model://rock_5</uri>
-      <pose>66.00 0 -10.80 -1.1 -0.10 3.07</pose>
-    </include>
-
-    <include>
-      <name>science_rock_02</name>
-      <uri>model://rock_5</uri>
-      <pose>50.10 -100 -14.90 0 0 0</pose>
-    </include>
-
-    <include>
-      <name>science_rock_03</name>
-      <uri>model://rock_5</uri>
-      <pose>-120 40 9.90 1.60 -0.30 1.20</pose>
-    </include>
-
-    <include>
-      <name>science_rock_04</name>
-      <uri>model://rock_5</uri>
-      <pose>-120 -115 -12.40 0 -0.40 0</pose>
+      <pose>50.10 -80.0 -14.50 -1.1 -0.10 3.07</pose>
     </include>
 
     <!-- Hazard patch -->
     <include>
       <uri>model://block_island</uri>
       <name>block_island</name>
-      <pose>-50 -70 0 0 0 1.50</pose>
+      <pose>-18 -35.50 0 0 0 1.50</pose>
     </include>
 
 
