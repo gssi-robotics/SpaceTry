@@ -1,4 +1,4 @@
-material FllingRocks/FallingRocks_Diffuse
+material FallingRocks/FallingRocks_Diffuse
 {
   technique
   {
