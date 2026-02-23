@@ -5,22 +5,28 @@ services:
       - PYTHONUNBUFFERED=1 # important to show error messages if a ros service crashes!
       - DISPLAY # for UI
       - QT_X11_NO_MITSHM=1 #fix some QT bugs
-      - NVIDIA_VISIBLE_DEVICES=all # for docker-nvidia2
-      - NVIDIA_DRIVER_CAPABILITIES=all # for docker-nvidia2
       - XDG_RUNTIME_DIR
-      - __NV_PRIME_RENDER_OFFLOAD=1
-      - __GLX_VENDOR_LIBRARY_NAME=nvidia
       - XAUTHORITY=$XAUTHORITY
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      # --- GPU vendor-agnostic: let the DRI device + Mesa/driver sort it out ---
+      # NVIDIA-specific (ignored by non-NVIDIA drivers)
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      # Mesa/Vulkan: prefer the first DRI render node (works for AMD, Intel, NVIDIA open)
+      - MESA_LOADER_DRIVER_OVERRIDE=${MESA_LOADER_DRIVER_OVERRIDE:-}
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw # for UI
       - /run/user:/run/user:ro # for UI
-      - /home/$(whoami)/.Xauthority:/home/$(whoami)/.Xauthority:ro  # Mount XAUTHORITY file
+      #- /home/$(whoami)/.Xauthority:/home/$(whoami)/.Xauthority:ro  # Mount XAUTHORITY file
+    devices:
+      - /dev/dri:/dev/dri # GPU device access — works for ANY GPU vendor
     network_mode: host
     privileged: true # for UI
     build:
       context: ..
       dockerfile: docker/Dockerfile
+      args:
+        RENDER_GID: ${RENDER_GID:-109}
     image: spacetry:dev
     entrypoint: ["bash", "-lc"]
     command: ["echo 'SpaceTry compose OK' && sleep infinity"]
