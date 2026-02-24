@@ -32,7 +32,7 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64 \
-            -t marti:ci \
+            -t spacetry:ci \
             -f "${GITHUB_WORKSPACE}/docker/Dockerfile" \
             --load \
             "${GITHUB_WORKSPACE}"
@@ -41,4 +41,4 @@ jobs:
         run: |
           docker run --rm --platform linux/amd64 \
             -v "${GITHUB_WORKSPACE}:/ws" -w /ws \
-            marti:ci bash -lc './scripts/smoke_test.sh'
+            spacetry:ci bash -lc './scripts/smoke_test.sh'
