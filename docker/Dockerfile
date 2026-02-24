@@ -86,6 +86,10 @@ WORKDIR /ws
 # Copy repo into image. Chown so runtime user can work in /ws when not bind-mounted.
 COPY --chown=${USERNAME}:${USERNAME} . /ws
 
+# Remove any stale colcon artifacts that slipped past .dockerignore
+# (prevents broken package.dsv files from a previous host build)
+RUN rm -rf /ws/build /ws/install /ws/log
+
 # Add GitHub host key to known_hosts to avoid interactive prompt
 RUN mkdir -p -m 0700 /root/.ssh && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
@@ -128,6 +132,11 @@ RUN for d in /opt/spacetry_deps/space_ros_demos/*; do \
 # Ensure runtime user can read cached deps and work in /ws.
 RUN chown -R ${USERNAME}:${USERNAME} /opt/spacetry_deps /ws
 RUN install -m 0644 /ws/docker/spacetry_ws_overlay.sh /etc/profile.d/spacetry_ws_overlay.sh
+
+# Add runtime user to video and render groups for GPU device access (/dev/dri)
+# Use host's render GID (default 109) so container user can access /dev/dri/renderD*
+ARG RENDER_GID=109
+RUN groupadd -f -g ${RENDER_GID} render && usermod -a -G video,render ${USERNAME}
 
 # Drop privileges for runtime
 USER ${USERNAME}
