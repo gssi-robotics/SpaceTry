@@ -13,6 +13,7 @@ services:
       - XAUTHORITY=$XAUTHORITY
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
     volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
       - /tmp/.X11-unix:/tmp/.X11-unix:rw # for UI
       - /run/user:/run/user:ro # for UI
       - /home/$(whoami)/.Xauthority:/home/$(whoami)/.Xauthority:ro  # Mount XAUTHORITY file
@@ -21,6 +22,8 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
+      ssh:
+        default: $SSH_AUTH_SOCK
     image: spacetry:dev
     entrypoint: ["bash", "-lc"]
     command: ["echo 'SpaceTry compose OK' && sleep infinity"]

@@ -86,8 +86,15 @@ WORKDIR /ws
 # Copy repo into image. Chown so runtime user can work in /ws when not bind-mounted.
 COPY --chown=${USERNAME}:${USERNAME} . /ws
 
-# Import pinned Space ROS demos into the image workspace.
-RUN rm -rf /ws/src/space_ros_demos && \
+# Add GitHub host key to known_hosts to avoid interactive prompt
+RUN mkdir -p -m 0700 /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# Import pinned Space ROS demos via SSH
+RUN --mount=type=ssh \
+    mkdir -p /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts && \
+    rm -rf /ws/src/space_ros_demos && \
     mkdir -p /ws/src && \
     vcs import /ws/src < /ws/deps/spacetry.repos
 
