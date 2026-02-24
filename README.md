@@ -2,12 +2,18 @@
 SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees. 
 
 ## Project layout (reference)
-* ```docker/``` — Dockerfile + compose + entrypoint
-* ```scripts/``` — build/run/smoke test/validator
-* ```src/``` — ROS 2 packages:
-    * ```spacetry_world``` — Gazebo world(s)
-    * ```spacetry_models``` — local Gazebo models
-    * ```spacetry_mission``` — mission YAML configs
+* `docker/` — Dockerfile + compose + entrypoint
+* `scripts/` — build / run / smoke test / validator
+* `deps/` — pinned external repos (`spacetry.repos`)
+* `src/` — ROS 2 packages & Gazebo assets:
+
+   * `spacetry_world` — Extension of the space-ros curiosity Mars world and launch files ([description](src/spacetry_world/worlds/README.md))
+   * `spacetry_models` — Gazebo models ( [description](src/spacetry_models/models/README.md))
+   * `spacetry_bringup` — integration launch files (rover + world + bridges)
+   * `spacetry_bt` — BehaviorTree.CPP-based mission runner
+   * `spacetry_mission` — mission YAML configs and tooling
+   * `spacetry_battery` — battery manager node
+   * `spacetry_perception` — perception helpers (LiDAR obstacle direction)
 
 ## Quickstart (Docker-only)
 
@@ -43,14 +49,14 @@ Enter the container:
 docker exec -it docker-spacetry-1 bash 
 ```
 
-Insider the container, build:
+Inside the container, build:
 ```bash
 source /opt/ros/spaceros/setup.bash
 source /etc/profile 
 colcon build --merge-install --event-handlers console_direct+
 ```
 
-Insider the container, run:
+Inside the container, run:
 ```bash
 source /ws/install/setup.bash
 ros2 launch spacetry_world mars_outpost.launch.py

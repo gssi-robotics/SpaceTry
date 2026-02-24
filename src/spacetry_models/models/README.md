@@ -2,6 +2,8 @@ We have extended the [space ros curiosity demo repository world](https://github.
 
 We also added the following models from Gazebo and Sketchfab:
 - [Block Island Meteorite](https://science.nasa.gov/3d-resources/block-island/)
-- [Target Rock](https://app.gazebosim.org/OpenRobotics/fuel/models/Large%20Rock%20Fall)
-- [Outpost/Base Station](https://skfb.ly/oUuWz)
+- [Science Rock](https://app.gazebosim.org/OpenRobotics/fuel/models/Falling%20Rock%205)
+- [Outpost/Base Station](https://skfb.ly/oUuYJ)
 - [Solar Panel](https://skfb.ly/oQtBs)
+
+Details on the models licenses and authors can be found in the respective .config files. Some of the models configuration were changed to optimize the performance of the simulation.
