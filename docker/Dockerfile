@@ -90,10 +90,15 @@ COPY --chown=${USERNAME}:${USERNAME} . /ws
 RUN mkdir -p -m 0700 /root/.ssh && \
     ssh-keyscan github.com >> /root/.ssh/known_hosts
 
-# Import pinned Space ROS demos via SSH
-RUN --mount=type=ssh \
+# Import pinned Space ROS demos.
+# When SSH agent is available (local dev), uses git@github.com URLs from spacetry.repos.
+# When not (CI), rewrites SSH URLs to HTTPS for public repos.
+RUN --mount=type=ssh,required=false \
     mkdir -p /root/.ssh && \
-    ssh-keyscan github.com >> /root/.ssh/known_hosts && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts 2>/dev/null && \
+    if ! ssh -o BatchMode=yes -T git@github.com 2>&1 | grep -q 'successfully authenticated'; then \
+      git config --global url."https://github.com/".insteadOf "git@github.com:"; \
+    fi && \
     rm -rf /ws/src/space_ros_demos && \
     mkdir -p /ws/src && \
     vcs import /ws/src < /ws/deps/spacetry.repos
