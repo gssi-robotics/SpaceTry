@@ -109,6 +109,7 @@ You should see:
 
 <details>
 <summary> 6. Launch Curiosity rover (GUI or headless) </summary>
+
    ## Run SpaceTry 🥐 with the Curiosity Mars Rover
 
    SpaceTry 🥐 includes a bringup that launches:
@@ -188,7 +189,7 @@ You should see:
 <details>
 <summary> 7. Stop SpaceTry 🥐 </summary>
 
-After closing Gazebo GUI, exit all the dockers with:
+After closing Gazebo GUI, exit all the containers bash with:
 
 ```bash
 exit
