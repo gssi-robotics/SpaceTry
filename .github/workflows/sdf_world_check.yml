@@ -10,32 +10,83 @@ on:
     paths:
       - "src/spacetry_world/worlds/mars_outpost.sdf"
 
+env:
+  GZ_VERSION: harmonic
+  # Pinned commit from deps/spacetry.repos
+  DEMOS_COMMIT: acf369b
+
 jobs:
   container-check:
     runs-on: ubuntu-latest
     container:
-      image: gazebo:latest
+      image: ubuntu:noble
       options: --user root
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check version
+      - name: Install Gazebo Harmonic
         run: |
           set -eu
-          echo "gz version"
-          command -v gz
-          gz sdf --version
+          apt-get update -qq
+          apt-get install -y -qq wget lsb-release gnupg curl ca-certificates
+          wget -q https://packages.osrfoundation.org/gazebo.gpg \
+            -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] \
+            http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" \
+            > /etc/apt/sources.list.d/gazebo-stable.list
+          apt-get update -qq
+          apt-get install -y -qq gz-${GZ_VERSION}
+          rm -rf /var/lib/apt/lists/*
 
-      - name: Validate SDF
-        env:
-          GZ_SIM_RESOURCE_PATH: ${{ github.workspace }}/src/spacetry_models/models:$HOME/curiosity_ws/src/curiosity_gazebo/models:$HOME/curiosity_ws/src/curiosity_gazebo/curiosity_description
+      - name: Check Gazebo version
+        run: gz sim --version
+
+      - name: Fetch external models
         run: |
           set -eu
-          # Use headless gz sim to load and validate the world with model resolution
-          timeout 5 gz sim -s src/spacetry_world/worlds/mars_outpost.sdf 2>&1 | tee /tmp/sim.log || SIM_EXIT=$?
-          # Check for model resolution failures
-          if grep -q "Unable to find uri\|Error Code 14" /tmp/sim.log; then
-            echo "ERROR: Failed to resolve all models in SDF"
+          # Download curiosity_gazebo models from space-ros/demos at the pinned commit
+          mkdir -p /tmp/demos_src /tmp/ext_models
+          curl -sL "https://github.com/space-ros/demos/archive/${DEMOS_COMMIT}.tar.gz" \
+            | tar xz -C /tmp/demos_src --strip-components=1
+          cp -a /tmp/demos_src/curiosity_rover/curiosity_gazebo/models/* /tmp/ext_models/
+          echo "External models fetched:"
+          ls /tmp/ext_models/
+
+      - name: Validate SDF syntax
+        env:
+          GZ_SIM_RESOURCE_PATH: ${{ github.workspace }}/src/spacetry_models/models:/tmp/ext_models
+          SDF_PATH: ${{ github.workspace }}/src/spacetry_models/models:/tmp/ext_models
+        run: |
+          set -eu
+          gz sdf -k src/spacetry_world/worlds/mars_outpost.sdf
+          echo "SDF syntax valid"
+
+      - name: Check model URIs resolve
+        env:
+          EXTERNAL_MODELS: "curiosity_path"
+        run: |
+          set -eu
+          MODEL_DIR="src/spacetry_models/models"
+          EXT_DIR="/tmp/ext_models"
+          SDF_FILE="src/spacetry_world/worlds/mars_outpost.sdf"
+
+          MODELS=$(grep -oP 'model://\K[^</"]+' "$SDF_FILE" | sort -u)
+          FAIL=0
+
+          for model in $MODELS; do
+            if [ -d "$MODEL_DIR/$model" ]; then
+              echo "  OK (repo):     $model"
+            elif [ -d "$EXT_DIR/$model" ]; then
+              echo "  OK (external): $model"
+            else
+              echo "  MISSING:       $model"
+              FAIL=1
+            fi
+          done
+
+          if [ "$FAIL" -ne 0 ]; then
+            echo "::error::One or more model URIs could not be resolved"
             exit 1
           fi
-          echo "World SDF validated successfully"
+          echo "All model URIs resolved"
+
