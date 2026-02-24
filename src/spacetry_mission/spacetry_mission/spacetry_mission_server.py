@@ -16,15 +16,15 @@ class MissionServer(Node):
         self._objects_path = f"{pkg_share}/config/objects.yaml"
 
         self._srv_wp = self.create_service(
-            Trigger, "/marti/mission/get_waypoints", self._handle_waypoints
+            Trigger, "/spacetry/mission/get_waypoints", self._handle_waypoints
         )
         self._srv_obj = self.create_service(
-            Trigger, "/marti/mission/get_objects", self._handle_objects
+            Trigger, "/spacetry/mission/get_objects", self._handle_objects
         )
 
         self.get_logger().info(f"Waypoints: {self._waypoints_path}")
         self.get_logger().info(f"Objects:   {self._objects_path}")
-        self.get_logger().info("Services ready: /marti/mission/get_waypoints, /marti/mission/get_objects")
+        self.get_logger().info("Services ready: /spacetry/mission/get_waypoints, /spacetry/mission/get_objects")
 
     def _load_yaml(self, path: str):
         with open(path, "r", encoding="utf-8") as f:
