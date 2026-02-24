@@ -1,0 +1,29 @@
+battery_manager:
+  ros__parameters:
+    capacity_wh: 120.0
+    initial_soc: 1.0
+    update_rate_hz: 10.0
+
+    cmd_vel_topic: /cmd_vel
+    joint_states_topic: /joint_states
+    odom_topic: /model/curiosity_mars_rover/odometry
+
+    outpost_x: 0.0
+    outpost_y: 0.0
+    outpost_radius_m: 2.0
+
+    arm_joint_patterns: ["*arm*"]
+    mast_joint_patterns: ["*mast*"]
+
+    drain_base_w: 4.0
+    drain_move_w_per_mps: 55.0
+    drain_turn_w_per_radps: 25.0
+    drain_arm_w: 30.0
+    drain_mast_w: 18.0
+
+    idle_recharge_w: 0.6
+    outpost_recharge_w: 90.0
+
+    vel_eps: 0.01
+    joint_vel_eps: 0.01
+    stale_timeout_s: 0.75
