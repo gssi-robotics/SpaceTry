@@ -15,8 +15,8 @@ Contents:
 * `deps/` — pinned external repos (`spacetry.repos`)
 * `src/` — ROS 2 packages & Gazebo assets:
 
-   * `spacetry_world` — Extension of the space-ros Curiosity Mars rover world and launch files ([description](src/spacetry_world/worlds/README.md))
-   * `spacetry_models` — Gazebo models ( [description](src/spacetry_models/models/README.md))
+   * `spacetry_world` — Extension of the space-ros Curiosity Mars rover world and launch files ([description](src/spacetry_world/README.md))
+   * `spacetry_models` — Gazebo models ( [description](src/spacetry_models/README.md))
    * `spacetry_bringup` — integration launch files (rover + world + bridges)
    * `spacetry_bt` — BehaviorTree.CPP-based mission runner
    * `spacetry_mission` — mission YAML configs and tooling
