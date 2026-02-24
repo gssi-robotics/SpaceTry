@@ -1,5 +1,12 @@
-# SpaceTry 🥐 — <u>Space</u> <u>T</u>raining <u>R</u>over Autonom<u>Y</u>
+<h1>SpaceTry 🥐 — <u>Space</u> <u>T</u>raining <u>R</u>over Autonom<u>Y</u></h1>
+
 SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees. 
+
+Contents:
+- [Project Layout](#project-layout-reference)
+- [Quickstart](#quickstart-docker-only)
+- [Run SpaceTry 🥐 (GUI or headless)](#run-spacetry--with-the-curiosity-mars-rover-gui-or-headless)
+- [Mission configuration](#mission-configuration)
 
 ## Project layout (reference)
 * `docker/` — Dockerfile + compose + entrypoint
@@ -28,9 +35,9 @@ From the repo root:
 
 ### 2) Verify your setup
 
-Run the smoke test (builds the workspace if needed, loads the world headless, validates configs):
-```
-./scripts/smoke_test.sh
+Run the smoke test (builds the workspace, loads the world headless, validates configs):
+```bash
+docker run --rm --platform linux/amd64 spacetry:dev /ws/scripts/smoke_test.sh
 ```
 
 You should see:
