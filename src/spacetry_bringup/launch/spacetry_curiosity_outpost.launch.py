@@ -25,10 +25,12 @@ from launch.actions import (
 )
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import IfCondition
 
 from launch_ros.actions import Node, SetParameter
-
+from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 def _load_waypoint_pose(waypoints_yaml: str, waypoint_name: str):
     """
@@ -57,6 +59,7 @@ def generate_launch_description():
     spawn_x_offset = LaunchConfiguration("spawn_x_offset")
     spawn_y_offset = LaunchConfiguration("spawn_y_offset")
     spawn_yaw_offset = LaunchConfiguration("spawn_yaw_offset")
+    battery = LaunchConfiguration("battery")
 
     # --- paths
     spacetry_world_share = get_package_share_directory("spacetry_world")
@@ -167,6 +170,25 @@ def generate_launch_description():
         output="screen",
     )
 
+    battery_params = PathJoinSubstitution(
+        [FindPackageShare("spacetry_battery"), "config", "battery_manager.yaml"]
+    )
+
+    battery_manager = Node(
+        package="spacetry_battery",
+        executable="battery_manager",
+        name="battery_manager",
+        output="screen",
+        parameters=[
+            battery_params,
+            {
+                "outpost_x": base_x,
+                "outpost_y": base_y,
+                "initial_soc": ParameterValue(battery, value_type=float),
+            },
+        ],
+    )
+
     # --- controllers: same sequence used by the Space ROS demo
     component_state_msg = '{name: "GazeboSystem", target_state: {id: 3, label: ""}}'
 
@@ -249,6 +271,11 @@ def generate_launch_description():
                 default_value="0.0",
                 description="(Reserved) Spawn yaw offset (radians) from the waypoint.",
             ),
+            DeclareLaunchArgument(
+                "battery",
+                default_value="1.0",
+                description="Initial battery SOC fraction (0.0..1.0). Example: battery:=0.2 starts at 20%.",
+            ),
             env_gz_plugin,
             env_gz_resource,
             SetParameter(name="use_sim_time", value=True),
@@ -258,6 +285,7 @@ def generate_launch_description():
             odom_node,
             ros_gz_bridge,
             image_bridge,
+            battery_manager,
             # Controller chain
             RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[set_hardware_interface_active])),
             RegisterEventHandler(OnProcessExit(target_action=set_hardware_interface_active, on_exit=[load_joint_state_broadcaster])),
