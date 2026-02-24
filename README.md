@@ -6,7 +6,7 @@ Contents:
 - [Project Layout](#project-layout)
 - [Dependencies & Requirements](#dependencies--requirements)
 - [Quickstart](#quickstart-docker-only)
-- [Step-by-Step: Run SpaceTry 🥐](#step-by-step-run-spacetry-)
+- [Step-by-Step: Run SpaceTry 🥐](#step-by-step-run-spacetry--with-the-curiosity-rover)
 - [Mission configuration](#spacetry--mission-configuration)
 
 ## Project layout
