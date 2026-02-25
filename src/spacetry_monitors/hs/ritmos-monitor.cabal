@@ -1,0 +1,14 @@
+cabal-version:      3.0
+name:               ritmos-monitor
+version:            0.1.0.0
+build-type:         Simple
+
+executable main
+  hs-source-dirs:   .
+  main-is:          Main.hs
+  other-modules:    Copilot.PtLTL, CuriosityMonitor
+  build-depends:    base >=4.14 && <5,
+                    copilot-language,
+                    copilot-core,
+                    copilot-c99
+  default-language: Haskell2010
