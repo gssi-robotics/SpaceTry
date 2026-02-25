@@ -1,0 +1,24 @@
+<root BTCPP_format="4" main_tree_to_execute="BaseMission">
+  <BehaviorTree ID="BaseMission">
+    <Sequence name="MissionSequence">
+      <!-- 1. Navigate to Science Rock waypoint -->
+      <NavigateToWaypoint waypoint="science_rock"/>
+
+      <!-- 2. Obstacle avoidance (front) -->
+      <Fallback name="ObstacleAvoidance">
+        <Sequence name="AvoidIfObstacle">
+          <ObstacleFront topic="/obstacle/front"/>
+          <AvoidObstacle/>
+        </Sequence>
+        <Pass/>
+      </Fallback>
+
+      <!-- 3. Align with Science Rock -->
+      <AlignWithGoal waypoint="science_rock"/>
+
+      <!-- 4. Stop and Observe (simulate photo) -->
+      <StopAndObserve duration_s="5.0"/>
+      <LogMessage message="Science rock reached"/>
+    </Sequence>
+  </BehaviorTree>
+</root>

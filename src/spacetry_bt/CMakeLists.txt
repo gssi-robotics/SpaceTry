@@ -29,4 +29,16 @@ install(DIRECTORY trees
   DESTINATION share/${PROJECT_NAME}
 )
 
+# Install Python BT runner as an executable script
+install(
+  PROGRAMS py_nodes/base_bt_runner.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install the entire py_nodes directory as a Python package
+install(
+  DIRECTORY py_nodes/
+  DESTINATION lib/${PROJECT_NAME}/py_nodes
+)
+
 ament_package()
