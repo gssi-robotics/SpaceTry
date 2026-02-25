@@ -154,12 +154,11 @@ class ObstacleDirectionNode(Node):
         now = self.get_clock().now()
         if (now - self._last_log_time).nanoseconds * 1e-9 >= self.log_period_s:
             self._last_log_time = now
-            self.get_logger().info(
-                f"scan_frame={scan_frame} valid={valid}/{len(msg.ranges)} "
-                f"range=[{msg.range_min:.2f},{msg.range_max:.2f}] "
-                f"min_any={min_any:.2f} front={min_front:.2f} left={min_left:.2f} right={min_right:.2f}"
-            )
-
+            # self.get_logger().info(
+            #     f"scan_frame={scan_frame} valid={valid}/{len(msg.ranges)} "
+            #     f"range=[{msg.range_min:.2f},{msg.range_max:.2f}] "
+            #     f"min_any={min_any:.2f} front={min_front:.2f} left={min_left:.2f} right={min_right:.2f}"
+            # )
 
 def main(args=None):
     rclpy.init(args=args)
