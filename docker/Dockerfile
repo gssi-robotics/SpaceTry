@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-controller-manager \
     ros-${ROS_DISTRO}-control-msgs \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
-    ros-${ROS_DISTRO}-py-trees \
     lsb-release wget gnupg \
  && rm -rf /var/lib/apt/lists/*
 
