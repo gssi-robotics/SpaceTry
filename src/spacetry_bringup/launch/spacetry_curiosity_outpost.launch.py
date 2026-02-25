@@ -299,7 +299,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "battery",
-                default_value="1.0",
+                default_value="0.2",
                 description="Initial battery SOC fraction (0.0..1.0). Example: battery:=0.2 starts at 20%.",
             ),
             env_gz_plugin,
