@@ -63,7 +63,7 @@ The Gazebo world (`mars_outpost.sdf`) defines a Martian environment with reduced
 
 Physics is tuned for performance: 4 ms step size at 250 Hz update rate (ODE solver, `quick` type), with shadows disabled.
 
-## SpaceTry Packages and Their Mission Role
+## SpaceTry packages and their role on the mission
 
 ### `spacetry_bt` — Behavior Tree mission runner
 

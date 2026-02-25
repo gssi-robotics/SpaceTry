@@ -94,23 +94,7 @@ You should see:
 </details>
 
 <details>
-<summary> 5.Launch the simulation environment </summary>
-
-   Inside the container, run:
-
-   ```bash
-   source /ws/install/setup.bash
-   ros2 launch spacetry_world mars_outpost.launch.py
-   ```
-
-> The launch file configures Gazebo resource paths so local models resolve without manually exporting environment variables.
-
-</details>
-
-<details>
-<summary> 6. Launch Curiosity rover (GUI or headless) </summary>
-
-   ## Run SpaceTry 🥐 with the Curiosity Mars Rover
+<summary> 5. Launch SpaceTry 🥐 with the Curiosity Mars Rover </summary>
 
    SpaceTry 🥐 includes a bringup that launches:
    - the `mars_outpost` world
@@ -125,11 +109,11 @@ You should see:
    docker exec -it docker-spacetry-1 bash 
    ```
 
-   ### 2) Build the workspace
+   ### 2) Setup the workspace
    Inside the container, run:
 
    ```bash
-   colcon build --merge-install --packages-select spacetry_battery spacetry_bringup
+   source /ws/install/setup.bash
    ```
 
    ### 3) Launch Curiosity in the outpost world
@@ -138,17 +122,16 @@ You should see:
    Inside the container, run:
 
    ```bash
-   source /ws/install/setup.bash
-   ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py headless:=0
+   ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=0
    ```
 
-   You should see Gazebo open with the outpost scene and the rover spawned nearby.
+   You should see Gazebo open with the outpost scene and the rover spawned nearby. The argument `battery:=0.5` sets the rover's initial battery state-of-charge.  
 
    #### Option B — Headless (CI / remote / no rendering)
    Inside the container, run:
    ```bash
    source /etc/profile
-   ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py headless:=1
+   ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1
    ```
 
    ### 4) Drive the rover using the Gazebo GUI
@@ -187,7 +170,7 @@ You should see:
 </details>
 
 <details>
-<summary> 7. Stop SpaceTry 🥐 </summary>
+<summary> 6. Stop SpaceTry 🥐 </summary>
 
 After closing Gazebo GUI, exit all the containers bash with:
 
@@ -198,7 +181,7 @@ exit
 And then from the repo root:
 
 ```bash
-docker compose -f docker/docker-compose.yaml stop
+docker compose -f docker/docker-compose.yaml down
 ```
 
 </details>
@@ -224,3 +207,4 @@ docker compose -f docker/docker-compose.yaml stop
    python3 /ws/scripts/validate_mission_config.py
    '
    ```
+> More details on the mission goals, configurations, and launch can be found in [MISSION.md](src/spacetry_mission/MISSION.md).
