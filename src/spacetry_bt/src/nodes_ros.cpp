@@ -31,7 +31,7 @@ double yawFromQuat(const geometry_msgs::msg::Quaternion& q)
   return std::atan2(siny_cosp, cosy_cosp);
 }
 
-// Minimum finite range in a sector [a0, a1] (radians, LaserScan frame)
+// Minimum valid (finite + within [range_min, range_max]) range in a sector [a0, a1]
 double sectorMin(const sensor_msgs::msg::LaserScan& scan, double a0, double a1)
 {
   if (scan.ranges.empty() || scan.angle_increment == 0.0) {
@@ -47,10 +47,20 @@ double sectorMin(const sensor_msgs::msg::LaserScan& scan, double a0, double a1)
   const int i0 = clampIndex(static_cast<int>(std::round((a0 - scan.angle_min) / scan.angle_increment)));
   const int i1 = clampIndex(static_cast<int>(std::round((a1 - scan.angle_min) / scan.angle_increment)));
 
+  const float rmin = scan.range_min;
+  const float rmax = scan.range_max;
+
   double m = std::numeric_limits<double>::infinity();
   for (int i = std::min(i0, i1); i <= std::max(i0, i1); ++i) {
     const float r = scan.ranges[static_cast<size_t>(i)];
-    if (std::isfinite(r)) m = std::min<double>(m, r);
+    if (!std::isfinite(r)) continue;
+
+    // Filter invalid samples that often appear as 0.0 or out-of-range.
+    if (r <= 0.0f) continue;
+    if (std::isfinite(rmin) && r < rmin) continue;
+    if (std::isfinite(rmax) && r > rmax) continue;
+
+    m = std::min<double>(m, r);
   }
   return m;
 }
@@ -120,7 +130,7 @@ void NavigateWithAvoidance::ensureInterfaces()
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
 
-  // Many Gazebo bridges publish odom as BEST_EFFORT; default Reliable subscriber may receive nothing.
+  // Gazebo/bridges frequently publish BEST_EFFORT; default Reliable subscriber can receive nothing.
   const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
 
   if (!odom_sub_) {
@@ -137,7 +147,7 @@ void NavigateWithAvoidance::ensureInterfaces()
     );
   }
 
-  // Same idea: depending on bridge/publisher, BEST_EFFORT avoids QoS mismatch.
+  // BestEffort here avoids QoS mismatch if obstacle topic is bridged.
   const auto obstacle_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
 
   if (!obstacle_front_sub_) {
@@ -218,12 +228,17 @@ BT::NodeStatus NavigateWithAvoidance::onStart()
   scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
   obstacle_front_topic_ = getInput<std::string>("obstacle_front_topic").value_or("/obstacle/front");
 
-  // Use last_odom_time_ as a "startup timer" so we can wait for the first odom message.
+  // Use last_odom_time_ as a startup timer/grace window until first odom message arrives.
   last_odom_time_ = node_->now();
 
   ensureInterfaces();
   avoiding_ = false;
   turn_sign_ = +1;
+
+  if (v_lin_ <= 0.0) {
+    RCLCPP_WARN(node_->get_logger(), "NavigateWithAvoidance: v_lin <= 0.0 (rover won't translate)");
+  }
+
   return BT::NodeStatus::RUNNING;
 }
 
@@ -255,8 +270,7 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
 
   const auto now = node_->now();
 
-  // --- ODOM handling ---
-  // If we haven't received odom yet, don't instantly fail: wait up to odom_timeout_s_.
+  // If no odom yet, wait up to odom_timeout_s_ rather than failing immediately.
   if (!have_odom) {
     publishStop();
     if ((now - t_odom).seconds() < odom_timeout_s_) {
@@ -267,7 +281,7 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
     return BT::NodeStatus::FAILURE;
   }
 
-  // If we have odom, but it's stale, fail.
+  // If odom stale, fail.
   if ((now - t_odom).seconds() > odom_timeout_s_) {
     publishStop();
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
@@ -284,17 +298,22 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
     return BT::NodeStatus::SUCCESS;
   }
 
-  // Prefer /obstacle/front if fresh; else fallback to /scan
+  // Decide obstacle: prefer /scan if fresh (reacts immediately as we rotate).
   bool front_blocked = false;
-  if (have_obs_front && (now - t_obs).seconds() < 1.0) {
-    front_blocked = obs_front;
-  } else if (have_scan && (now - t_scan).seconds() < 1.0) {
+  const bool scan_fresh = have_scan && (now - t_scan).seconds() < 1.0;
+  const bool obs_fresh  = have_obs_front && (now - t_obs).seconds() < 1.0;
+
+  if (scan_fresh) {
     front_blocked = (front < obstacle_threshold_);
+  } else if (obs_fresh) {
+    front_blocked = obs_front;
+  } else {
+    front_blocked = false;
   }
 
   if (front_blocked) {
     if (!avoiding_) {
-      // Choose the more free side if scan is available, else default left
+      // Choose the more free side if scan is available, else default left.
       if (have_scan && std::isfinite(left) && std::isfinite(right)) {
         turn_sign_ = (left >= right) ? +1 : -1;
       } else {
@@ -302,7 +321,14 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
       }
       avoiding_ = true;
     }
+
+    // Turn in place to clear obstacle.
     publishCmd(0.0, static_cast<double>(turn_sign_) * v_ang_);
+
+    RCLCPP_INFO_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
+                         "NavigateWithAvoidance: avoiding (front=%0.2f, left=%0.2f, right=%0.2f, thr=%0.2f)",
+                         front, left, right, obstacle_threshold_);
+
     return BT::NodeStatus::RUNNING;
   }
 
@@ -313,12 +339,26 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
   const double yaw_err = wrapPi(desired_yaw - yaw);
   const double ang = clamp(kp_yaw_ * yaw_err, -v_ang_, +v_ang_);
 
+  // Previously: lin was set to 0 when |yaw_err| > yaw_slow_rad_ (spin in place).
+  // Now: scale lin down but keep a small creep forward so it doesn't look "stuck".
   double lin = v_lin_;
-  if (std::fabs(yaw_err) > yaw_slow_rad_) {
-    lin = 0.0;
+  const double yaw_abs = std::fabs(yaw_err);
+
+  if (yaw_abs > yaw_slow_rad_) {
+    const double min_scale = 0.15;  // keep 15% forward creep
+    const double denom = std::max(1e-6, (kPi - yaw_slow_rad_));
+    const double scale = 1.0 - (yaw_abs - yaw_slow_rad_) / denom;
+    lin *= std::max(min_scale, clamp(scale, 0.0, 1.0));
   }
 
   publishCmd(lin, ang);
+
+  RCLCPP_INFO_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
+                       "NavigateWithAvoidance: dist=%0.2f yaw_err_deg=%0.1f lin=%0.2f ang=%0.2f (scan_fresh=%d front=%0.2f obs_fresh=%d obs=%d)",
+                       dist, yaw_err * 180.0 / kPi, lin, ang,
+                       static_cast<int>(scan_fresh), front,
+                       static_cast<int>(obs_fresh), static_cast<int>(obs_front));
+
   return BT::NodeStatus::RUNNING;
 }
 
@@ -342,7 +382,6 @@ void AlignToGoal::ensureInterfaces()
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
 
-  // Match Gazebo/bridge odom QoS (often BEST_EFFORT).
   const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
 
   if (!odom_sub_) {
@@ -391,7 +430,6 @@ BT::NodeStatus AlignToGoal::onStart()
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
   odom_topic_ = getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
 
-  // Startup timer/grace period for first odom message.
   last_odom_time_ = node_->now();
 
   ensureInterfaces();
@@ -415,7 +453,6 @@ BT::NodeStatus AlignToGoal::onRunning()
 
   const auto now = node_->now();
 
-  // If no odom yet, wait (RUNNING) up to odom_timeout_s_.
   if (!have_odom) {
     publishStop();
     if ((now - t_odom).seconds() < odom_timeout_s_) {
@@ -426,7 +463,6 @@ BT::NodeStatus AlignToGoal::onRunning()
     return BT::NodeStatus::FAILURE;
   }
 
-  // If odom stale, fail.
   if ((now - t_odom).seconds() > odom_timeout_s_) {
     publishStop();
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,

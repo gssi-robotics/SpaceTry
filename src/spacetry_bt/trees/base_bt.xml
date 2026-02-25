@@ -1,23 +1,25 @@
 <root BTCPP_format="4" main_tree_to_execute="Main">
   <BehaviorTree ID="Main">
     <Sequence name="MissionSequence">
-      <!-- 1) Select the goal waypoint and put it on the Blackboard -->
       <SetGoal waypoint="science_rock" goal="{goal}" />
 
-      <!-- 2) Navigate using odom + simple obstacle avoidance -->
       <NavigateWithAvoidance
         goal="{goal}"
-        v_lin="4.0"
-        v_ang="2.00"
-        dist_tol="1.00"
-        obstacle_threshold_m="3.00" />
+        v_lin="0.35"
+        v_ang="0.60"
+        dist_tol="0.80"
+        obstacle_threshold_m="1.00"
+        yaw_slow_deg="35.0"
+        kp_yaw="1.5"
+        odom_timeout_s="2.0" />
 
-      <!-- 3) Final alignment with the target -->
-      <AlignToGoal goal="{goal}" v_ang="0.40" yaw_tol_deg="10" />
+      <AlignToGoal
+        goal="{goal}"
+        v_ang="0.40"
+        yaw_tol_deg="10"
+        odom_timeout_s="2.0" />
 
-      <!-- 4) No camera: stop and observe -->
       <StopAndObserve seconds="3.0" />
-
       <LogMessage message="Science rock reached" />
     </Sequence>
   </BehaviorTree>
