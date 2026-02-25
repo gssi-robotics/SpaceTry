@@ -119,21 +119,30 @@ void NavigateWithAvoidance::ensureInterfaces()
   if (!cmd_pub_) {
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
+
+  // Many Gazebo bridges publish odom as BEST_EFFORT; default Reliable subscriber may receive nothing.
+  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
+
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
-      odom_topic_, 10,
+      odom_topic_, odom_qos,
       [this](nav_msgs::msg::Odometry::SharedPtr msg){ odomCb(std::move(msg)); }
     );
   }
+
   if (!scan_sub_) {
     scan_sub_ = node_->create_subscription<sensor_msgs::msg::LaserScan>(
       scan_topic_, rclcpp::SensorDataQoS(),
       [this](sensor_msgs::msg::LaserScan::SharedPtr msg){ scanCb(std::move(msg)); }
     );
   }
+
+  // Same idea: depending on bridge/publisher, BEST_EFFORT avoids QoS mismatch.
+  const auto obstacle_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
+
   if (!obstacle_front_sub_) {
     obstacle_front_sub_ = node_->create_subscription<std_msgs::msg::Bool>(
-      obstacle_front_topic_, 10,
+      obstacle_front_topic_, obstacle_qos,
       [this](std_msgs::msg::Bool::SharedPtr msg){ obstacleFrontCb(std::move(msg)); }
     );
   }
@@ -209,6 +218,9 @@ BT::NodeStatus NavigateWithAvoidance::onStart()
   scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
   obstacle_front_topic_ = getInput<std::string>("obstacle_front_topic").value_or("/obstacle/front");
 
+  // Use last_odom_time_ as a "startup timer" so we can wait for the first odom message.
+  last_odom_time_ = node_->now();
+
   ensureInterfaces();
   avoiding_ = false;
   turn_sign_ = +1;
@@ -242,10 +254,24 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
   }
 
   const auto now = node_->now();
-  if (!have_odom || (now - t_odom).seconds() > odom_timeout_s_) {
+
+  // --- ODOM handling ---
+  // If we haven't received odom yet, don't instantly fail: wait up to odom_timeout_s_.
+  if (!have_odom) {
+    publishStop();
+    if ((now - t_odom).seconds() < odom_timeout_s_) {
+      return BT::NodeStatus::RUNNING;
+    }
+    RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
+                          "NavigateWithAvoidance: odom not received");
+    return BT::NodeStatus::FAILURE;
+  }
+
+  // If we have odom, but it's stale, fail.
+  if ((now - t_odom).seconds() > odom_timeout_s_) {
     publishStop();
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
-                          "NavigateWithAvoidance: odom missing/stale");
+                          "NavigateWithAvoidance: odom stale");
     return BT::NodeStatus::FAILURE;
   }
 
@@ -315,9 +341,13 @@ void AlignToGoal::ensureInterfaces()
   if (!cmd_pub_) {
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
+
+  // Match Gazebo/bridge odom QoS (often BEST_EFFORT).
+  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
+
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
-      odom_topic_, 10,
+      odom_topic_, odom_qos,
       [this](nav_msgs::msg::Odometry::SharedPtr msg){ odomCb(std::move(msg)); }
     );
   }
@@ -361,6 +391,9 @@ BT::NodeStatus AlignToGoal::onStart()
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
   odom_topic_ = getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
 
+  // Startup timer/grace period for first odom message.
+  last_odom_time_ = node_->now();
+
   ensureInterfaces();
   return BT::NodeStatus::RUNNING;
 }
@@ -381,10 +414,23 @@ BT::NodeStatus AlignToGoal::onRunning()
   }
 
   const auto now = node_->now();
-  if (!have_odom || (now - t_odom).seconds() > odom_timeout_s_) {
+
+  // If no odom yet, wait (RUNNING) up to odom_timeout_s_.
+  if (!have_odom) {
+    publishStop();
+    if ((now - t_odom).seconds() < odom_timeout_s_) {
+      return BT::NodeStatus::RUNNING;
+    }
+    RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
+                          "AlignToGoal: odom not received");
+    return BT::NodeStatus::FAILURE;
+  }
+
+  // If odom stale, fail.
+  if ((now - t_odom).seconds() > odom_timeout_s_) {
     publishStop();
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
-                          "AlignToGoal: odom missing/stale");
+                          "AlignToGoal: odom stale");
     return BT::NodeStatus::FAILURE;
   }
 
