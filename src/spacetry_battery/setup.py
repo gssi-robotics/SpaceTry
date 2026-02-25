@@ -14,8 +14,8 @@ setup(
     ],
     install_requires=["setuptools"],
     zip_safe=True,
-    maintainer="spacetry",
-    maintainer_email="noreply@example.com",
+    maintainer="SpaceTry",
+    maintainer_email="ricardo.caldas@gssi.it",
     description="Standalone battery manager node",
     license="Apache-2.0",
     entry_points={

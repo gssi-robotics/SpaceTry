@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>Perception helpers for SpaceTry (LiDAR obstacle direction topics).</description>
 
-  <maintainer email="you@todo.todo">you</maintainer>
+  <maintainer email="ricardo.caldas@gssi.it">SpaceTry 🥐</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_python</buildtool_depend>

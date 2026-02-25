@@ -3,7 +3,7 @@
   <name>spacetry_battery</name>
   <version>0.0.0</version>
   <description>Standalone battery manager node</description>
-  <maintainer email="noreply@example.com">spacetry</maintainer>
+  <maintainer email="ricardo.caldas@gssi.it">SpaceTry 🥐</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_python</buildtool_depend>

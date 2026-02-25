@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>SpaceTry 🥐 bringup and integration launch files.</description>
 
-  <maintainer email="todo@example.com">SpaceTry 🥐</maintainer>
+  <maintainer email="ricardo.caldas@gssi.it">SpaceTry 🥐</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
