@@ -167,16 +167,16 @@ You should see:
    Inside another terminal, run:
 
    ```bash
-   docker run --rm --platform linux/amd64 -v "$(pwd)":/ws -w /ws --network=host spacetry:dev bash -lc '
+   docker run --rm --platform linux/amd64 -v --network=host spacetry:dev bash -lc '
    set -e
    source /opt/ros/spaceros/setup.bash
    colcon build --packages-select spacetry_bt
    source install/setup.bash
-   ros2 run spacetry_bt spacetry_bt_runner --ros-args \
-   -p tree_file:="$(ros2 pkg prefix spacetry_bt)/share/spacetry_bt/trees/silly_explorer.xml" \
+   ros2 run spacetry_bt base_bt_runner.py --ros-args \
+   -p tree_file:=$(ros2 pkg prefix spacetry_bt)/share/spacetry_bt/trees/base_bt.xml \
    -p tick_hz:=10.0 \
    -p max_runtime_s:=30.0
-   '   
+   '
    ```
 
 </details>
