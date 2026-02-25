@@ -86,9 +86,7 @@ You should see:
    Inside the container, run:
 
    ```bash
-   source /opt/ros/spaceros/setup.bash
-   source /etc/profile 
-   colcon build --merge-install --event-handlers console_direct+
+   source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+
    ```
 
 </details>
@@ -101,22 +99,14 @@ You should see:
    - the Curiosity rover (spawned near `dock_pad_01`)
    - ROS↔Gazebo bridges + demo nodes
 
-   ### 1) Get into the running container
-   Assuming that steps 1) and 2) are completed. 
-   From the repo root, run:
-
-   ```bash
-   docker exec -it docker-spacetry-1 bash 
-   ```
-
-   ### 2) Setup the workspace
+   ### 1) Setup the workspace
    Inside the container, run:
 
    ```bash
    source /ws/install/setup.bash
    ```
 
-   ### 3) Launch Curiosity in the outpost world
+   ### 2) Launch Curiosity in the outpost world
 
    #### Option A — With Gazebo GUI (recommended for manual driving)
    Inside the container, run:
@@ -134,7 +124,7 @@ You should see:
    ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1
    ```
 
-   ### 4) Drive the rover using the Gazebo GUI
+   ### 3) Drive the rover using the Gazebo GUI
 
    Once Gazebo is running with the rover spawned:
 
@@ -170,7 +160,29 @@ You should see:
 </details>
 
 <details>
-<summary> 6. Stop SpaceTry 🥐 </summary>
+<summary> 6. Run the Behavior Tree (BT) </summary>
+
+### 1) Run the Behavior Tree:
+
+   Inside another terminal, run:
+
+   ```bash
+   docker run --rm --platform linux/amd64 -v "$(pwd)":/ws -w /ws --network=host spacetry:dev bash -lc '
+   set -e
+   source /opt/ros/spaceros/setup.bash
+   colcon build --packages-select spacetry_bt
+   source install/setup.bash
+   ros2 run spacetry_bt spacetry_bt_runner --ros-args \
+   -p tree_file:="$(ros2 pkg prefix spacetry_bt)/share/spacetry_bt/trees/silly_explorer.xml" \
+   -p tick_hz:=10.0 \
+   -p max_runtime_s:=30.0
+   '   
+   ```
+
+</details>
+
+<details>
+<summary> 7. Stop SpaceTry 🥐 </summary>
 
 After closing Gazebo GUI, exit all the containers bash with:
 
