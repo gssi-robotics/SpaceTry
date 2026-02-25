@@ -112,7 +112,7 @@ You should see:
    Inside the container, run:
 
    ```bash
-   ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=0
+   ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py
    ```
 
    You should see Gazebo open with the outpost scene and the rover spawned nearby. The argument `battery:=0.5` sets the rover's initial battery state-of-charge.  
@@ -172,8 +172,8 @@ You should see:
    source /opt/ros/spaceros/setup.bash
    colcon build --packages-select spacetry_bt
    source install/setup.bash
-   ros2 run spacetry_bt base_bt_runner.py --ros-args \
-   -p tree_file:=$(ros2 pkg prefix spacetry_bt)/share/spacetry_bt/trees/base_bt.xml \
+   ros2 run spacetry_bt spacetry_bt_runner --ros-args \
+   -p tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/base_bt.xml \
    -p tick_hz:=10.0 \
    -p max_runtime_s:=30.0
    '
