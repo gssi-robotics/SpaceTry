@@ -254,11 +254,22 @@ def generate_launch_description():
         }],
     )
 
+    # --- Copilot runtime monitors (MR_009 + MR_011)
+    # Runs the same command you'd run manually:
+    #   ros2 run spacetry_monitors copilot
+    copilot_monitor = Node(
+        package="spacetry_monitors",
+        executable="copilot",
+        name="curiosity_monitor",
+        output="screen",
+        parameters=[{"use_sim_time": True}],
+    )
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
                 "headless",
-                default_value="1",
+                default_value="0",
                 description="Run gz sim headless (server-only) if supported by the world launch.",
             ),
             DeclareLaunchArgument(
@@ -302,6 +313,7 @@ def generate_launch_description():
             image_bridge,
             battery_manager,
             obstacle_direction,
+            copilot_monitor,
             # Controller chain
             RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[set_hardware_interface_active])),
             RegisterEventHandler(OnProcessExit(target_action=set_hardware_interface_active, on_exit=[load_joint_state_broadcaster])),
