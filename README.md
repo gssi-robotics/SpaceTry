@@ -174,8 +174,7 @@ You should see:
    source install/setup.bash
    ros2 run spacetry_bt spacetry_bt_runner --ros-args \
    -p tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/base_bt.xml \
-   -p tick_hz:=10.0 \
-   -p max_runtime_s:=30.0
+   --params-file /ws/src/spacetry_bt/bt_params.yaml
    '
    ```
 
