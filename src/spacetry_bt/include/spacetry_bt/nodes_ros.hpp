@@ -16,7 +16,6 @@
 
 namespace spacetry_bt {
 
-// Lightweight 2D goal used on the Blackboard
 struct Goal2D
 {
   double x{0.0};
@@ -24,9 +23,6 @@ struct Goal2D
   double yaw{0.0};
 };
 
-// === Mission base nodes (Groot2-friendly, ROS2 /cmd_vel) ===
-
-// SetGoal: read a named waypoint from ROS params and write Goal2D to blackboard
 class SetGoal : public BT::SyncActionNode
 {
 public:
@@ -49,7 +45,6 @@ private:
   bool getWaypoint(const std::string& name, Goal2D& out) const;
 };
 
-// NavigateWithAvoidance: go-to-goal using odom and simple obstacle avoidance
 class NavigateWithAvoidance : public BT::StatefulActionNode
 {
 public:
@@ -60,11 +55,13 @@ public:
     return {
       BT::InputPort<Goal2D>("goal"),
 
-      BT::InputPort<double>("v_lin", 0.3, "Linear speed (m/s)"),
+      BT::InputPort<double>("v_lin", 0.3, "Desired linear speed (m/s)"),
+      BT::InputPort<double>("min_lin", 2.0, "Minimum linear speed while RUNNING (m/s)"),
       BT::InputPort<double>("v_ang", 0.6, "Max angular speed (rad/s)"),
+
       BT::InputPort<double>("dist_tol", 0.6, "Goal distance tolerance (m)"),
       BT::InputPort<double>("kp_yaw", 1.5, "Yaw P gain"),
-      BT::InputPort<double>("yaw_slow_deg", 25.0, "Stop forward motion above this yaw error (deg)"),
+      BT::InputPort<double>("yaw_slow_deg", 25.0, "Start scaling down lin above this yaw error (deg)"),
 
       BT::InputPort<std::string>("odom_topic", "/model/curiosity_mars_rover/odometry"),
       BT::InputPort<std::string>("scan_topic", "/scan"),
@@ -84,13 +81,11 @@ public:
 private:
   static rclcpp::Node::SharedPtr node_;
 
-  // ROS I/O
   rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_pub_;
   rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odom_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr obstacle_front_sub_;
 
-  // State
   Goal2D goal_;
   bool have_goal_{false};
 
@@ -112,8 +107,8 @@ private:
   bool avoiding_{false};
   int turn_sign_{+1};
 
-  // Cached params
   double v_lin_{0.3};
+  double min_lin_{2.0};
   double v_ang_{0.6};
   double dist_tol_{0.6};
   double kp_yaw_{1.5};
@@ -134,7 +129,6 @@ private:
   void obstacleFrontCb(const std_msgs::msg::Bool::SharedPtr msg);
 };
 
-// AlignToGoal: rotate in place until pointing to goal
 class AlignToGoal : public BT::StatefulActionNode
 {
 public:
@@ -144,6 +138,10 @@ public:
   {
     return {
       BT::InputPort<Goal2D>("goal"),
+
+      BT::InputPort<double>("v_lin", 2.0, "Desired linear speed while aligning (m/s)"),
+      BT::InputPort<double>("min_lin", 2.0, "Minimum linear speed while RUNNING (m/s)"),
+
       BT::InputPort<double>("v_ang", 0.4, "Max angular speed (rad/s)"),
       BT::InputPort<double>("kp_yaw", 2.0, "Yaw P gain"),
       BT::InputPort<double>("yaw_tol_deg", 10.0, "Yaw tolerance (deg)"),
@@ -172,6 +170,8 @@ private:
   rclcpp::Time last_odom_time_;
   std::mutex mtx_;
 
+  double v_lin_{2.0};
+  double min_lin_{2.0};
   double v_ang_{0.4};
   double kp_yaw_{2.0};
   double yaw_tol_rad_{0.1745};
@@ -180,12 +180,10 @@ private:
 
   void ensureInterfaces();
   void publishStop();
-  void publishCmd(double ang);
-
+  void publishCmd(double lin, double ang);
   void odomCb(const nav_msgs::msg::Odometry::SharedPtr msg);
 };
 
-// StopAndObserve: publish /cmd_vel=0 and wait N seconds (no camera)
 class StopAndObserve : public BT::StatefulActionNode
 {
 public:
@@ -211,7 +209,6 @@ private:
   void publishStop();
 };
 
-// LogMessage: print a message
 class LogMessage : public BT::SyncActionNode
 {
 public:

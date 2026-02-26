@@ -31,13 +31,11 @@ double yawFromQuat(const geometry_msgs::msg::Quaternion& q)
   return std::atan2(siny_cosp, cosy_cosp);
 }
 
-// Minimum valid (finite + within [range_min, range_max]) range in a sector [a0, a1]
 double sectorMin(const sensor_msgs::msg::LaserScan& scan, double a0, double a1)
 {
   if (scan.ranges.empty() || scan.angle_increment == 0.0) {
     return std::numeric_limits<double>::infinity();
   }
-
   if (a1 < a0) std::swap(a0, a1);
 
   const auto clampIndex = [&](int i) {
@@ -54,12 +52,9 @@ double sectorMin(const sensor_msgs::msg::LaserScan& scan, double a0, double a1)
   for (int i = std::min(i0, i1); i <= std::max(i0, i1); ++i) {
     const float r = scan.ranges[static_cast<size_t>(i)];
     if (!std::isfinite(r)) continue;
-
-    // Filter invalid samples that often appear as 0.0 or out-of-range.
     if (r <= 0.0f) continue;
     if (std::isfinite(rmin) && r < rmin) continue;
     if (std::isfinite(rmax) && r > rmax) continue;
-
     m = std::min<double>(m, r);
   }
   return m;
@@ -67,6 +62,7 @@ double sectorMin(const sensor_msgs::msg::LaserScan& scan, double a0, double a1)
 
 }  // namespace
 
+// Define each static node_ EXACTLY ONCE:
 rclcpp::Node::SharedPtr SetGoal::node_;
 rclcpp::Node::SharedPtr NavigateWithAvoidance::node_;
 rclcpp::Node::SharedPtr AlignToGoal::node_;
@@ -86,9 +82,7 @@ bool SetGoal::getWaypoint(const std::string& name, Goal2D& out) const
 
   const std::string key = std::string("waypoints.") + name;
   std::vector<double> v;
-  if (!node_->get_parameter(key, v)) {
-    return false;
-  }
+  if (!node_->get_parameter(key, v)) return false;
   if (v.size() < 2) return false;
 
   out.x = v[0];
@@ -130,9 +124,7 @@ void NavigateWithAvoidance::ensureInterfaces()
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
 
-  // Gazebo/bridges frequently publish BEST_EFFORT; default Reliable subscriber can receive nothing.
   const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
-
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
       odom_topic_, odom_qos,
@@ -147,9 +139,7 @@ void NavigateWithAvoidance::ensureInterfaces()
     );
   }
 
-  // BestEffort here avoids QoS mismatch if obstacle topic is bridged.
   const auto obstacle_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
-
   if (!obstacle_front_sub_) {
     obstacle_front_sub_ = node_->create_subscription<std_msgs::msg::Bool>(
       obstacle_front_topic_, obstacle_qos,
@@ -184,7 +174,6 @@ void NavigateWithAvoidance::odomCb(const nav_msgs::msg::Odometry::SharedPtr msg)
 
 void NavigateWithAvoidance::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
-  // Sectors: front [-15,+15], left [15,60], right [-60,-15]
   const double deg = kPi / 180.0;
   const double front = sectorMin(*msg, -15.0 * deg, +15.0 * deg);
   const double left  = sectorMin(*msg, +15.0 * deg, +60.0 * deg);
@@ -216,11 +205,13 @@ BT::NodeStatus NavigateWithAvoidance::onStart()
   have_goal_ = true;
 
   v_lin_ = getInput<double>("v_lin").value_or(0.3);
+  min_lin_ = getInput<double>("min_lin").value_or(2.0);
   v_ang_ = getInput<double>("v_ang").value_or(0.6);
+
   dist_tol_ = getInput<double>("dist_tol").value_or(0.6);
   kp_yaw_ = getInput<double>("kp_yaw").value_or(1.5);
-
   yaw_slow_rad_ = (getInput<double>("yaw_slow_deg").value_or(25.0)) * (kPi / 180.0);
+
   obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(1.0);
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
 
@@ -228,15 +219,15 @@ BT::NodeStatus NavigateWithAvoidance::onStart()
   scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
   obstacle_front_topic_ = getInput<std::string>("obstacle_front_topic").value_or("/obstacle/front");
 
-  // Use last_odom_time_ as a startup timer/grace window until first odom message arrives.
   last_odom_time_ = node_->now();
 
   ensureInterfaces();
   avoiding_ = false;
   turn_sign_ = +1;
 
-  if (v_lin_ <= 0.0) {
-    RCLCPP_WARN(node_->get_logger(), "NavigateWithAvoidance: v_lin <= 0.0 (rover won't translate)");
+  if (min_lin_ < 0.0) {
+    RCLCPP_WARN(node_->get_logger(), "NavigateWithAvoidance: min_lin < 0.0; forcing to 0.0");
+    min_lin_ = 0.0;
   }
 
   return BT::NodeStatus::RUNNING;
@@ -246,7 +237,6 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
 {
   if (!have_goal_) return BT::NodeStatus::FAILURE;
 
-  // Copy latest state
   double x, y, yaw;
   double front, left, right;
   bool have_odom, have_scan;
@@ -270,18 +260,14 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
 
   const auto now = node_->now();
 
-  // If no odom yet, wait up to odom_timeout_s_ rather than failing immediately.
   if (!have_odom) {
     publishStop();
-    if ((now - t_odom).seconds() < odom_timeout_s_) {
-      return BT::NodeStatus::RUNNING;
-    }
+    if ((now - t_odom).seconds() < odom_timeout_s_) return BT::NodeStatus::RUNNING;
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
                           "NavigateWithAvoidance: odom not received");
     return BT::NodeStatus::FAILURE;
   }
 
-  // If odom stale, fail.
   if ((now - t_odom).seconds() > odom_timeout_s_) {
     publishStop();
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
@@ -294,11 +280,9 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
   const double dist = std::hypot(dx, dy);
 
   if (dist <= dist_tol_) {
-    publishStop();
     return BT::NodeStatus::SUCCESS;
   }
 
-  // Decide obstacle: prefer /scan if fresh (reacts immediately as we rotate).
   bool front_blocked = false;
   const bool scan_fresh = have_scan && (now - t_scan).seconds() < 1.0;
   const bool obs_fresh  = have_obs_front && (now - t_obs).seconds() < 1.0;
@@ -313,7 +297,6 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
 
   if (front_blocked) {
     if (!avoiding_) {
-      // Choose the more free side if scan is available, else default left.
       if (have_scan && std::isfinite(left) && std::isfinite(right)) {
         turn_sign_ = (left >= right) ? +1 : -1;
       } else {
@@ -322,43 +305,29 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
       avoiding_ = true;
     }
 
-    // Turn in place to clear obstacle.
-    publishCmd(0.0, static_cast<double>(turn_sign_) * v_ang_);
-
-    RCLCPP_INFO_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
-                         "NavigateWithAvoidance: avoiding (front=%0.2f, left=%0.2f, right=%0.2f, thr=%0.2f)",
-                         front, left, right, obstacle_threshold_);
-
+    const double lin = std::max(min_lin_, 0.0);
+    const double ang = static_cast<double>(turn_sign_) * v_ang_;
+    publishCmd(lin, ang);
     return BT::NodeStatus::RUNNING;
   }
 
   avoiding_ = false;
 
-  // Nominal go-to-goal
   const double desired_yaw = std::atan2(dy, dx);
   const double yaw_err = wrapPi(desired_yaw - yaw);
   const double ang = clamp(kp_yaw_ * yaw_err, -v_ang_, +v_ang_);
 
-  // Previously: lin was set to 0 when |yaw_err| > yaw_slow_rad_ (spin in place).
-  // Now: scale lin down but keep a small creep forward so it doesn't look "stuck".
   double lin = v_lin_;
   const double yaw_abs = std::fabs(yaw_err);
 
   if (yaw_abs > yaw_slow_rad_) {
-    const double min_scale = 0.15;  // keep 15% forward creep
     const double denom = std::max(1e-6, (kPi - yaw_slow_rad_));
     const double scale = 1.0 - (yaw_abs - yaw_slow_rad_) / denom;
-    lin *= std::max(min_scale, clamp(scale, 0.0, 1.0));
+    lin *= clamp(scale, 0.0, 1.0);
   }
 
+  lin = std::max(lin, min_lin_);
   publishCmd(lin, ang);
-
-  RCLCPP_INFO_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
-                       "NavigateWithAvoidance: dist=%0.2f yaw_err_deg=%0.1f lin=%0.2f ang=%0.2f (scan_fresh=%d front=%0.2f obs_fresh=%d obs=%d)",
-                       dist, yaw_err * 180.0 / kPi, lin, ang,
-                       static_cast<int>(scan_fresh), front,
-                       static_cast<int>(obs_fresh), static_cast<int>(obs_front));
-
   return BT::NodeStatus::RUNNING;
 }
 
@@ -383,7 +352,6 @@ void AlignToGoal::ensureInterfaces()
   }
 
   const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
-
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
       odom_topic_, odom_qos,
@@ -392,17 +360,18 @@ void AlignToGoal::ensureInterfaces()
   }
 }
 
-void AlignToGoal::publishCmd(double ang)
+void AlignToGoal::publishCmd(double lin, double ang)
 {
   if (!cmd_pub_) return;
   geometry_msgs::msg::Twist t;
+  t.linear.x = lin;
   t.angular.z = ang;
   cmd_pub_->publish(t);
 }
 
 void AlignToGoal::publishStop()
 {
-  publishCmd(0.0);
+  publishCmd(0.0, 0.0);
 }
 
 void AlignToGoal::odomCb(const nav_msgs::msg::Odometry::SharedPtr msg)
@@ -424,9 +393,13 @@ BT::NodeStatus AlignToGoal::onStart()
   goal_ = g.value();
   have_goal_ = true;
 
+  v_lin_ = getInput<double>("v_lin").value_or(2.0);
+  min_lin_ = getInput<double>("min_lin").value_or(2.0);
+
   v_ang_ = getInput<double>("v_ang").value_or(0.4);
   kp_yaw_ = getInput<double>("kp_yaw").value_or(2.0);
   yaw_tol_rad_ = (getInput<double>("yaw_tol_deg").value_or(10.0)) * (kPi / 180.0);
+
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
   odom_topic_ = getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
 
@@ -455,9 +428,7 @@ BT::NodeStatus AlignToGoal::onRunning()
 
   if (!have_odom) {
     publishStop();
-    if ((now - t_odom).seconds() < odom_timeout_s_) {
-      return BT::NodeStatus::RUNNING;
-    }
+    if ((now - t_odom).seconds() < odom_timeout_s_) return BT::NodeStatus::RUNNING;
     RCLCPP_ERROR_THROTTLE(node_->get_logger(), *node_->get_clock(), 2000,
                           "AlignToGoal: odom not received");
     return BT::NodeStatus::FAILURE;
@@ -472,16 +443,18 @@ BT::NodeStatus AlignToGoal::onRunning()
 
   const double dx = goal_.x - x;
   const double dy = goal_.y - y;
+
   const double desired_yaw = std::atan2(dy, dx);
   const double yaw_err = wrapPi(desired_yaw - yaw);
 
   if (std::fabs(yaw_err) <= yaw_tol_rad_) {
-    publishStop();
     return BT::NodeStatus::SUCCESS;
   }
 
   const double ang = clamp(kp_yaw_ * yaw_err, -v_ang_, +v_ang_);
-  publishCmd(ang);
+
+  const double lin = std::max(v_lin_, min_lin_);
+  publishCmd(lin, ang);
   return BT::NodeStatus::RUNNING;
 }
 
@@ -503,17 +476,15 @@ void StopAndObserve::publishStop()
     if (!node_) throw BT::RuntimeError("StopAndObserve: node not set");
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
-  geometry_msgs::msg::Twist t;  // zeros
+  geometry_msgs::msg::Twist t;
   cmd_pub_->publish(t);
 }
 
 BT::NodeStatus StopAndObserve::onStart()
 {
   if (!node_) throw BT::RuntimeError("StopAndObserve: node not set");
-
   seconds_ = getInput<double>("seconds").value_or(3.0);
   start_ = node_->now();
-
   publishStop();
   return BT::NodeStatus::RUNNING;
 }
@@ -540,10 +511,8 @@ LogMessage::LogMessage(const std::string& name, const BT::NodeConfiguration& cfg
 BT::NodeStatus LogMessage::tick()
 {
   if (!node_) throw BT::RuntimeError("LogMessage: node not set");
-
   const auto msg = getInput<std::string>("message");
   if (!msg) throw BT::RuntimeError("LogMessage missing input [message]");
-
   RCLCPP_INFO(node_->get_logger(), "%s", msg.value().c_str());
   return BT::NodeStatus::SUCCESS;
 }
