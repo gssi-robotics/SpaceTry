@@ -1,0 +1,267 @@
+# signal_inventory.yaml
+# Canonical inventory of signals available in the SpaceTry system.
+# Source of truth for the FRETish agent's signal checker.
+#
+# Each signal has:
+#   kind:      input | output | internal
+#   ros_topic: ROS 2 topic or service name (null if derived)
+#   msg_type:  ROS 2 message type
+#   field:     specific field path within the message (null if whole msg)
+#   unit:      physical unit or "bool" / "enum"
+#   verified:  true if confirmed from source code; false if assumed/planned
+#   notes:     free-form annotation
+
+# ── ENVIRONMENT / SENSOR INPUTS ──────────────────────────────────────────────
+
+obstacle_min_range:
+  kind: input
+  ros_topic: /scan
+  msg_type: sensor_msgs/msg/LaserScan
+  field: ranges  # min(ranges) computed at monitor level
+  unit: meters
+  verified: true
+  notes: >
+    Minimum range from LaserScan. The BT node ObstacleTooClose computes
+    min(ranges) and compares against threshold_m (default 1.0 m).
+
+rover_position_x:
+  kind: input
+  ros_topic: /model/curiosity_mars_rover/odometry
+  msg_type: nav_msgs/msg/Odometry
+  field: pose.pose.position.x
+  unit: meters
+  verified: true
+  notes: World-frame X position from Gazebo odometry bridge.
+
+rover_position_y:
+  kind: input
+  ros_topic: /model/curiosity_mars_rover/odometry
+  msg_type: nav_msgs/msg/Odometry
+  field: pose.pose.position.y
+  unit: meters
+  verified: true
+  notes: World-frame Y position from Gazebo odometry bridge.
+
+rover_yaw:
+  kind: input
+  ros_topic: /model/curiosity_mars_rover/odometry
+  msg_type: nav_msgs/msg/Odometry
+  field: pose.pose.orientation  # quaternion → yaw conversion needed
+  unit: radians
+  verified: true
+  notes: >
+    Yaw derived from orientation quaternion. Requires tf conversion at
+    monitor level.
+
+rover_linear_velocity:
+  kind: input
+  ros_topic: /model/curiosity_mars_rover/odometry
+  msg_type: nav_msgs/msg/Odometry
+  field: twist.twist.linear.x
+  unit: m/s
+  verified: true
+  notes: Forward linear velocity from odometry twist.
+
+sim_time:
+  kind: input
+  ros_topic: /clock
+  msg_type: rosgraph_msgs/msg/Clock
+  field: clock
+  unit: seconds
+  verified: true
+  notes: Gazebo simulation clock.
+
+# ── ROVER CONTROL OUTPUTS ────────────────────────────────────────────────────
+# These are service calls (std_srvs/Empty). In the monitor context they are
+# treated as boolean "command was issued" signals.
+
+cmd_move_forward:
+  kind: output
+  ros_topic: /move_forward
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that starts forward motion.
+
+cmd_move_stop:
+  kind: output
+  ros_topic: /move_stop
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that stops all motion.
+
+cmd_turn_left:
+  kind: output
+  ros_topic: /turn_left
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that starts left rotation.
+
+cmd_turn_right:
+  kind: output
+  ros_topic: /turn_right
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that starts right rotation.
+
+cmd_mast_open:
+  kind: output
+  ros_topic: /mast_open
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that deploys mast sensors.
+
+cmd_mast_close:
+  kind: output
+  ros_topic: /mast_close
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that retracts mast.
+
+cmd_mast_rotate:
+  kind: output
+  ros_topic: /mast_rotate
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that rotates mast for scanning.
+
+cmd_open_arm:
+  kind: output
+  ros_topic: /open_arm
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that deploys arm.
+
+cmd_close_arm:
+  kind: output
+  ros_topic: /close_arm
+  msg_type: std_srvs/srv/Empty
+  field: null
+  unit: bool
+  verified: true
+  notes: Service call that retracts arm.
+
+# ── INTERNAL / DERIVED PREDICATES ────────────────────────────────────────────
+# These do not map to a single ROS topic but are computed by the monitor
+# or the FRETish agent from the raw signals above.
+
+obstacle_too_close:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: true
+  notes: >
+    Derived: obstacle_min_range < OBSTACLE_THRESHOLD_M.
+    Default threshold is 1.0 m (from BT ObstacleTooClose node).
+
+rover_is_moving:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: true
+  notes: >
+    Derived: abs(rover_linear_velocity) > MOVING_EPSILON.
+    Indicates the rover has non-negligible forward velocity.
+
+distance_to_waypoint:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: meters
+  verified: true
+  notes: >
+    Derived: sqrt((rover_position_x - wp_x)^2 + (rover_position_y - wp_y)^2).
+    Requires a target waypoint to be specified.
+
+at_waypoint:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: true
+  notes: >
+    Derived: distance_to_waypoint < waypoint_tolerance.
+    Uses per-waypoint tolerance from waypoints.yaml.
+
+# ── UNVERIFIED / PLANNED SIGNALS ─────────────────────────────────────────────
+# These appear in MISSION.md or design docs but have NO implementation.
+# Requirements that reference these signals will be flagged by the signal
+# checker. They are listed here so the agent can suggest them when relevant.
+
+battery_percentage:
+  kind: input
+  ros_topic: null  # NOT YET IMPLEMENTED
+  msg_type: null
+  field: null
+  unit: percent
+  verified: false
+  notes: >
+    NOT IMPLEMENTED. MISSION.md mentions battery energy levels but no
+    battery model, depletion logic, or ROS topic exists in the codebase.
+    A future spacetry_battery package would publish this.
+
+battery_is_low:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: false
+  notes: >
+    NOT IMPLEMENTED. Would be derived: battery_percentage < LOW_THRESHOLD.
+    Depends on battery_percentage which does not exist yet.
+
+sample_detected:
+  kind: input
+  ros_topic: null  # currently a random 8% stub in BT
+  msg_type: null
+  field: null
+  unit: bool
+  verified: false
+  notes: >
+    STUB ONLY. The BT uses RandomSuccess(probability=0.08) as a placeholder.
+    A real perception pipeline would publish this on a dedicated topic.
+
+hazard_nearby:
+  kind: input
+  ros_topic: null  # NOT YET IMPLEMENTED
+  msg_type: null
+  field: null
+  unit: bool
+  verified: false
+  notes: >
+    NOT IMPLEMENTED. Would require a perception pipeline that classifies
+    world objects as hazards. block_island is defined in objects.yaml as
+    a hazard but no runtime detection exists.
+
+comms_available:
+  kind: input
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: false
+  notes: >
+    NOT IMPLEMENTED. Would indicate whether the rover is within comms
+    range of outpost_habitat_01 (type: comms_asset).
