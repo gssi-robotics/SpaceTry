@@ -1,0 +1,275 @@
+{
+    "requirements": [
+        {
+            "reqid": "REQ_OBSTACLE_STOP",
+            "parent_reqid": "",
+            "project": "SpaceTry",
+            "rationale": "When an obstacle is detected within the safety threshold, the rover must immediately stop.\n",
+            "comments": "",
+            "fulltext": "if obstacle_too_close the rover shall immediately satisfy cmd_move_stop",
+            "status": "",
+            "semantics": {
+                "type": "nasa",
+                "scope": {
+                    "type": "null"
+                },
+                "condition": "regular",
+                "timing": "immediately",
+                "response": "satisfaction",
+                "variables": [
+                    "obstacle_too_close",
+                    "cmd_move_stop"
+                ],
+                "component_name": "rover",
+                "ptExpanded": "",
+                "pt": ""
+            }
+        },
+        {
+            "reqid": "REQ_NO_FORWARD_WHILE_OBSTACLE",
+            "parent_reqid": "",
+            "project": "SpaceTry",
+            "rationale": "While an obstacle is within the safety threshold, the rover must not command forward motion.\n",
+            "comments": "",
+            "fulltext": "if obstacle_too_close the rover shall always satisfy not cmd_move_forward",
+            "status": "",
+            "semantics": {
+                "type": "nasa",
+                "scope": {
+                    "type": "null"
+                },
+                "condition": "regular",
+                "timing": "always",
+                "response": "satisfaction",
+                "variables": [
+                    "obstacle_too_close",
+                    "cmd_move_forward"
+                ],
+                "component_name": "rover",
+                "ptExpanded": "",
+                "pt": ""
+            }
+        },
+        {
+            "reqid": "REQ_VELOCITY_CAP",
+            "parent_reqid": "",
+            "project": "SpaceTry",
+            "rationale": "The rover's forward velocity must never exceed 1.5 m/s.\n",
+            "comments": "",
+            "fulltext": "the rover shall always satisfy rover_linear_velocity <= 1.5",
+            "status": "",
+            "semantics": {
+                "type": "nasa",
+                "scope": {
+                    "type": "null"
+                },
+                "condition": "null",
+                "timing": "always",
+                "response": "satisfaction",
+                "variables": [
+                    "rover_linear_velocity"
+                ],
+                "component_name": "rover",
+                "ptExpanded": "",
+                "pt": ""
+            }
+        },
+        {
+            "reqid": "REQ_BATTERY_RETURN",
+            "parent_reqid": "",
+            "project": "SpaceTry",
+            "rationale": "When battery is critically low, the rover must eventually reach the safe haven waypoint (-5, -5, tolerance 1.0 m). NOTE: battery_is_low is NOT YET IMPLEMENTED.\n",
+            "comments": "",
+            "fulltext": "if battery_is_low the rover shall eventually satisfy at_waypoint",
+            "status": "",
+            "semantics": {
+                "type": "nasa",
+                "scope": {
+                    "type": "null"
+                },
+                "condition": "regular",
+                "timing": "eventually",
+                "response": "satisfaction",
+                "variables": [
+                    "battery_is_low",
+                    "at_waypoint",
+                    "rover_position_x",
+                    "rover_position_y"
+                ],
+                "component_name": "rover",
+                "ptExpanded": "",
+                "pt": ""
+            }
+        },
+        {
+            "reqid": "ASM_ENV_CLEARANCE_assumption",
+            "parent_reqid": "",
+            "project": "SpaceTry",
+            "rationale": "Environment clearance assumption for liveness.\n",
+            "comments": "",
+            "fulltext": "the environment shall always satisfy obstacle_min_range > 0.0",
+            "status": "",
+            "semantics": {
+                "type": "nasa",
+                "scope": {
+                    "type": "null"
+                },
+                "condition": "null",
+                "timing": "always",
+                "response": "satisfaction",
+                "variables": [
+                    "obstacle_min_range"
+                ],
+                "component_name": "environment",
+                "ptExpanded": "",
+                "pt": ""
+            }
+        },
+        {
+            "reqid": "ASM_BATTERY_DECREASE_assumption",
+            "parent_reqid": "",
+            "project": "SpaceTry",
+            "rationale": "Battery percentage is non-negative. NOTE: battery_percentage is NOT YET IMPLEMENTED.\n",
+            "comments": "",
+            "fulltext": "the environment shall always satisfy battery_percentage >= 0",
+            "status": "",
+            "semantics": {
+                "type": "nasa",
+                "scope": {
+                    "type": "null"
+                },
+                "condition": "null",
+                "timing": "always",
+                "response": "satisfaction",
+                "variables": [
+                    "battery_percentage"
+                ],
+                "component_name": "environment",
+                "ptExpanded": "",
+                "pt": ""
+            }
+        }
+    ],
+    "variables": [
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "rover_linear_velocity",
+            "reqs": [],
+            "dataType": "double",
+            "idType": "Input",
+            "moduleName": "",
+            "description": "Forward linear velocity from odometry twist.",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "rover_position_y",
+            "reqs": [],
+            "dataType": "double",
+            "idType": "Input",
+            "moduleName": "",
+            "description": "World-frame Y position from Gazebo odometry bridge.",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "rover_position_x",
+            "reqs": [],
+            "dataType": "double",
+            "idType": "Input",
+            "moduleName": "",
+            "description": "World-frame X position from Gazebo odometry bridge.",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "obstacle_min_range",
+            "reqs": [],
+            "dataType": "double",
+            "idType": "Input",
+            "moduleName": "",
+            "description": "Minimum range from LaserScan. The BT node ObstacleTooClose computes min(ranges) and compares against threshold_m (default 1.0 m).\n",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "battery_percentage",
+            "reqs": [],
+            "dataType": "double",
+            "idType": "Input",
+            "moduleName": "",
+            "description": "NOT IMPLEMENTED. MISSION.md mentions battery energy levels but no battery model, depletion logic, or ROS topic exists in the codebase. A future spacetry_battery package would publish this.\n",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "cmd_move_stop",
+            "reqs": [],
+            "dataType": "boolean",
+            "idType": "Output",
+            "moduleName": "",
+            "description": "Service call that stops all motion.",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "cmd_move_forward",
+            "reqs": [],
+            "dataType": "boolean",
+            "idType": "Output",
+            "moduleName": "",
+            "description": "Service call that starts forward motion.",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "obstacle_too_close",
+            "reqs": [],
+            "dataType": "boolean",
+            "idType": "Internal",
+            "moduleName": "",
+            "description": "Derived: obstacle_min_range < OBSTACLE_THRESHOLD_M. Default threshold is 1.0 m (from BT ObstacleTooClose node).\n",
+            "assignment": "obstacle_min_range < 1.0",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "battery_is_low",
+            "reqs": [],
+            "dataType": "boolean",
+            "idType": "Internal",
+            "moduleName": "",
+            "description": "NOT IMPLEMENTED. Would be derived: battery_percentage < LOW_THRESHOLD. Depends on battery_percentage which does not exist yet.\n",
+            "assignment": "",
+            "completed": true
+        },
+        {
+            "project": "SpaceTry",
+            "component_name": "rover",
+            "variable_name": "at_waypoint",
+            "reqs": [],
+            "dataType": "boolean",
+            "idType": "Internal",
+            "moduleName": "",
+            "description": "Derived: distance_to_waypoint < waypoint_tolerance. Uses per-waypoint tolerance from waypoints.yaml.\n",
+            "assignment": "",
+            "completed": true
+        }
+    ]
+}

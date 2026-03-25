@@ -1,23 +1,20 @@
 """
 realizability_runner.py
 ───────────────────────
-Interface to FRETish realizability checking.
+Invoke realizability checking via FRET's CLI or structural pre-check.
 
-**IMPORTANT — PLACEHOLDER:**
-The actual FRET realizability tool (``fret-realizability`` or equivalent)
-is not known to be installed in this environment.  This module isolates
-the integration behind a well-defined interface so that:
+FRET CLI realizability invocation:
 
-  1. The rest of the agent can be developed and tested without the tool.
-  2. When the tool becomes available, only this module needs to change.
+    fretcli realizability <project> <component> [--solver kind2|jkind]
+        [--timeout N] [--diagnose] [--json [file]]
 
-What must be filled in:
-  - ``FRET_REALIZABILITY_CMD``: the shell command to invoke.
-  - The expected input format (currently assumes the ``.fcs`` file).
-  - The expected output format (stdout JSON or exit code).
+FRET CLI formalize invocation:
 
-If you know the correct command, set the environment variable
-``FRET_REALIZABILITY_CMD`` (e.g. ``fret-realizability --check``).
+    fretcli formalize '<fretish sentence>' -l pt
+
+Dependencies for realizability:
+- Z3 SMT solver (required for all engines)
+- Kind2 v2.2.0 (NOT v2.3.0) or JKind + JRealizability
 """
 
 from __future__ import annotations
@@ -26,189 +23,208 @@ import json
 import os
 import shutil
 import subprocess
-import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from .fretish_writer import Requirement, requirements_to_fcs
-from .variable_mapper import VariableMap, variable_map_to_signals_yaml
-
-
-# ── Configuration ────────────────────────────────────────────────────────────
-
-# PLACEHOLDER: set via environment or replace with actual command
-FRET_REALIZABILITY_CMD = os.environ.get(
-    "FRET_REALIZABILITY_CMD",
-    "",  # empty means "not configured"
-)
+from .fretish_writer import Requirement
+from .variable_mapper import VariableMap
 
 
 @dataclass
 class RealizabilityResult:
-    """Outcome of a realizability check."""
+    """Result of a realizability check."""
 
-    realizable: Optional[bool]  # True / False / None if tool not available
-    message: str
+    realizable: Optional[bool]  # True/False/None if tool unavailable
+    message: str = ""
     diagnostics: List[str] = field(default_factory=list)
+    conflicts: List[List[str]] = field(default_factory=list)
     raw_output: str = ""
 
     def summary(self) -> str:
         if self.realizable is None:
-            return f"SKIPPED: {self.message}"
-        status = "REALIZABLE" if self.realizable else "UNREALIZABLE"
-        lines = [f"{status}: {self.message}"]
+            return f"REALIZABILITY: SKIPPED — {self.message}"
+        tag = "REALIZABLE" if self.realizable else "UNREALIZABLE"
+        lines = [f"REALIZABILITY: {tag}"]
+        if self.message:
+            lines.append(f"  {self.message}")
         for d in self.diagnostics:
             lines.append(f"  - {d}")
+        if self.conflicts:
+            lines.append("  Conflicting requirement sets:")
+            for i, c in enumerate(self.conflicts, 1):
+                lines.append(f"    Conflict {i}: {', '.join(c)}")
         return "\n".join(lines)
 
 
-def check_realizability(
-    reqs: List[Requirement],
-    vmap: VariableMap,
-    work_dir: Optional[Path] = None,
-) -> RealizabilityResult:
+# ── FRET CLI integration ────────────────────────────────────────────────────
+
+def _find_fretcli() -> Optional[str]:
+    """Locate the FRET CLI binary."""
+    env_path = os.environ.get("FRET_CLI_PATH")
+    if env_path and os.path.isfile(env_path):
+        return env_path
+    candidates = [shutil.which("fretcli"), shutil.which("fret")]
+    fret_dir = os.environ.get("FRET_HOME")
+    if fret_dir:
+        cli_path = os.path.join(fret_dir, "fret-electron", "app", "cli", "fretCLI.js")
+        if os.path.isfile(cli_path):
+            candidates.append(cli_path)
+    for c in candidates:
+        if c and os.path.isfile(c):
+            return c
+    return None
+
+
+def formalize_fretish(fretish_text: str) -> Optional[str]:
     """
-    Run realizability checking on a set of requirements.
-
-    If the FRET tool is not configured, returns a result with
-    ``realizable=None`` and instructions for the user.
+    Use FRET CLI to convert a FRETish sentence to past-time LTL (ptLTL).
+    Returns the ptLTL formula string, or None if FRET CLI is unavailable.
     """
-
-    if not FRET_REALIZABILITY_CMD:
-        return _placeholder_check(reqs, vmap)
-
-    # ── Write temporary files for the tool ────────────────────────
-    if work_dir is None:
-        work_dir = Path(tempfile.mkdtemp(prefix="fretish_"))
-
-    fcs_path = work_dir / "roverSpec_full.fcs"
-    sig_path = work_dir / "signals_full.yaml"
-
-    fcs_path.write_text(requirements_to_fcs(reqs))
-    sig_path.write_text(variable_map_to_signals_yaml(vmap))
-
-    # ── Invoke the tool ───────────────────────────────────────────
-    cmd = f"{FRET_REALIZABILITY_CMD} --spec {fcs_path} --signals {sig_path}"
+    fretcli = _find_fretcli()
+    if not fretcli:
+        return None
     try:
-        proc = subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=120,
+        result = subprocess.run(
+            [fretcli, "formalize", fretish_text, "-l", "pt"],
+            capture_output=True, text=True, timeout=30,
         )
-    except FileNotFoundError:
-        return RealizabilityResult(
-            realizable=None,
-            message=f"Realizability tool not found: {FRET_REALIZABILITY_CMD}",
-        )
-    except subprocess.TimeoutExpired:
-        return RealizabilityResult(
-            realizable=None,
-            message="Realizability check timed out after 120 s",
-        )
-
-    # ── Parse output (best-effort) ────────────────────────────────
-    raw = proc.stdout + proc.stderr
-    realizable = proc.returncode == 0
-    diagnostics = [
-        line.strip()
-        for line in raw.splitlines()
-        if line.strip() and not line.startswith("#")
-    ]
-
-    return RealizabilityResult(
-        realizable=realizable,
-        message="Realizability check completed",
-        diagnostics=diagnostics,
-        raw_output=raw,
-    )
+        if result.returncode == 0:
+            return result.stdout.strip()
+    except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+        pass
+    return None
 
 
-def _placeholder_check(
-    reqs: List[Requirement],
-    vmap: VariableMap,
+def check_realizability_fret(
+    project: str, component: str,
+    solver: str = "kind2", timeout: int = 900, diagnose: bool = True,
 ) -> RealizabilityResult:
     """
-    Structural pre-check when the FRET tool is not available.
+    Run FRET CLI realizability checking.
 
-    Performs lightweight sanity checks that can catch obvious
-    unrealizability causes without the full tool:
-      - Contradictory requirements (same signal, conflicting responses)
-      - Missing output signals
-      - Assumptions that constrain outputs
+    Prerequisites: FRET installed, Z3 + Kind2/JKind on PATH,
+    project + component with completed variable mapping in FRET's DB.
     """
-    diagnostics: List[str] = []
-
-    # Check: guarantees must reference at least one output
-    guarantees = [r for r in reqs if r.kind == "guarantee"]
-    for g in guarantees:
-        has_output = any(
-            vmap.outputs.get(s) is not None
-            for s in (g.signals_used or [])
+    fretcli = _find_fretcli()
+    if not fretcli:
+        return RealizabilityResult(
+            realizable=None,
+            message="FRET CLI not found. Set FRET_CLI_PATH or add fretcli to PATH.",
         )
-        if not has_output:
-            diagnostics.append(
-                f"{g.req_id}: guarantee does not reference any output signal "
-                f"in its signals_used list — may be unrealizable"
-            )
+    cmd = [fretcli, "realizability", project, component,
+           "--solver", solver, "--timeout", str(timeout), "--json"]
+    if diagnose:
+        cmd.append("--diagnose")
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout + 30)
+    except subprocess.TimeoutExpired:
+        return RealizabilityResult(realizable=None, message=f"FRET timed out after {timeout}s.")
+    except FileNotFoundError:
+        return RealizabilityResult(realizable=None, message="FRET CLI binary not found.")
 
-    # Check: unmapped signals
+    raw = result.stdout + result.stderr
+    try:
+        data = json.loads(result.stdout)
+        return _parse_fret_json_result(data, raw)
+    except (json.JSONDecodeError, KeyError):
+        if "REALIZABLE" in raw and "UNREALIZABLE" not in raw:
+            return RealizabilityResult(realizable=True, raw_output=raw)
+        elif "UNREALIZABLE" in raw:
+            return RealizabilityResult(realizable=False, raw_output=raw)
+        return RealizabilityResult(realizable=None, message=f"Cannot parse FRET output (exit {result.returncode})", raw_output=raw)
+
+
+def _parse_fret_json_result(data: dict, raw: str) -> RealizabilityResult:
+    """Parse FRET's JSON realizability output."""
+    components = data.get("systemComponents", [])
+    if not components:
+        return RealizabilityResult(realizable=None, message="No components in FRET output", raw_output=raw)
+    comp = components[0]
+    result_obj = comp.get("compositional") or comp.get("monolithic", {})
+    result_str = result_obj.get("result", "UNKNOWN")
+    realizable = {"REALIZABLE": True, "UNREALIZABLE": False}.get(result_str)
+    diagnostics, conflicts = [], []
+    diagnosis = result_obj.get("diagnosisReport", {})
+    if diagnosis and diagnosis.get("Conflicts"):
+        for conflict in diagnosis["Conflicts"]:
+            conflict_reqs = conflict.get("Conflict", [])
+            conflicts.append(conflict_reqs)
+            diagnostics.append(f"Conflict: {', '.join(conflict_reqs)}")
+    for cc in result_obj.get("connectedComponents", []):
+        if cc.get("result") == "UNREALIZABLE":
+            diagnostics.append(f"CC {cc.get('ccName', '?')} is UNREALIZABLE")
+            cc_diag = cc.get("diagnosisReport", {})
+            if cc_diag and cc_diag.get("Conflicts"):
+                for c in cc_diag["Conflicts"]:
+                    conflicts.append(c.get("Conflict", []))
+    return RealizabilityResult(realizable=realizable, message=f"Result: {result_str}",
+                               diagnostics=diagnostics, conflicts=conflicts, raw_output=raw)
+
+
+# ── Structural pre-check ─────────────────────────────────────────────────────
+
+def _structural_precheck(reqs: List[Requirement], vmap: VariableMap) -> List[str]:
+    issues = []
+    output_names = set(vmap.outputs.keys())
+    guarantees = [r for r in reqs if r.kind == "guarantee"]
+    for r in guarantees:
+        req_signals = set(r.signals_used) if r.signals_used else set()
+        if req_signals and not (req_signals & output_names):
+            issues.append(f"{r.req_id}: guarantee references no output signals — may be unrealizable")
     if vmap.has_unmapped():
         for name, req_ids in vmap.unmapped.items():
-            diagnostics.append(
-                f"Signal '{name}' is unmapped (used in {', '.join(req_ids)})"
-            )
-
-    # Check: conflicting immediate responses
-    immediate_responses: Dict[str, List[str]] = {}
+            issues.append(f"'{name}' (used in {', '.join(req_ids)}) not in signal inventory")
+    by_condition: Dict[str, List[Requirement]] = {}
     for r in guarantees:
-        if r.timing in ("immediately", "always"):
-            key = r.condition or "(unconditional)"
-            immediate_responses.setdefault(key, []).append(
-                f"{r.req_id}: {r.response}"
-            )
-    for cond, resps in immediate_responses.items():
-        if len(resps) > 1:
-            diagnostics.append(
-                f"Potential conflict under condition '{cond}': "
-                + "; ".join(resps)
-            )
+        by_condition.setdefault(r.condition or "(unconditional)", []).append(r)
+    for cond, group in by_condition.items():
+        if len(group) > 1:
+            issues.append(f"Potential conflict under '{cond}': " +
+                          "; ".join(f"{r.req_id}: {r.response}" for r in group))
+    return issues
 
+
+# ── Main entry ──────────────────────────────────────────────────────────────
+
+def check_realizability(
+    reqs: List[Requirement], vmap: VariableMap,
+    work_dir: Optional[Path] = None,
+) -> RealizabilityResult:
+    fretcli = _find_fretcli()
+    if fretcli:
+        result = check_realizability_fret("SpaceTry", "rover")
+        if result.realizable is not None:
+            return result
+    issues = _structural_precheck(reqs, vmap)
+    msg_suffix = "See docs/architecture.md for FRET + solver setup." if not fretcli else ""
+    if issues:
+        return RealizabilityResult(
+            realizable=None,
+            message=f"FRET not available. Structural pre-check found issues. {msg_suffix}",
+            diagnostics=issues,
+        )
     return RealizabilityResult(
         realizable=None,
-        message=(
-            "FRET realizability tool is not configured. "
-            "Set FRET_REALIZABILITY_CMD environment variable to enable. "
-            "Structural pre-check completed below."
-        ),
-        diagnostics=diagnostics,
+        message=f"FRET not available. Structural pre-check passed. {msg_suffix}",
     )
 
 
-def get_realizability_invocation(
-    fcs_path: str = "roverSpec_full.fcs",
-    sig_path: str = "signals_full.yaml",
-) -> str:
-    """
-    Return the command that *would* be run for realizability checking.
-
-    Useful for documentation and for the user to run manually.
-    """
-    if FRET_REALIZABILITY_CMD:
-        return f"{FRET_REALIZABILITY_CMD} --spec {fcs_path} --signals {sig_path}"
+def get_realizability_invocation(reqs: Optional[List[Requirement]] = None) -> str:
+    fretcli = _find_fretcli()
+    if fretcli:
+        return (
+            f"# FRET CLI at: {fretcli}\n"
+            f"#   fretcli realizability SpaceTry rover --diagnose --json\n"
+        )
     return (
-        "# PLACEHOLDER: FRET realizability command not configured.\n"
-        "# When available, the invocation would be:\n"
-        "#   fret-realizability --check --spec roverSpec_full.fcs "
-        "--signals signals_full.yaml\n"
+        "# FRET CLI not found.\n"
         "#\n"
-        "# Set FRET_REALIZABILITY_CMD env var to the actual command.\n"
-        "# Expected inputs:\n"
-        f"#   {fcs_path}  — FRETish requirements\n"
-        f"#   {sig_path}  — signal/variable mapping\n"
-        "# Expected output:\n"
-        "#   exit code 0 = realizable, non-zero = unrealizable\n"
-        "#   stdout/stderr = diagnostic messages"
+        "# Setup:\n"
+        "#   cd deps/fret/fret-electron && npm install && npm run build-cli\n"
+        "#   Install Z3 v4.14.1 + Kind2 v2.2.0 (NOT v2.3.0) on PATH\n"
+        "#\n"
+        "# For monitor synthesis without realizability:\n"
+        "#   ritmos ros package spec.fcs --signals-map signals.yaml \\\n"
+        "#     --pkg spacetry_monitor --outdir ros_ws/src --compile-copilot\n"
     )

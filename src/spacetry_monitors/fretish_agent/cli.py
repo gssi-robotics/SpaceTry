@@ -29,6 +29,7 @@ from .linter import format_lint_report, lint_requirements
 from .realizability_runner import (
     RealizabilityResult,
     check_realizability,
+    formalize_fretish,
     get_realizability_invocation,
 )
 from .revision_advisor import advise_revisions, format_revision_report
@@ -58,6 +59,8 @@ def _load_requirements(path: Path) -> list[Requirement]:
                 description=entry.get("description", ""),
                 kind=entry.get("kind", "guarantee"),
                 signals_used=entry.get("signals_used", []),
+                rationale=entry.get("rationale", ""),
+                ptLTL=entry.get("ptLTL", ""),
             )
         )
     return reqs
@@ -169,6 +172,49 @@ def cmd_advise(args):
     print(get_realizability_invocation())
 
 
+def cmd_formalize(args):
+    """Convert FRETish text to ptLTL using FRET CLI."""
+    ptltl = formalize_fretish(args.fretish)
+    if ptltl:
+        print(f"ptLTL: {ptltl}")
+    else:
+        print("FRET CLI not available. Cannot formalize.")
+        print("Install FRET and add fretcli to PATH.")
+        sys.exit(1)
+
+
+def cmd_ritmos(args):
+    """Show RiTMOS invocation command for the exported artifacts."""
+    reg = _registry(args)
+    reqs = _load_requirements(Path(args.requirements))
+    vmap = build_variable_map(reqs, reg)
+    out_dir = Path(args.output_dir)
+
+    # Export first
+    result = export_ritmos_artifacts(reqs, vmap, out_dir)
+    for w in result.get("warnings", []):
+        print(f"WARNING: {w}")
+
+    spec_path = result["spec_path"]
+    signals_path = result["signals_path"]
+
+    print("\nExported artifacts:")
+    print(f"  Spec:    {spec_path}")
+    print(f"  Signals: {signals_path}")
+    print(f"  FRET:    {result['fret_json_path']}")
+
+    print("\nRiTMOS monitor generation command:")
+    print(f"  ritmos ros package {spec_path} \\")
+    print(f"    --pkg spacetry_monitor \\")
+    print(f"    --outdir ros_ws/src \\")
+    print(f"    --signals-map {signals_path} \\")
+    print(f"    --compile-copilot")
+
+    print("\nRiTMOS spec validation:")
+    print(f"  ritmos spec read {spec_path}")
+    print(f"  ritmos spec analyze {spec_path} --signals-map {signals_path}")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 
@@ -214,6 +260,15 @@ def main():
     p_adv = sub.add_parser("advise", help="Full pipeline with revision advice")
     p_adv.add_argument("requirements", help="Path to requirements.yaml")
 
+    # formalize
+    p_form = sub.add_parser("formalize", help="Convert FRETish text to ptLTL via FRET CLI")
+    p_form.add_argument("fretish", help="FRETish sentence (in quotes)")
+
+    # ritmos
+    p_ritmos = sub.add_parser("ritmos", help="Export artifacts and show RiTMOS invocation")
+    p_ritmos.add_argument("requirements", help="Path to requirements.yaml")
+    p_ritmos.add_argument("-o", "--output-dir", default=".", help="Output directory")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -226,6 +281,8 @@ def main():
         "realize": cmd_realize,
         "export": cmd_export,
         "advise": cmd_advise,
+        "formalize": cmd_formalize,
+        "ritmos": cmd_ritmos,
     }
     dispatch[args.command](args)
 

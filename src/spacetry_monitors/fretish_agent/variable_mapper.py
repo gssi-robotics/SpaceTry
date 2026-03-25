@@ -2,9 +2,11 @@
 variable_mapper.py
 ──────────────────
 Maps the variables used in a set of FRETish requirements to their signal
-inventory entries and categorises them for RiTMOS export.
+inventory entries and categorises them for RiTMOS and FRET export.
 
-Produces a structured mapping that can be exported to ``signals_full.yaml``.
+Produces a structured mapping that feeds into:
+- RiTMOS ``signals.yaml`` (flat signal list + numeric_bools)
+- FRET variable list (with idType, dataType)
 """
 
 from __future__ import annotations
@@ -24,12 +26,27 @@ class MappedVariable:
 
     name: str
     kind: str  # input | output | internal
-    ros_topic: Optional[str]
-    msg_type: Optional[str]
-    field_path: Optional[str]
-    unit: str
-    verified: bool
+    ros_topic: Optional[str] = None
+    msg_type: Optional[str] = None
+    field_path: Optional[str] = None
+    unit: str = "bool"
+    verified: bool = True
+    notes: Optional[str] = None
     used_in: List[str] = field(default_factory=list)  # list of req_ids
+    used_by: List[str] = field(default_factory=list)   # FRET req _ids
+
+    # Derivation expression for internal/derived signals
+    # Used by RiTMOS numeric_bools (e.g. "speed <= 1.5")
+    derivation_expr: str = ""
+
+    @property
+    def datatype(self) -> str:
+        """Infer RiTMOS-compatible datatype from unit."""
+        if self.unit == "bool":
+            return "bool"
+        if self.unit in ("meters", "m/s", "radians", "percent", "seconds"):
+            return "float64"
+        return "bool"
 
 
 @dataclass
@@ -39,7 +56,7 @@ class VariableMap:
     inputs: Dict[str, MappedVariable] = field(default_factory=dict)
     outputs: Dict[str, MappedVariable] = field(default_factory=dict)
     internals: Dict[str, MappedVariable] = field(default_factory=dict)
-    unmapped: Dict[str, List[str]] = field(default_factory=dict)  # name → [req_ids]
+    unmapped: Dict[str, List[str]] = field(default_factory=dict)
 
     def all_mapped(self) -> Dict[str, MappedVariable]:
         return {**self.inputs, **self.outputs, **self.internals}
@@ -61,6 +78,16 @@ class VariableMap:
         return "\n".join(lines)
 
 
+# ── Derivation expressions for known internal signals ────────────────────────
+# These map internal signal names to the expressions RiTMOS can use.
+
+KNOWN_DERIVATIONS = {
+    "obstacle_too_close": "obstacle_min_range < 1.0",
+    "rover_is_moving": "rover_linear_velocity > 0.01",
+    "speed_ok": "rover_linear_velocity <= 1.5",
+}
+
+
 def build_variable_map(
     reqs: List[Requirement],
     registry: SignalRegistry,
@@ -71,7 +98,6 @@ def build_variable_map(
     vmap = VariableMap()
 
     for r in reqs:
-        # Combine explicit signals_used list and auto-extracted names
         explicit = set(r.signals_used) if r.signals_used else set()
         extracted = extract_signal_names(r)
         all_signals = explicit | extracted
@@ -90,7 +116,9 @@ def build_variable_map(
                 field_path=sig.field_path,
                 unit=sig.unit,
                 verified=sig.verified,
+                notes=sig.notes,
                 used_in=[],
+                derivation_expr=KNOWN_DERIVATIONS.get(sig.name, ""),
             )
 
             target = {
@@ -104,38 +132,3 @@ def build_variable_map(
             target[sig_name].used_in.append(r.req_id)
 
     return vmap
-
-
-def variable_map_to_signals_yaml(vmap: VariableMap) -> str:
-    """
-    Export the variable map in the ``signals_full.yaml`` format expected
-    by RiTMOS.
-
-    Schema (per variable)::
-
-        variable_name:
-          kind: input | output | internal
-          ros_topic: /topic/name
-          msg_type: pkg/msg/Type
-          field: field.path
-          datatype: bool | float | int
-    """
-    data: dict = {}
-    for mv in sorted(vmap.all_mapped().values(), key=lambda v: v.name):
-        entry: dict = {"kind": mv.kind}
-        if mv.ros_topic:
-            entry["ros_topic"] = mv.ros_topic
-        if mv.msg_type:
-            entry["msg_type"] = mv.msg_type
-        if mv.field_path:
-            entry["field"] = mv.field_path
-        # Infer datatype from unit
-        if mv.unit == "bool":
-            entry["datatype"] = "bool"
-        elif mv.unit in ("meters", "m/s", "radians", "percent", "seconds"):
-            entry["datatype"] = "float"
-        else:
-            entry["datatype"] = "float"  # default
-        data[mv.name] = entry
-
-    return yaml.dump(data, default_flow_style=False, sort_keys=False, width=120)
