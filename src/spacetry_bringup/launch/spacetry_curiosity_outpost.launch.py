@@ -25,10 +25,12 @@ from launch.actions import (
 )
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.conditions import IfCondition
 
 from launch_ros.actions import Node, SetParameter
-
+from launch_ros.substitutions import FindPackageShare
+from launch_ros.parameter_descriptions import ParameterValue
 
 def _load_waypoint_pose(waypoints_yaml: str, waypoint_name: str):
     """
@@ -57,6 +59,7 @@ def generate_launch_description():
     spawn_x_offset = LaunchConfiguration("spawn_x_offset")
     spawn_y_offset = LaunchConfiguration("spawn_y_offset")
     spawn_yaw_offset = LaunchConfiguration("spawn_yaw_offset")
+    battery = LaunchConfiguration("battery")
 
     # --- paths
     spacetry_world_share = get_package_share_directory("spacetry_world")
@@ -167,6 +170,25 @@ def generate_launch_description():
         output="screen",
     )
 
+    battery_params = PathJoinSubstitution(
+        [FindPackageShare("spacetry_battery"), "config", "battery_manager.yaml"]
+    )
+
+    battery_manager = Node(
+        package="spacetry_battery",
+        executable="battery_manager",
+        name="battery_manager",
+        output="screen",
+        parameters=[
+            battery_params,
+            {
+                "outpost_x": base_x,
+                "outpost_y": base_y,
+                "initial_soc": ParameterValue(battery, value_type=float),
+            },
+        ],
+    )
+
     # --- controllers: same sequence used by the Space ROS demo
     component_state_msg = '{name: "GazeboSystem", target_state: {id: 3, label: ""}}'
 
@@ -217,11 +239,37 @@ def generate_launch_description():
         )
     )
 
+
+    # --- LiDAR obstacle direction (front/left/right topics for BT)
+    obstacle_direction = Node(
+        package="spacetry_perception",
+        executable="obstacle_direction_node",
+        name="obstacle_direction",
+        output="screen",
+        parameters=[{
+            "use_sim_time": True,
+            "scan_topic": "/scan",
+            "base_frame": "base_link",
+            "threshold_m": 10.0,
+        }],
+    )
+
+    # --- Copilot runtime monitors (MR_009 + MR_011)
+    # Runs the same command you'd run manually:
+    #   ros2 run spacetry_monitors copilot
+    copilot_monitor = Node(
+        package="spacetry_monitors",
+        executable="copilot",
+        name="curiosity_monitor",
+        output="screen",
+        parameters=[{"use_sim_time": True}],
+    )
+
     return LaunchDescription(
         [
             DeclareLaunchArgument(
                 "headless",
-                default_value="1",
+                default_value="0",
                 description="Run gz sim headless (server-only) if supported by the world launch.",
             ),
             DeclareLaunchArgument(
@@ -249,6 +297,11 @@ def generate_launch_description():
                 default_value="0.0",
                 description="(Reserved) Spawn yaw offset (radians) from the waypoint.",
             ),
+            DeclareLaunchArgument(
+                "battery",
+                default_value="0.2",
+                description="Initial battery SOC fraction (0.0..1.0). Example: battery:=0.2 starts at 20%.",
+            ),
             env_gz_plugin,
             env_gz_resource,
             SetParameter(name="use_sim_time", value=True),
@@ -258,6 +311,9 @@ def generate_launch_description():
             odom_node,
             ros_gz_bridge,
             image_bridge,
+            battery_manager,
+            obstacle_direction,
+            copilot_monitor,
             # Controller chain
             RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[set_hardware_interface_active])),
             RegisterEventHandler(OnProcessExit(target_action=set_hardware_interface_active, on_exit=[load_joint_state_broadcaster])),

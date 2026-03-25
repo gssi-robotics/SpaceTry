@@ -1,0 +1,31 @@
+# Markdown files
+**/*.md
+
+# Git
+.git
+.gitignore
+
+# Docker
+.dockerignore
+
+# Log files
+log/
+**/*.log
+
+# Build artifacts (already excluded via Dockerfile RUN rm -rf)
+# but good to be explicit
+build/
+install/
+
+# IDEs
+.editorconfig
+.vscode/
+.idea/
+**/*.swp
+**/*.swo
+
+# CI/CD
+.github/
+
+# macOS
+.DS_Store

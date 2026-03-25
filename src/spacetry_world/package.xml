@@ -4,7 +4,7 @@
   <version>0.0.0</version>
   <description>SpaceTry 🥐 Gazebo worlds and launch files</description>
 
-  <maintainer email="TODO@TODO.com">TODO</maintainer>
+  <maintainer email="keila.lima@gssi.it">SpaceTry 🥐</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
