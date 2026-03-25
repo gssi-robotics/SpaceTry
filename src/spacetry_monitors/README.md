@@ -45,11 +45,14 @@ python -m fretish_agent.cli check-signals examples/scenario_safe_return/requirem
 ## Workflow
 
 1. Describe your mission scenario in natural language.
-2. Using `config/agent_prompt.md` and `config/fretish_templates.yaml` as
-   references, write a `requirements.yaml` with the minimal safety rules.
-3. Run `fretish-agent advise requirements.yaml` to validate.
-4. Iterate on the requirements until lint/signals/realizability pass.
-5. Run `fretish-agent export requirements.yaml -o output/` to generate
+2. Start from `config/mission_description_template.md` and write the
+   mission in natural language.
+3. Use `config/agent_prompt.md`, `config/fretish_templates.yaml`, and
+   `config/signal_inventory.yaml` to have the agent derive a
+   scenario-specific `requirements.yaml`.
+4. Run `fretish-agent advise requirements.yaml` to validate.
+5. Iterate on the requirements until lint/signals/realizability pass.
+6. Run `fretish-agent export requirements.yaml -o output/` to generate
    the RiTMOS artifacts.
 
 ## Example scenarios

@@ -25,6 +25,7 @@ src/spacetry_monitors/
 ├── config/
 │   ├── signal_inventory.yaml  # Canonical signal ground truth
 │   ├── fretish_templates.yaml # Common requirement patterns
+│   ├── mission_description_template.md # User-facing mission intake template
 │   └── agent_prompt.md        # System prompt for LLM-assisted mode
 ├── examples/
 │   ├── scenario_rock_survey/  # Example 1: full end-to-end
