@@ -85,6 +85,8 @@ KNOWN_DERIVATIONS = {
     "obstacle_too_close": "obstacle_min_range < 1.0",
     "rover_is_moving": "rover_linear_velocity > 0.01",
     "speed_ok": "rover_linear_velocity <= 1.5",
+    "velocity_within_limit": "rover_linear_velocity <= 1.5",
+    "environment_clearance_ok": "obstacle_min_range > 0.0",
 }
 
 

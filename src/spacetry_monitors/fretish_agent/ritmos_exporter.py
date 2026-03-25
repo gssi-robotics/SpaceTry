@@ -35,6 +35,7 @@ from typing import List
 import yaml
 
 from .fretish_writer import Requirement, requirements_to_fcs, requirements_to_fret_json
+from .realizability_runner import formalize_fretish
 from .variable_mapper import VariableMap
 
 
@@ -164,6 +165,31 @@ def export_ritmos_artifacts(
     """
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    formalized_reqs: List[Requirement] = []
+    autoformalized = []
+    for req in reqs:
+        ptltl = req.ptLTL
+        if not ptltl:
+            ptltl = formalize_fretish(req.fretish_text()) or ""
+            if ptltl:
+                autoformalized.append(req.req_id)
+
+        formalized_reqs.append(
+            Requirement(
+                req_id=req.req_id,
+                scope=req.scope,
+                condition=req.condition,
+                component=req.component,
+                timing=req.timing,
+                response=req.response,
+                description=req.description,
+                kind=req.kind,
+                signals_used=list(req.signals_used),
+                rationale=req.rationale,
+                ptLTL=ptltl,
+            )
+        )
+
     signals_path = output_dir / signals_filename
     spec_path = output_dir / spec_filename
     fret_json_path = output_dir / fret_json_filename
@@ -178,12 +204,12 @@ def export_ritmos_artifacts(
     signals_path.write_text(signals_content)
 
     # ── spec.fcs (RiTMOS JSON format) ────────────────────────────
-    fcs_content = requirements_to_fcs(reqs)
+    fcs_content = requirements_to_fcs(formalized_reqs)
     spec_path.write_text(fcs_content)
 
     # ── fretRequirementsVariables.json (FRET format) ─────────────
     fret_variables = _build_fret_variables(vmap)
-    fret_json_content = requirements_to_fret_json(reqs, fret_variables)
+    fret_json_content = requirements_to_fret_json(formalized_reqs, fret_variables)
     fret_json_path.write_text(fret_json_content)
 
     # ── Warnings ──────────────────────────────────────────────────
@@ -202,8 +228,14 @@ def export_ritmos_artifacts(
             f"{', '.join(unverified_in_map)}"
         )
 
+    if autoformalized:
+        warnings.append(
+            f"INFO: Auto-formalized {len(autoformalized)} requirement(s): "
+            f"{', '.join(autoformalized)}"
+        )
+
     # Check that all requirements have ptLTL
-    missing_ptltl = [r.req_id for r in reqs if not r.ptLTL]
+    missing_ptltl = [r.req_id for r in formalized_reqs if not r.ptLTL]
     if missing_ptltl:
         warnings.append(
             f"WARNING: {len(missing_ptltl)} requirement(s) missing ptLTL "

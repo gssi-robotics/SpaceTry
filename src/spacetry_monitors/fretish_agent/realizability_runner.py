@@ -64,7 +64,13 @@ def _find_fretcli() -> Optional[str]:
     env_path = os.environ.get("FRET_CLI_PATH")
     if env_path and os.path.isfile(env_path):
         return env_path
-    candidates = [shutil.which("fretcli"), shutil.which("fret")]
+    repo_root = Path(__file__).resolve().parents[3]
+    candidates = [
+        shutil.which("fretcli"),
+        shutil.which("fret"),
+        str(repo_root / ".spacetry" / "bin" / "fretcli"),
+        str(repo_root / "deps" / "fret" / "tools" / "Scripts" / "cli" / "fretcli"),
+    ]
     fret_dir = os.environ.get("FRET_HOME")
     if fret_dir:
         cli_path = os.path.join(fret_dir, "fret-electron", "app", "cli", "fretCLI.js")
@@ -84,13 +90,35 @@ def formalize_fretish(fretish_text: str) -> Optional[str]:
     fretcli = _find_fretcli()
     if not fretcli:
         return None
+    def _extract_formula(output: str) -> Optional[str]:
+        for line in output.splitlines():
+            text = line.strip()
+            if not text:
+                continue
+            if text.startswith(">") or text.startswith("npm "):
+                continue
+            if text.startswith("Error "):
+                continue
+            if text.startswith("Initialized project properties"):
+                continue
+            return text
+        return None
+
+    attempts = [fretish_text]
+    normalized = fretish_text.replace(" satisfy not ", " satisfy ! ")
+    if normalized != fretish_text:
+        attempts.append(normalized)
+
     try:
-        result = subprocess.run(
-            [fretcli, "formalize", fretish_text, "-l", "pt"],
-            capture_output=True, text=True, timeout=30,
-        )
-        if result.returncode == 0:
-            return result.stdout.strip()
+        for attempt in attempts:
+            result = subprocess.run(
+                [fretcli, "formalize", attempt, "-l", "pt"],
+                capture_output=True, text=True, timeout=30,
+            )
+            if result.returncode == 0:
+                formula = _extract_formula(result.stdout)
+                if formula:
+                    return formula
     except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
         pass
     return None

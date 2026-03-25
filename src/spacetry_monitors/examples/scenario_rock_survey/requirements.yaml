@@ -36,19 +36,20 @@ requirements:
     condition: ""
     component: the rover
     timing: always
-    response: "satisfy rover_linear_velocity <= 1.5"
+    response: "satisfy velocity_within_limit"
     description: >
       The rover's forward velocity must never exceed 1.5 m/s.
     kind: guarantee
     signals_used:
       - rover_linear_velocity
+      - velocity_within_limit
 
   - req_id: ASM_ENV_CLEARANCE
     scope: globally
     condition: ""
     component: the environment
     timing: always
-    response: "satisfy obstacle_min_range > 0.0"
+    response: "satisfy environment_clearance_ok"
     description: >
       The environment is assumed to always provide at least some minimum
       clearance — the rover is never fully enclosed with zero escape path.
@@ -56,34 +57,32 @@ requirements:
     kind: assumption
     signals_used:
       - obstacle_min_range
+      - environment_clearance_ok
 
   - req_id: REQ_REACH_RIDGE
     scope: globally
     condition: ""
     component: the rover
     timing: eventually
-    response: "satisfy at_waypoint"
+    response: "satisfy at_ridge_waypoint"
     description: >
       The rover must eventually reach the ridge waypoint.
-      at_waypoint is derived from distance_to_waypoint < tolerance
-      with target = ridge (12, 4, tolerance 1.0 m).
+      at_ridge_waypoint is true when the rover reaches ridge (12, 4)
+      within tolerance 1.0 m.
     kind: guarantee
     signals_used:
-      - at_waypoint
-      - rover_position_x
-      - rover_position_y
+      - at_ridge_waypoint
 
   - req_id: REQ_RETURN_HOME
-    scope: "after at_waypoint"
+    scope: "after at_ridge_waypoint"
     condition: ""
     component: the rover
     timing: eventually
-    response: "satisfy at_waypoint"
+    response: "satisfy at_home_waypoint"
     description: >
       After reaching the ridge, the rover must eventually return to the
       outpost habitat (145, 50, tolerance 1.0 m).
     kind: guarantee
     signals_used:
-      - at_waypoint
-      - rover_position_x
-      - rover_position_y
+      - at_ridge_waypoint
+      - at_home_waypoint

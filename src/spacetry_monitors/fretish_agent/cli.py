@@ -72,6 +72,21 @@ def _registry(args) -> SignalRegistry:
     return SignalRegistry()
 
 
+def _resolve_input_path(path_str: str) -> Path:
+    """Resolve a user-provided path from cwd, package root, or repo root."""
+    candidate = Path(path_str)
+    if candidate.is_file():
+        return candidate
+
+    package_root = Path(__file__).resolve().parents[1]
+    repo_root = Path(__file__).resolve().parents[3]
+    for base in (package_root, repo_root):
+        resolved = base / path_str
+        if resolved.is_file():
+            return resolved
+    return candidate
+
+
 # ── Commands ─────────────────────────────────────────────────────────────────
 
 
@@ -88,7 +103,7 @@ def cmd_inventory(args):
 
 def cmd_lint(args):
     reg = _registry(args)
-    reqs = _load_requirements(Path(args.requirements))
+    reqs = _load_requirements(_resolve_input_path(args.requirements))
     issues = lint_requirements(reqs, reg)
     print(format_lint_report(issues))
     sys.exit(1 if any(i.severity == "error" for i in issues) else 0)
@@ -96,7 +111,7 @@ def cmd_lint(args):
 
 def cmd_check_signals(args):
     reg = _registry(args)
-    reqs = _load_requirements(Path(args.requirements))
+    reqs = _load_requirements(_resolve_input_path(args.requirements))
     issues = check_signals(reqs, reg)
     print(format_signal_report(issues))
     sys.exit(1 if any(i.severity == "error" for i in issues) else 0)
@@ -104,7 +119,7 @@ def cmd_check_signals(args):
 
 def cmd_realize(args):
     reg = _registry(args)
-    reqs = _load_requirements(Path(args.requirements))
+    reqs = _load_requirements(_resolve_input_path(args.requirements))
     vmap = build_variable_map(reqs, reg)
     result = check_realizability(reqs, vmap)
     print(result.summary())
@@ -114,7 +129,7 @@ def cmd_realize(args):
 
 def cmd_export(args):
     reg = _registry(args)
-    reqs = _load_requirements(Path(args.requirements))
+    reqs = _load_requirements(_resolve_input_path(args.requirements))
     vmap = build_variable_map(reqs, reg)
     out_dir = Path(args.output_dir)
     result = export_ritmos_artifacts(reqs, vmap, out_dir)
@@ -127,7 +142,7 @@ def cmd_export(args):
 def cmd_advise(args):
     """Full pipeline: lint → signal check → realizability → revision advice."""
     reg = _registry(args)
-    reqs = _load_requirements(Path(args.requirements))
+    reqs = _load_requirements(_resolve_input_path(args.requirements))
     vmap = build_variable_map(reqs, reg)
 
     print("=" * 60)
@@ -173,20 +188,34 @@ def cmd_advise(args):
 
 
 def cmd_formalize(args):
-    """Convert FRETish text to ptLTL using FRET CLI."""
+    """Convert FRETish text or a requirements YAML file to ptLTL using FRET CLI."""
+    candidate_path = _resolve_input_path(args.fretish)
+    if candidate_path.is_file():
+        reqs = _load_requirements(candidate_path)
+        failures = 0
+        for req in reqs:
+            ptltl = formalize_fretish(req.fretish_text())
+            if ptltl:
+                print(f"{req.req_id}: {ptltl}")
+            else:
+                print(f"{req.req_id}: FORMALIZATION FAILED")
+                failures += 1
+        sys.exit(1 if failures else 0)
+
     ptltl = formalize_fretish(args.fretish)
     if ptltl:
         print(f"ptLTL: {ptltl}")
-    else:
-        print("FRET CLI not available. Cannot formalize.")
-        print("Install FRET and add fretcli to PATH.")
-        sys.exit(1)
+        return
+
+    print("FRET CLI not available or formalization failed.")
+    print("Install FRET and add fretcli to PATH.")
+    sys.exit(1)
 
 
 def cmd_ritmos(args):
     """Show RiTMOS invocation command for the exported artifacts."""
     reg = _registry(args)
-    reqs = _load_requirements(Path(args.requirements))
+    reqs = _load_requirements(_resolve_input_path(args.requirements))
     vmap = build_variable_map(reqs, reg)
     out_dir = Path(args.output_dir)
 
@@ -261,8 +290,8 @@ def main():
     p_adv.add_argument("requirements", help="Path to requirements.yaml")
 
     # formalize
-    p_form = sub.add_parser("formalize", help="Convert FRETish text to ptLTL via FRET CLI")
-    p_form.add_argument("fretish", help="FRETish sentence (in quotes)")
+    p_form = sub.add_parser("formalize", help="Convert FRETish text or a requirements YAML file to ptLTL via FRET CLI")
+    p_form.add_argument("fretish", help="FRETish sentence (in quotes) or path to requirements.yaml")
 
     # ritmos
     p_ritmos = sub.add_parser("ritmos", help="Export artifacts and show RiTMOS invocation")

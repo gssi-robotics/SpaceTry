@@ -182,6 +182,28 @@ rover_is_moving:
     Derived: abs(rover_linear_velocity) > MOVING_EPSILON.
     Indicates the rover has non-negligible forward velocity.
 
+velocity_within_limit:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: true
+  notes: >
+    Derived: rover_linear_velocity <= 1.5.
+    Indicates the rover is within the configured safe forward-speed bound.
+
+environment_clearance_ok:
+  kind: internal
+  ros_topic: null
+  msg_type: null
+  field: null
+  unit: bool
+  verified: true
+  notes: >
+    Derived: obstacle_min_range > 0.0.
+    Indicates the environment provides some non-zero free space.
+
 distance_to_waypoint:
   kind: internal
   ros_topic: null
@@ -203,6 +225,28 @@ at_waypoint:
   notes: >
     Derived: distance_to_waypoint < waypoint_tolerance.
     Uses per-waypoint tolerance from waypoints.yaml.
+
+at_ridge_waypoint:
+  kind: input
+  ros_topic: /spacetry/at_ridge_waypoint
+  msg_type: std_msgs/msg/Bool
+  field: data
+  unit: bool
+  verified: false
+  notes: >
+    Planned boolean predicate for "rover is at the ridge waypoint".
+    This can be published by mission logic or a waypoint-checking helper.
+
+at_home_waypoint:
+  kind: input
+  ros_topic: /spacetry/at_home_waypoint
+  msg_type: std_msgs/msg/Bool
+  field: data
+  unit: bool
+  verified: false
+  notes: >
+    Planned boolean predicate for "rover is at the outpost habitat waypoint".
+    This can be published by mission logic or a waypoint-checking helper.
 
 # ── UNVERIFIED / PLANNED SIGNALS ─────────────────────────────────────────────
 # These appear in MISSION.md or design docs but have NO implementation.
