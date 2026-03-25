@@ -1,0 +1,104 @@
+# fretish_templates.yaml
+# Common FRETish requirement patterns for Mars rover safety.
+#
+# These templates serve as a reference for the agent and for human
+# authors.  Each template has a name, a parameterised FRETish pattern,
+# the expected parameter types, and a plain-English explanation.
+
+templates:
+
+  obstacle_stop:
+    pattern: "globally, if {obstacle_predicate} {component} shall immediately satisfy {stop_command}"
+    parameters:
+      obstacle_predicate: "bool — predicate that is true when obstacle is too close"
+      stop_command: "bool — output signal for stopping"
+      component: "string — component name (default: the rover)"
+    description: >
+      When an obstacle is detected within the safety threshold, the rover
+      must immediately stop.  This is the most fundamental collision-avoidance
+      requirement.
+    example:
+      scope: globally
+      condition: "if obstacle_too_close"
+      component: the rover
+      timing: immediately
+      response: "satisfy cmd_move_stop"
+      kind: guarantee
+
+  no_motion_while_obstacle:
+    pattern: "globally, if {obstacle_predicate} {component} shall always satisfy not {forward_command}"
+    parameters:
+      obstacle_predicate: "bool"
+      forward_command: "bool — output signal for forward motion"
+    description: >
+      While an obstacle is within the safety threshold, the rover must
+      not command forward motion.  Complementary to obstacle_stop.
+    example:
+      scope: globally
+      condition: "if obstacle_too_close"
+      component: the rover
+      timing: always
+      response: "satisfy not cmd_move_forward"
+      kind: guarantee
+
+  velocity_bound:
+    pattern: "globally, {component} shall always satisfy {velocity_signal} <= {max_velocity}"
+    parameters:
+      velocity_signal: "float — velocity signal name"
+      max_velocity: "float — maximum safe velocity"
+    description: >
+      The rover's velocity must never exceed a safe maximum.
+    example:
+      scope: globally
+      condition: ""
+      component: the rover
+      timing: always
+      response: "satisfy rover_linear_velocity <= 1.5"
+      kind: guarantee
+
+  reach_waypoint:
+    pattern: "globally, {component} shall eventually satisfy {at_waypoint_predicate}"
+    parameters:
+      at_waypoint_predicate: "bool — predicate true when rover is at target waypoint"
+    description: >
+      The rover must eventually reach its designated waypoint.
+      This is a liveness/mission-completion requirement.
+    example:
+      scope: globally
+      condition: ""
+      component: the rover
+      timing: eventually
+      response: "satisfy at_waypoint"
+      kind: guarantee
+
+  battery_return_assumption:
+    pattern: "globally, if {battery_low_predicate} {component} shall eventually satisfy {at_safe_waypoint}"
+    parameters:
+      battery_low_predicate: "bool — true when battery is below safe threshold"
+      at_safe_waypoint: "bool — true when rover reaches safe/charging waypoint"
+    description: >
+      When battery is low, the rover must eventually reach a safe location.
+      NOTE: battery signals are not yet implemented in SpaceTry.
+    example:
+      scope: globally
+      condition: "if battery_is_low"
+      component: the rover
+      timing: eventually
+      response: "satisfy at_waypoint"
+      kind: guarantee
+
+  environment_obstacle_assumption:
+    pattern: "globally, the environment shall always satisfy {max_obstacles_predicate}"
+    parameters:
+      max_obstacles_predicate: "bool — bound on obstacle density or minimum clearance"
+    description: >
+      An assumption about the environment: obstacles do not completely
+      block all paths.  Without this, liveness requirements may be
+      unrealizable.
+    example:
+      scope: globally
+      condition: ""
+      component: the environment
+      timing: always
+      response: "satisfy obstacle_min_range > 0.0"
+      kind: assumption
