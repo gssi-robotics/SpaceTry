@@ -13,7 +13,7 @@ USER root
 # Base tools + ros_gz + vcstool + git
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates \
-    git python3-vcstool \
+    git python3-vcstool python3-yaml \
     ros-${ROS_DISTRO}-ros-gz \
     ros-${ROS_DISTRO}-gz-ros2-control \
     ros-${ROS_DISTRO}-ros2-control \
@@ -86,8 +86,24 @@ WORKDIR /ws
 # Copy repo into image. Chown so runtime user can work in /ws when not bind-mounted.
 COPY --chown=${USERNAME}:${USERNAME} . /ws
 
-# Import pinned Space ROS demos into the image workspace.
-RUN rm -rf /ws/src/space_ros_demos && \
+# Remove any stale colcon artifacts that slipped past .dockerignore
+# (prevents broken package.dsv files from a previous host build)
+RUN rm -rf /ws/build /ws/install /ws/log
+
+# Add GitHub host key to known_hosts to avoid interactive prompt
+RUN mkdir -p -m 0700 /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# Import pinned Space ROS demos.
+# When SSH agent is available (local dev), uses git@github.com URLs from spacetry.repos.
+# When not (CI), rewrites SSH URLs to HTTPS for public repos.
+RUN --mount=type=ssh,required=false \
+    mkdir -p /root/.ssh && \
+    ssh-keyscan github.com >> /root/.ssh/known_hosts 2>/dev/null && \
+    if ! ssh -o BatchMode=yes -T git@github.com 2>&1 | grep -q 'successfully authenticated'; then \
+      git config --global url."https://github.com/".insteadOf "git@github.com:"; \
+    fi && \
+    rm -rf /ws/src/space_ros_demos && \
     mkdir -p /ws/src && \
     vcs import /ws/src < /ws/deps/spacetry.repos
 
@@ -116,6 +132,11 @@ RUN for d in /opt/spacetry_deps/space_ros_demos/*; do \
 # Ensure runtime user can read cached deps and work in /ws.
 RUN chown -R ${USERNAME}:${USERNAME} /opt/spacetry_deps /ws
 RUN install -m 0644 /ws/docker/spacetry_ws_overlay.sh /etc/profile.d/spacetry_ws_overlay.sh
+
+# Add runtime user to video and render groups for GPU device access (/dev/dri)
+# Use host's render GID (default 109) so container user can access /dev/dri/renderD*
+ARG RENDER_GID=109
+RUN groupadd -f -g ${RENDER_GID} render && usermod -a -G video,render ${USERNAME}
 
 # Drop privileges for runtime
 USER ${USERNAME}
