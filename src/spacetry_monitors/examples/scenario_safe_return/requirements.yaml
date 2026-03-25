@@ -1,0 +1,86 @@
+# requirements.yaml — Safe Return Under Low Battery
+# Includes unverified signals to demonstrate agent flagging.
+
+requirements:
+
+  - req_id: REQ_OBSTACLE_STOP
+    scope: globally
+    condition: "if obstacle_too_close"
+    component: the rover
+    timing: immediately
+    response: "satisfy cmd_move_stop"
+    description: >
+      When an obstacle is detected within the safety threshold,
+      the rover must immediately stop.
+    kind: guarantee
+    signals_used:
+      - obstacle_too_close
+      - cmd_move_stop
+
+  - req_id: REQ_NO_FORWARD_WHILE_OBSTACLE
+    scope: globally
+    condition: "if obstacle_too_close"
+    component: the rover
+    timing: always
+    response: "satisfy not cmd_move_forward"
+    description: >
+      While an obstacle is within the safety threshold, the rover must
+      not command forward motion.
+    kind: guarantee
+    signals_used:
+      - obstacle_too_close
+      - cmd_move_forward
+
+  - req_id: REQ_VELOCITY_CAP
+    scope: globally
+    condition: ""
+    component: the rover
+    timing: always
+    response: "satisfy rover_linear_velocity <= 1.5"
+    description: >
+      The rover's forward velocity must never exceed 1.5 m/s.
+    kind: guarantee
+    signals_used:
+      - rover_linear_velocity
+
+  - req_id: REQ_BATTERY_RETURN
+    scope: globally
+    condition: "if battery_is_low"
+    component: the rover
+    timing: eventually
+    response: "satisfy at_waypoint"
+    description: >
+      When battery is critically low, the rover must eventually reach
+      the safe haven waypoint (-5, -5, tolerance 1.0 m).
+      NOTE: battery_is_low is NOT YET IMPLEMENTED.
+    kind: guarantee
+    signals_used:
+      - battery_is_low
+      - at_waypoint
+      - rover_position_x
+      - rover_position_y
+
+  - req_id: ASM_ENV_CLEARANCE
+    scope: globally
+    condition: ""
+    component: the environment
+    timing: always
+    response: "satisfy obstacle_min_range > 0.0"
+    description: >
+      Environment clearance assumption for liveness.
+    kind: assumption
+    signals_used:
+      - obstacle_min_range
+
+  - req_id: ASM_BATTERY_DECREASE
+    scope: globally
+    condition: ""
+    component: the environment
+    timing: always
+    response: "satisfy battery_percentage >= 0"
+    description: >
+      Battery percentage is non-negative.
+      NOTE: battery_percentage is NOT YET IMPLEMENTED.
+    kind: assumption
+    signals_used:
+      - battery_percentage

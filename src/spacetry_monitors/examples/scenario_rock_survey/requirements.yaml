@@ -1,0 +1,89 @@
+# requirements.yaml — Rock Survey at Ridge
+# Minimal safety requirements for the rock survey mission.
+
+requirements:
+
+  - req_id: REQ_OBSTACLE_STOP
+    scope: globally
+    condition: "if obstacle_too_close"
+    component: the rover
+    timing: immediately
+    response: "satisfy cmd_move_stop"
+    description: >
+      When an obstacle is detected within the safety threshold (1.0 m),
+      the rover must immediately issue a stop command.
+    kind: guarantee
+    signals_used:
+      - obstacle_too_close
+      - cmd_move_stop
+
+  - req_id: REQ_NO_FORWARD_WHILE_OBSTACLE
+    scope: globally
+    condition: "if obstacle_too_close"
+    component: the rover
+    timing: always
+    response: "satisfy not cmd_move_forward"
+    description: >
+      While an obstacle is within the safety threshold, the rover must
+      not command forward motion.
+    kind: guarantee
+    signals_used:
+      - obstacle_too_close
+      - cmd_move_forward
+
+  - req_id: REQ_VELOCITY_CAP
+    scope: globally
+    condition: ""
+    component: the rover
+    timing: always
+    response: "satisfy rover_linear_velocity <= 1.5"
+    description: >
+      The rover's forward velocity must never exceed 1.5 m/s.
+    kind: guarantee
+    signals_used:
+      - rover_linear_velocity
+
+  - req_id: ASM_ENV_CLEARANCE
+    scope: globally
+    condition: ""
+    component: the environment
+    timing: always
+    response: "satisfy obstacle_min_range > 0.0"
+    description: >
+      The environment is assumed to always provide at least some minimum
+      clearance — the rover is never fully enclosed with zero escape path.
+      This is needed for liveness requirements to be realizable.
+    kind: assumption
+    signals_used:
+      - obstacle_min_range
+
+  - req_id: REQ_REACH_RIDGE
+    scope: globally
+    condition: ""
+    component: the rover
+    timing: eventually
+    response: "satisfy at_waypoint"
+    description: >
+      The rover must eventually reach the ridge waypoint.
+      at_waypoint is derived from distance_to_waypoint < tolerance
+      with target = ridge (12, 4, tolerance 1.0 m).
+    kind: guarantee
+    signals_used:
+      - at_waypoint
+      - rover_position_x
+      - rover_position_y
+
+  - req_id: REQ_RETURN_HOME
+    scope: "after at_waypoint"
+    condition: ""
+    component: the rover
+    timing: eventually
+    response: "satisfy at_waypoint"
+    description: >
+      After reaching the ridge, the rover must eventually return to the
+      outpost habitat (145, 50, tolerance 1.0 m).
+    kind: guarantee
+    signals_used:
+      - at_waypoint
+      - rover_position_x
+      - rover_position_y
