@@ -10,9 +10,11 @@ Commands:
     lint            Lint a requirements YAML file
     check-signals   Check signal availability for a requirements file
     realize         Run realizability checking (or placeholder pre-check)
-    export          Export RiTMOS artifacts (signals_full.yaml + roverSpec_full.fcs)
-    run-example     Run a built-in example scenario end-to-end
+    formalize       Convert FRETish text to ptLTL via FRET CLI
+    export          Export RiTMOS artifacts (spec.fcs + signals.yaml)
     advise          Run full pipeline and print revision advice
+    ritmos          Export artifacts and show RiTMOS invocation
+    walk            Interactive step-by-step pipeline with human review
 """
 
 from __future__ import annotations
@@ -172,6 +174,220 @@ def cmd_advise(args):
     print(get_realizability_invocation())
 
 
+def cmd_walk(args):
+    """
+    Interactive walk-through: runs the pipeline step by step, pausing
+    after each phase for human review.
+
+    At each gate the human can:
+      [y] proceed to next step
+      [e] edit requirements.yaml and re-run this step
+      [s] skip this step
+      [a] abort the pipeline
+
+    The requirements file is **reloaded** after every edit, so changes
+    made in an external editor (VS Code, Codex, vim) take effect
+    immediately.
+    """
+    reg = _registry(args)
+    req_path = Path(args.requirements)
+    out_dir = Path(args.output_dir)
+
+    def _gate(step_name: str) -> str:
+        """Prompt the human. Returns 'y', 'e', 's', or 'a'."""
+        while True:
+            try:
+                answer = input(
+                    f"\n{'─' * 60}\n"
+                    f"  [{step_name}] "
+                    f"proceed / edit & re-run / skip / abort? [y/e/s/a]: "
+                ).strip().lower()
+            except (EOFError, KeyboardInterrupt):
+                print()
+                return "a"
+            if answer in ("y", "e", "s", "a", ""):
+                return answer or "y"
+            print("  Please enter y, e, s, or a.")
+
+    # ── Step 0: Show requirements ────────────────────────────────
+    step = "REQUIREMENTS REVIEW"
+    while True:
+        reqs = _load_requirements(req_path)
+        print(f"\n{'=' * 60}")
+        print(f"STEP 0 — {step}")
+        print(f"{'=' * 60}")
+        print(f"Loaded {len(reqs)} requirement(s) from {req_path}\n")
+        for r in reqs:
+            print(f"  [{r.kind.upper():10s}] {r.req_id}")
+            print(f"    {r.fretish_text()}")
+            if r.description:
+                print(f"    → {r.description.strip()}")
+            print()
+
+        choice = _gate(step)
+        if choice == "a":
+            print("Aborted.")
+            return
+        if choice == "e":
+            print(f"  Edit {req_path} in your editor, then press Enter...")
+            try:
+                input()
+            except (EOFError, KeyboardInterrupt):
+                print("\nAborted.")
+                return
+            continue  # reload and re-display
+        break  # 'y' or 's'
+
+    # ── Step 1: Lint ─────────────────────────────────────────────
+    step = "LINT"
+    while True:
+        reqs = _load_requirements(req_path)
+        print(f"\n{'=' * 60}")
+        print(f"STEP 1 — {step}")
+        print(f"{'=' * 60}")
+        lint_issues = lint_requirements(reqs, reg)
+        print(format_lint_report(lint_issues))
+        errors = [i for i in lint_issues if i.severity == "error"]
+        if errors:
+            print(f"  *** {len(errors)} error(s) found. Fix before proceeding.")
+
+        choice = _gate(step)
+        if choice == "a":
+            print("Aborted.")
+            return
+        if choice == "e":
+            print(f"  Edit {req_path}, then press Enter...")
+            try:
+                input()
+            except (EOFError, KeyboardInterrupt):
+                print("\nAborted.")
+                return
+            continue
+        break
+
+    # ── Step 2: Signal check ─────────────────────────────────────
+    step = "SIGNAL CHECK"
+    while True:
+        reqs = _load_requirements(req_path)
+        print(f"\n{'=' * 60}")
+        print(f"STEP 2 — {step}")
+        print(f"{'=' * 60}")
+        sig_issues = check_signals(reqs, reg)
+        print(format_signal_report(sig_issues))
+
+        choice = _gate(step)
+        if choice == "a":
+            print("Aborted.")
+            return
+        if choice == "e":
+            print(f"  Edit {req_path}, then press Enter...")
+            try:
+                input()
+            except (EOFError, KeyboardInterrupt):
+                print("\nAborted.")
+                return
+            continue
+        break
+
+    # ── Step 3: Variable mapping ─────────────────────────────────
+    step = "VARIABLE MAPPING"
+    reqs = _load_requirements(req_path)
+    vmap = build_variable_map(reqs, reg)
+    print(f"\n{'=' * 60}")
+    print(f"STEP 3 — {step}")
+    print(f"{'=' * 60}")
+    print(vmap.summary())
+    if vmap.has_unmapped():
+        print("\n  *** Unmapped signals found. These are not in the inventory.")
+
+    choice = _gate(step)
+    if choice == "a":
+        print("Aborted.")
+        return
+
+    # ── Step 4: Realizability ────────────────────────────────────
+    step = "REALIZABILITY"
+    if choice != "s":
+        while True:
+            reqs = _load_requirements(req_path)
+            vmap = build_variable_map(reqs, reg)
+            print(f"\n{'=' * 60}")
+            print(f"STEP 4 — {step}")
+            print(f"{'=' * 60}")
+            result = check_realizability(reqs, vmap)
+            print(result.summary())
+            print()
+            print("Invocation reference:")
+            print(get_realizability_invocation())
+
+            choice = _gate(step)
+            if choice == "a":
+                print("Aborted.")
+                return
+            if choice == "e":
+                print(f"  Edit {req_path}, then press Enter...")
+                try:
+                    input()
+                except (EOFError, KeyboardInterrupt):
+                    print("\nAborted.")
+                    return
+                continue
+            break
+    else:
+        result = RealizabilityResult(realizable=None, message="Skipped by user")
+        lint_issues = lint_requirements(reqs, reg)
+        sig_issues = check_signals(reqs, reg)
+
+    # ── Step 5: Revision advice ──────────────────────────────────
+    step = "REVISION ADVICE"
+    reqs = _load_requirements(req_path)
+    vmap = build_variable_map(reqs, reg)
+    lint_issues = lint_requirements(reqs, reg)
+    sig_issues = check_signals(reqs, reg)
+    print(f"\n{'=' * 60}")
+    print(f"STEP 5 — {step}")
+    print(f"{'=' * 60}")
+    revisions = advise_revisions(reqs, vmap, lint_issues, sig_issues, result)
+    print(format_revision_report(revisions))
+
+    choice = _gate(step)
+    if choice == "a":
+        print("Aborted.")
+        return
+    if choice == "e":
+        print(f"  Edit {req_path}, then press Enter to proceed to export...")
+        try:
+            input()
+        except (EOFError, KeyboardInterrupt):
+            print("\nAborted.")
+            return
+
+    # ── Step 6: Export ───────────────────────────────────────────
+    step = "EXPORT"
+    reqs = _load_requirements(req_path)
+    vmap = build_variable_map(reqs, reg)
+    print(f"\n{'=' * 60}")
+    print(f"STEP 6 — {step}")
+    print(f"{'=' * 60}")
+    export_result = export_ritmos_artifacts(reqs, vmap, out_dir)
+    print(f"  spec.fcs                       → {export_result['spec_path']}")
+    print(f"  signals.yaml                   → {export_result['signals_path']}")
+    print(f"  fretRequirementsVariables.json  → {export_result['fret_json_path']}")
+    for w in export_result.get("warnings", []):
+        print(f"  {w}")
+
+    print(f"\nRiTMOS invocation:")
+    print(f"  ritmos ros package {export_result['spec_path']} \\")
+    print(f"    --pkg spacetry_monitor \\")
+    print(f"    --outdir ros_ws/src \\")
+    print(f"    --signals-map {export_result['signals_path']} \\")
+    print(f"    --compile-copilot")
+
+    print(f"\n{'=' * 60}")
+    print("PIPELINE COMPLETE")
+    print(f"{'=' * 60}")
+
+
 def cmd_formalize(args):
     """Convert FRETish text to ptLTL using FRET CLI."""
     ptltl = formalize_fretish(args.fretish)
@@ -269,6 +485,11 @@ def main():
     p_ritmos.add_argument("requirements", help="Path to requirements.yaml")
     p_ritmos.add_argument("-o", "--output-dir", default=".", help="Output directory")
 
+    # walk
+    p_walk = sub.add_parser("walk", help="Interactive step-by-step pipeline with human review")
+    p_walk.add_argument("requirements", help="Path to requirements.yaml")
+    p_walk.add_argument("-o", "--output-dir", default=".", help="Output directory")
+
     args = parser.parse_args()
     if not args.command:
         parser.print_help()
@@ -283,6 +504,7 @@ def main():
         "advise": cmd_advise,
         "formalize": cmd_formalize,
         "ritmos": cmd_ritmos,
+        "walk": cmd_walk,
     }
     dispatch[args.command](args)
 
