@@ -1,4 +1,4 @@
-# FRETish Agent — Architecture
+# SpaceTry Requirements Tooling — Architecture
 
 ## Overview
 
@@ -10,7 +10,7 @@ realizability checking and with RiTMOS for Copilot monitor generation.
 ## Module structure
 
 ```
-src/spacetry_monitors/
+src/spacetry_requirements/
 ├── fretish_agent/             # Python package
 │   ├── __init__.py
 │   ├── cli.py                 # Command-line interface (entry point)
