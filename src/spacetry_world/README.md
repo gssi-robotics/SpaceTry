@@ -8,7 +8,6 @@ Local models can be found in `[src/spacetry_models/models/](../../spacetry_model
 | Model | Description |
 |---|---|
 | `station` | Outpost habitat module |
-| `solar_panel` | Solar panel with pole (static) |
 | `rock_5` | Lightweight science rock (static) |
 | `block_island` | Hazard patch terrain obstacle (static) |
 

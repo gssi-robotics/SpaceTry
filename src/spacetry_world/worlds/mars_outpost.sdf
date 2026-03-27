@@ -105,12 +105,6 @@
        <pose>66.00 0 -10.80 -1.1 -0.10 3.07</pose>
     </include>
 
-    <include>
-      <name>solar_panel</name>
-      <uri>model://solar_panel</uri>
-      <pose>60 1 -9.0 1.60 -0.60 0.30</pose>
-    </include>
-
     <!-- Science targets -->
     <include>
       <name>science_rock_01</name>
