@@ -2,12 +2,13 @@
 
 SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees. 
 
-Contents:
-- [Project Layout](#project-layout)
-- [Dependencies & Requirements](#dependencies--requirements)
-- [Quickstart](#quickstart-docker-only)
-- [Step-by-Step: Run SpaceTry 🥐](#step-by-step-run-spacetry--with-the-curiosity-rover)
-- [Mission configuration](#spacetry--mission-configuration)
+**Contents:**
+- [Project Layout](#project-layout) — Repository structure and ROS2 packages
+- [Dependencies & Integrations](#dependencies--integrations) — Integration with Space-ROS, Curiosity Rover, and BehaviorTree.CPP
+- [Quickstart](#quickstart-docker-only) — Quick validation: build Docker image and run smoke tests
+- [Step-by-Step: Run SpaceTry 🥐](#step-by-step-run-spacetry--with-the-curiosity-rover) — Complete walkthrough from container startup to rover control
+- [Mission configuration](#spacetry--mission-configuration) — Mission objectives, waypoints, and validation
+- [Test Scenarios](#test-scenarios-for-autonomy-evaluation) — Framework for autonomy evaluation and self-adaptation testing
 
 ## Project layout
 * `docker/` — Dockerfile + compose + entrypoint
@@ -233,9 +234,9 @@ docker compose -f docker/docker-compose.yaml down
 ## SpaceTry 🥐 Mission Configuration
 
    Mission configuration files live in:
-   * ```src/spacetry_mission/config/waypoints.yaml``` — named navigation waypoints (frame: world)
+   * ```src/spacetry_mission/config/mission_01.yaml``` — mission objectives
    * ```src/spacetry_mission/config/objects.yaml``` — mission objects (IDs must match model instance names in the world)
-   * ```src/spacetry_mission/config/mission_01.yaml``` — example objective list (optional)
+   * ```src/spacetry_mission/config/waypoints.yaml``` — named navigation waypoints (frame: world)
 
    ### Validate mission config against the world
    The validator checks that IDs in objects.yaml exist in the installed world SDF.
@@ -252,3 +253,250 @@ docker compose -f docker/docker-compose.yaml down
    '
    ```
 > More details on the mission goals, configurations, and launch can be found in [MISSION.md](src/spacetry_mission/MISSION.md).
+
+## Test Scenarios for Autonomy Evaluation
+
+SpaceTry 🥐 includes a framework for generating and running test scenarios that evaluate the rover's autonomous capabilities and self-adaptation to changing/unforeseen conditions.
+
+### Overview
+
+Test scenarios inject uncertainty into the rover's mission execution to evaluate:
+- **Perceptual Adaptation** — Can the rover adapt when sensors degrade or fail?
+- **Behavioral Flexibility** — Does the behavior tree transition to contingencies appropriately?
+- **Resource-Aware Autonomy** — Can the rover adapt goals to energy constraints?
+- **Obstacle Intelligence** — Can the rover discover and avoid dynamic obstacles?
+- **Mission Resilience** — Can the rover recover from failures or replanning challenges?
+- **Safety Under Autonomy** — Does self-adaptation maintain safety constraints?
+
+### Quick Start: Run a Test Scenario
+
+<details>
+<summary> 1. Understand the Test Scenario Framework </summary>
+
+   Scenario templates are available in the `scenarios/` directory:
+
+   - [**SCENARIO_PROMPT_TEMPLATE.md**](scenarios/SCENARIO_PROMPT_TEMPLATE.md) — Comprehensive guide with base template, instantiation examples, and usage patterns
+   - [**SCENARIO_PROMPT_QUICK_REF.md**](scenarios/SCENARIO_PROMPT_QUICK_REF.md) — Quick reference with one-liners, uncertainty injection templates, and naming conventions
+
+   These templates guide the creation of scenario driver components that:
+   - Inject uncertainty at decision-critical moments
+   - Monitor rover autonomy metrics (goal completion, contingency activations, safety violations)
+   - Log behavior for post-execution analysis
+   - Adapt challenge intensity based on observed performance
+
+</details>
+
+<details>
+<summary> 2. Create a Test Scenario Description </summary>
+
+   Use the scenario prompt templates to define your test scenario. For example:
+
+   **Sensor Degradation Scenario:**
+   ```
+   Given the behavior tree at src/spacetry_bt/trees/base_bt.xml,
+   source code in src/spacetry_perception/,
+   and mission defined in src/spacetry_mission/config/mission_01.yaml,
+   create a scenario driver that injects LIDAR degradation (100% → 50% → fail over 5 min)
+   to test whether autonomous perception adaptation can maintain obstacle avoidance.
+   ```
+
+   **Dynamic Obstacle Scenario:**
+   ```
+   Given the behavior tree at src/spacetry_bt/trees/base_bt.xml,
+   source code in src/spacetry_perception/,
+   and mission defined in src/spacetry_mission/config/mission_01.yaml,
+   create a scenario driver that spawns dynamic obstacles at waypoints
+   to test whether autonomous navigation can detect, replan, and avoid.
+   ```
+
+   **Power Constraint Scenario:**
+   ```
+   Given the behavior tree at src/spacetry_bt/trees/base_bt.xml,
+   source code in src/spacetry_battery/battery_manager_node.py,
+   and mission defined in src/spacetry_mission/config/mission_01.yaml,
+   create a scenario driver that accelerates battery drain
+   to test whether autonomous mission planning can gracefully degrade and complete with limited energy.
+   ```
+
+   See [scenarios/SCENARIO_PROMPT_QUICK_REF.md](scenarios/SCENARIO_PROMPT_QUICK_REF.md) for rapid scenario generation templates.
+
+</details>
+
+<details>
+<summary> 3. Build and Prepare the Scenario </summary>
+
+   From inside the running container:
+
+   ```bash
+   # Rebuild packages if scenario components have changed
+   docker compose exec spacetry colcon build --packages-select spacetry_mission spacetry_bt spacetry_world spacetry_perception spacetry_battery
+   ```
+
+</details>
+
+<details>
+<summary> 4. Launch the Rover with Scenario Parameters </summary>
+
+   Scenarios are launched using the same bringup launch file with additional parameters to enable uncertainty injection:
+
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
+       headless:=0 \
+       battery:=1.0 \
+       spawn_waypoint:=dock_pad_01 \
+       scenario_enabled:=true \
+       scenario_type:=sensor_degradation
+   '
+   ```
+
+   **Available scenario parameters:**
+   - `scenario_enabled` (true/false) — Enable uncertainty injection
+   - `scenario_type` — Type of uncertainty: `sensor_degradation`, `dynamic_obstacles`, `power_constraints`, `cascading_failures`
+   - `scenario_intensity` (float 0-1) — Intensity of uncertainty injection (0=none, 1=maximum)
+   - `scenario_log_dir` (string) — Output directory for scenario logs (default: `/tmp/spacetry_scenarios/`)
+
+   **Example scenarios:**
+
+   *Scenario 1: Progressive LIDAR Degradation*
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
+       headless:=0 battery:=1.0 \
+       scenario_enabled:=true \
+       scenario_type:=sensor_degradation \
+       scenario_intensity:=0.5
+   '
+   ```
+
+   *Scenario 2: Dynamic Obstacles*
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
+       headless:=0 battery:=1.0 \
+       scenario_enabled:=true \
+       scenario_type:=dynamic_obstacles \
+       scenario_intensity:=0.7
+   '
+   ```
+
+   *Scenario 3: Power Constraints*
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
+       headless:=0 battery:=0.5 \
+       scenario_enabled:=true \
+       scenario_type:=power_constraints \
+       scenario_intensity:=0.8
+   '
+   ```
+
+</details>
+
+<details>
+<summary> 5. Run the Behavior Tree During Scenario Execution </summary>
+
+   In another container terminal, start the behavior tree runner:
+
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 run spacetry_bt spacetry_bt_runner \
+       --ros-args \
+       -p tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/base_bt.xml \
+       -p tick_hz:=10 \
+       -p max_runtime_s:=300 \
+       --params-file /ws/src/spacetry_bt/bt_params.yaml
+   '
+   ```
+
+   The behavior tree will execute the mission objectives from `src/spacetry_mission/config/mission_01.yaml` while the scenario driver injects uncertainty at decision points.
+
+</details>
+
+<details>
+<summary> 6. Monitor Autonomy Metrics During Execution </summary>
+
+   While the scenario runs, monitor key autonomy metrics in a third terminal:
+
+   **Goal Progress:**
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 topic echo /spacetry_mission/current_objective
+   '
+   ```
+
+   **Battery State:**
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 topic echo /battery_manager/state_of_charge
+   '
+   ```
+
+   **Obstacle Detection (if applicable):**
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 topic echo /obstacle_direction
+   '
+   ```
+
+   **Behavior Tree Status:**
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     ros2 topic echo /tree_outputs
+   '
+   ```
+
+</details>
+
+<details>
+<summary> 7. Analyze Scenario Results </summary>
+
+   After the scenario completes, analyze the results using the scenario report:
+
+   ```bash
+   docker compose exec spacetry bash -lc '\
+     source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+     python3 /ws/scripts/scenario_analyzer.py \
+       --log-dir /tmp/spacetry_scenarios/latest \
+       --output-report /tmp/spacetry_scenarios/latest/autonomy_report.md
+   '
+   ```
+
+   The report will show:
+   - **Autonomy Metrics**: Adaptation success rate, contingency activations, recovery time
+   - **Goal Completion**: Primary objectives reached, partial completion, failure modes
+   - **Safety Constraints**: Violations detected, boundary breaches, collision events
+   - **Graceful Degradation**: Performance under increasing uncertainty intensity
+   - **Recommendations**: Which autonomy aspects to improve based on scenario results
+
+</details>
+
+### Test Scenario Workflow (Detailed)
+
+For a deeper understanding of the test scenario process and how to create custom scenarios, see the [AGENTS.md](AGENTS.md) section on [Test Scenario Generation Workflow](AGENTS.md#test-scenario-generation-workflow).
+
+The workflow consists of:
+1. **Define Autonomy Test Context** — Specify scenario parameters and objectives
+2. **Build and Prepare** — Compile scenario components
+3. **Launch Scenario with Autonomy Variations** — Run rover with uncertainty injection
+4. **Execute Test & Monitor Autonomous Behavior** — Observe real-time decision-making
+5. **Analyze Autonomy Results** — Generate evaluation report with metrics
+
+### Scenario Template Files
+
+Quick references for scenario creation:
+- [scenarios/SCENARIO_PROMPT_TEMPLATE.md](scenarios/SCENARIO_PROMPT_TEMPLATE.md) — Comprehensive template with examples
+- [scenarios/SCENARIO_PROMPT_QUICK_REF.md](scenarios/SCENARIO_PROMPT_QUICK_REF.md) — Quick reference guide
+- [AGENTS.md](AGENTS.md) — Project-wide autonomy evaluation framework
+- [src/spacetry_mission/config/mission_01.yaml](src/spacetry_mission/config/mission_01.yaml) — Example mission configuration
+- [src/spacetry_mission/config/waypoints.yaml](src/spacetry_mission/config/waypoints.yaml) — Navigation waypoints
+- [src/spacetry_mission/config/objects.yaml](src/spacetry_mission/config/objects.yaml) — Mission objects and hazards
