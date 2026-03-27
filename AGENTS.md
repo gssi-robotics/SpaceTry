@@ -39,7 +39,22 @@ spacetry/
 
 ## Development Workflow
 
-### 1. Running the Simulation
+### 1. ROS 2 Packages Changes:
+Each `src/*/` directory is a ROS2 package. Modifications are only allowed during the development stage. After evaluation or during scenario driver generation, changes should be done only if there are bugs detected on the initial implemented behavior. In that case, those changes shall be approved by the user.
+
+When modifying ROS2 packages:
+
+1. **CMakeLists.txt / setup.py** - Declare dependencies, entry points, targets
+2. **package.xml** - Metadata, dependencies, build type
+3. **Source code** - Follow the package's language conventions (C++, Python)
+4. **Configuration files** - In `config/` subdirectories as YAML
+
+After modifying any ROS2 files:
+```bash
+docker compose exec spacetry colcon build --packages-select <package-name>
+```
+
+### 2. Running the Simulation
 
 The project uses Docker Compose to orchestrate the simulation environment:
 
@@ -146,7 +161,7 @@ Do not override these unless specifically needed.
 
 ---
 
-## Test Scenario Generation Workflow
+## Test Scenario Generation and Evaluation Workflow
 
 Test scenarios validate the rover's autonomous capabilities and capacity to self-adapt to changing or unforeseen conditions. This workflow describes how to generate, configure, and execute test scenarios to evaluate robot autonomy.
 
@@ -180,7 +195,12 @@ A test scenario consists of:
 
 ### Test Scenario Workflow
 
-For detailed guidance on creating test scenario prompts, see [SCENARIO_PROMPT_TEMPLATE.md](./docs/SCENARIO_PROMPT_TEMPLATE.md).
+- **Step 1** (Define Autonomy Test Context) → The template will be used to guide the generation of the scenario driver for the evaluation of the robot autonomy
+- **Step 2** (Build and Prepare) → Template specifies code modules to build
+- **Step 3** (Launch Scenario) → Driver component executes uncertainty injection during launch
+- **Step 4** (Execute & Monitor) → Measure autonomy metrics defined in template
+- **Step 5** (Analyze Results) → Assess which autonomy aspects succeeded/failed
+
 
 **Step 1: Define Autonomy Test Context**
 ```bash
@@ -216,16 +236,20 @@ docker compose exec spacetry bash -lc \
 - Did it maintain safety while pursuing objectives?
 - How did autonomy degrade gracefully with resource constraints?
 
-### Autonomy Evaluation Criteria
+### Test Scenario Generation
 
-Test scenarios assess:
+The scenario driver template is in `scenarios/SCENARIO_PROMPT_TEMPLATE.md`.
 
-- **Perceptual Adaptation** - Does the rover handle sensor degradation? (spacetry_perception)
-- **Behavioral Flexibility** - Can behaviors transition when conditions change? (spacetry_bt)
-- **Resource-Aware Autonomy** - Does the rover adapt goals to energy constraints? (spacetry_battery)
-- **Obstacle Intelligence** - Does it discover and avoid dynamic obstacles? (spacetry_perception + spacetry_bt)
-- **Mission Resilience** - Can it recover from failures or replanning? (spacetry_mission)
-- **Safety Under Autonomy** - Does self-adaptation never violate safety? (spacetry_monitors)
+When generating or creating scenario driver components consider:
+
+1. **Parse the template** - Extract BT location, code paths, mission file
+2. **Identify uncertainty injection points** - Read BT and the monitors to find decision nodes
+3. **Create injection logic** - Implement event triggers (sensor degrade, obstacle spawn, power drain)
+4. **Instrument monitoring** - Subscribe to relevant ROS2 topics for state tracking
+5. **Measure and log** - Record autonomy metrics (recovery rate, goal completion, safety violations)
+6. **Report results** - Generate scenario evaluation with autonomy impact assessment
+
+The initial specified behavior through the BT and the monitors should not be changed because there are exactly what the scenario will evaluate and test.
 
 ### Package Impact on Autonomous Capabilities
 
@@ -241,28 +265,27 @@ Different packages contribute to rover autonomy:
 
 When modifying a package, evaluate how it changes the rover's autonomous capabilities and self-adaptation potential.
 
+### Autonomy Evaluation Criteria
+
+Test scenarios assess:
+
+- **Perceptual Adaptation** - Does the rover handle sensor degradation? (spacetry_perception)
+- **Behavioral Flexibility** - Can behaviors transition when conditions change? (spacetry_bt)
+- **Resource-Aware Autonomy** - Does the rover adapt goals to energy constraints? (spacetry_battery)
+- **Obstacle Intelligence** - Does it discover and avoid dynamic obstacles? (spacetry_perception + spacetry_bt)
+- **Mission Resilience** - Can it recover from failures or replanning? (spacetry_mission)
+- **Safety Under Autonomy** - Does self-adaptation never violate safety? (spacetry_monitors)
+
 ---
 
-Each `src/*/` directory is a ROS2 package. When modifying:
-
-1. **CMakeLists.txt / setup.py** - Declare dependencies, entry points, targets
-2. **package.xml** - Metadata, dependencies, build type
-3. **Source code** - Follow the package's language conventions (C++, Python)
-4. **Configuration files** - In `config/` subdirectories as YAML
-
-After modifying any ROS2 files:
-```bash
-docker compose exec spacetry colcon build --packages-select <package-name>
-```
-
-### Behavior Trees
+## Behavior Trees
 
 Located in `src/spacetry_bt/trees/`:
 - XML format using BehaviorTree.CPP library
 - Modify only after understanding the node definitions
 - Test changes by relaunching the rover
 
-### Gazebo Models
+## Gazebo Models
 
 Located in `src/spacetry_models/models/`:
 - Each model has `model.config` and `model.sdf` (XML/SDF format)

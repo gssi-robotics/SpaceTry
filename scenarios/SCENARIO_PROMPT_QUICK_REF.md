@@ -176,6 +176,19 @@ Create a driver that:
 - Measure: Graceful degradation (mission completion %), energy awareness (reserve margin), constraint violations
 ```
 
+### Example 4: Basic Benchmark Scenario
+
+```
+Given:
+i) BT: src/spacetry_bt/trees/base_bt.xml (contains perception → navigation logic)
+ii) Code: src/
+iii) Mission: src/spacetry_mission/MISSION.md
+Design a Scenario Driver Software Component that:
+1. Injects Uncertainty during robot execution
+2. Tests Autonomous Adaptation:
+3. Challenges Safety and Goal Viability
+```
+
 ---
 
 ## Template Adaptation Guide
@@ -189,31 +202,6 @@ Use this table to customize the template for your specific scenario:
 | **Measurement Focus** | Adaptation speed, safety preservation, goal viability, recovery rate | "Time to activate obstacle_avoidance behavior" |
 | **Intensity Increase** | Gradual, sudden, cascading | "LIDAR quality: 100% → 80% → 50% → 0% over 10 minutes" |
 | **Success Criteria** | Autonomy achieved (adapted & safe), degraded (adapted, unsafe), failed (not adapted) | "Goal completed + 0 safety violations = SUCCESS" |
-
----
-
-## Usage in Scenario Driver Code
-
-Apply this template when generating or creating scenario driver components:
-
-1. **Parse the template** - Extract BT location, code paths, mission file
-2. **Identify uncertainty injection points** - Read BT to find decision nodes
-3. **Create injection logic** - Implement event triggers (sensor degrade, obstacle spawn, power drain)
-4. **Instrument monitoring** - Subscribe to relevant ROS2 topics for state tracking
-5. **Measure and log** - Record autonomy metrics (recovery rate, goal completion, safety violations)
-6. **Report results** - Generate scenario evaluation with autonomy impact assessment
-
----
-
-## Integration with Test Scenario Workflow
-
-This template supports the [Test Scenario Generation Workflow](./AGENTS.md#test-scenario-generation-workflow) by:
-
-- **Step 1** (Define Autonomy Test Context) → Use template to clarify scenario objectives
-- **Step 2** (Build and Prepare) → Template specifies code modules to build
-- **Step 3** (Launch Scenario) → Driver component executes uncertainty injection during launch
-- **Step 4** (Execute & Monitor) → Measure autonomy metrics defined in template
-- **Step 5** (Analyze Results) → Assess which autonomy aspects succeeded/failed
 
 ---
 
