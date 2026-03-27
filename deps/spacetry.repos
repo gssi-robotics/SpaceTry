@@ -2,4 +2,4 @@ repositories:
   space_ros_demos:
     type: git
     url: git@github.com:space-ros/demos.git
-    version: acf369b
+    version: 0b1a987
