@@ -185,6 +185,7 @@ def generate_launch_description():
                 "outpost_x": base_x,
                 "outpost_y": base_y,
                 "initial_soc": ParameterValue(battery, value_type=float),
+                "use_sim_time": True,
             },
         ],
     )
