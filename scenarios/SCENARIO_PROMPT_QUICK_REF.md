@@ -180,12 +180,13 @@ Create a driver that:
 
 ```
 Given:
-i) BT: src/spacetry_bt/trees/base_bt.xml (contains perception → navigation logic)
-ii) Code: src/
+i) BT: src/spacetry_bt/trees/base_bt.xml with the goal specification and the overall nominal robot behavior.
+ii) Code: src/ with the ros 2 packages
 iii) Mission: src/spacetry_mission/MISSION.md
-Design a Scenario Driver Software Component that:
+iv) Monitors: src/spacetry_monitors with the monitors for safety behavior
+Design and implement a Scenario Driver Software Component that:
 1. Injects Uncertainty during robot execution
-2. Tests Autonomous Adaptation:
+2. Tests Autonomous Adaptation
 3. Challenges Safety and Goal Viability
 ```
 
