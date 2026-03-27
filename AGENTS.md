@@ -40,7 +40,16 @@ spacetry/
 ## Development Workflow
 
 ### 1. ROS 2 Packages Changes:
-Each `src/*/` directory is a ROS2 package. Modifications are only allowed during the development stage. After evaluation or during scenario driver generation, changes should be done only if there are bugs detected on the initial implemented behavior. In that case, those changes shall be approved by the user.
+The rover ROS 2 Packages are:
+- `src/spacetry_battery/`
+- `src/spacetry_bt/`
+- `src/spacetry_models/`
+- `src/spacetry_monitors/`
+- `src/spacetry_perception/`
+- `src/spacetry_requirements/`
+- `src/spacetry_models/`
+
+Modifications to the listed rover ROS 2 packages above are only allowed during the development stage. After evaluation or during scenario driver generation, changes should be done only if there are bugs detected on the initial implemented behavior. In that case, those changes shall be approved by the user.
 
 When modifying ROS2 packages:
 
@@ -249,7 +258,7 @@ When generating or creating scenario driver components consider:
 5. **Measure and log** - Record autonomy metrics (recovery rate, goal completion, safety violations)
 6. **Report results** - Generate scenario evaluation with autonomy impact assessment
 
-The initial specified behavior through the BT and the monitors should not be changed because there are exactly what the scenario will evaluate and test.
+The initial specified behavior through the BT and the monitors should not be changed because those are exactly what the scenario will evaluate and test.
 
 ### Package Impact on Autonomous Capabilities
 
