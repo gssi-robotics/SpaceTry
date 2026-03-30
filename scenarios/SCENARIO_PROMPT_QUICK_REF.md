@@ -5,97 +5,126 @@ Use this concise template to rapidly generate natural language prompts for missi
 ## One-Liner Format
 
 ```
-Given the behavior tree at {BT_PATH}, source code in {CODE_PACKAGE}, and mission defined in {MISSION_FILE},
-create a scenario driver that injects {UNCERTAINTY_TYPE} to test whether autonomous {ADAPTATION_ASPECT} can
-maintain {SUCCESS_CRITERION}.
-```
-
-**Example Usage:**
-```
-Given the behavior tree at src/spacetry_bt/trees/base_bt.xml, source code in src/spacetry_perception,
-and mission defined in src/spacetry_mission/config/mission_01.yaml, create a scenario driver that injects
-LIDAR degradation to test whether autonomous perception adaptation can maintain obstacle avoidance.
+Given the behavior tree at src/spacetry_bt/trees/base_bt.xml, source code in src/spacetry_perception and src/spacetry_world,
+and mission defined in src/spacetry_mission/MISSION.md, create a scenario driver that injects
+uncertainty to test whether autonomous navigation and replanning can maintain obstacle avoidance.
 ```
 
 ---
 
-## Expandable Format (for detailed scenarios)
+## Template Instantiation Examples
+
+### Example 1: Basic Benchmark Scenario
 
 ```
-Scenario: {NAME}
+Given the following components:
 
-Given:
-- Behavior Tree: {BT_FILE} 
-- Source: {CODE_MODULES}
-- Mission: {MISSION_FILE}
+i) **Robot Behavior Definition** (Behavior Tree):
+   Location: src/spacetry_bt/trees/base_bt.xml
+   Description: This XML file defines the autonomous behavior tree for the rover, specifying:
+    - Primary robot behavior via control and action tree nodes
 
-Uncertainty: {DESCRIPTION}
-- Injection Point: {WHEN}
-- Intensity Progression: {HOW_IT_ESCALATES}
+ii) **Implementation Source Code**:
+    Location: src/
+    Description: source code with the ROS 2 packages that implement the behavior tree logic and handle real-time decision-making:
+    - Perception: spacetry_perception
+    - Behavior execution: spacetry_bt
+    - Mission Details: spacetry_mission
+    - Battery manager: spacetry_battery
+    - Dependency packages: ../deps/spacetry.repos
 
-Test Objective: Verify autonomous {CAPABILITY} can {ADAPTATION_STRATEGY}
+iii) **Mission Description**:
+     Location: src/spacetry_mission/MISSION.md
+     Description: Natural Language description of the mission goals, safety constraints, and robot capabilities.
+     - Success criteria options: Autonomy achieved (adapted & safe), Degraded (adapted, unsafe), or  Failed (not adapted).
+     - Constraints:
+        - Constraints: {SAFETY_CONSTRAINTS}
 
-Success Criteria:
-- Goal Status: {PASS_CONDITION}
-- Safety Status: {CONSTRAINT_STATUS}
-- Autonomy Assessment: {PASS/DEGRADED/FAIL}
+iv) **Monitors**:
+    Location: src/spacetry_monitors
+    Description: ROS 2 package with the monitors for safety constraints
+    - Safety Constraints:
+      - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
+      - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
 
-Metrics to Log: {MEASUREMENTS}
+## Objective
+
+Design and implement a **Scenario Driver Software Component** that:
+
+1. **Injects Uncertainty** during robot execution considering:
+   - Simulated sensors (perception capability)
+   - Dynamic obstacles or other changes in the simulation environment
+   - Impose resource constraints
+   - Trigger unexpected state changes
+
+2. **Tests Autonomous Adaptation**:
+   - Can the rover adapt perception strategies when sensors degrade?
+   - Does the behavior tree transition to contingency actions appropriately?
+   - Does the rover maintain safety constraints while adapting to uncertainty?
+   - Can mission planning adjust goals when resources become limited?
+
+3. **Challenges Safety and Goal Viability**:
+   - Insert conditions that could violate safety constraints (e.g., approach hazards, collide with obstacles)
+   - Create tradeoffs between goal completion and safety (e.g., reach target vs. avoid collision)
+   - Monitor whether the rover's autonomy resolves conflicts correctly or fails catastrophically
+   - Log which autonomy aspects degrade first under uncertainty accumulation
+
+4. **Measurement Focus**:
+   - Adaptation speed (time in milliseconds between the uncertainty was injected and the reaction of the robot to it)
+   - Safety preservation (key-value pair with the safety constraints derived from the monitors and their preservation state in boolean) 
+   - Goal viability (key-value pair with the goal and a boolean with indication if the goal is viable)
+   - Recovery rate (time in milliseconds between the reaction of the robot to the triggered uncertainty and the reaction outcome)
+
+## Component Specification
+
+The driver component should:
+
+- **Monitor** the rover's execution state (position, battery, sensor status)
+- **Trigger** uncertainty events at decision-critical moments (e.g., when rover commits to action)
+- **Measure** adaptation success (goal completion, safety violations, contingency activations)
+- **Adapt injection intensity** based on observed autonomy performance (gradually increase challenge)
+- **Log behavior** for post-execution analysis (decision timestamps, fallback activations, constraint violations)
+
+## Component Behavior Configuration:
+
+For each autonomy and safety requirement being evaluated, the driver component should target one behavior of each category below:
+
+1. **Injection Timing**:
+   - At decision point of the behavior tree 
+   - Mid-action 
+   - During contingency
+
+2. **Intensity Increase**:
+   - Gradual 
+   - Sudden 
+   - Cascading
+
+## Code Style and Guidelines
+- Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
+- Follow additional instructions from the AGENTS.md file in the project and sub-folders (packages).
 ```
 
 **Example Expansion:**
 ```
-Scenario: Progressive LIDAR Degradation
+Scenario: Dynamic Obstacle Avoidance
 
 Given:
 - Behavior Tree: src/spacetry_bt/trees/base_bt.xml
-- Source: src/spacetry_perception, src/spacetry_bt/src/bt_runner.cpp
-- Mission: src/spacetry_mission/config/mission_01.yaml (navigate to rock site, sample, return)
+- Source: src/spacetry_perception, src/spacetry_world/worlds/mars_outpost.sdf
+- Mission: src/spacetry_mission/config/mission_01.yaml (traverse open terrain)
 
-Uncertainty: LIDAR confidence drops from 100% → 50% → fail
-- Injection Point: After rover detects first waypoint
-- Intensity Progression: 0% → 20% degradation every 2 minutes, final failure at T+5min
+Uncertainty: Dynamic obstacles (moving rocks, sliding terrain) placed at waypoints
+- Injection Point: When rover commits to movement toward waypoint
+- Intensity Progression: Single obstacle → Multiple obstacles → Cascading obstacle placement every 30 seconds
 
-Test Objective: Verify autonomous perception adaptation can fall back to camera-based navigation
+Test Objective: Verify autonomous navigation and replanning can detect obstacles and navigate around them
 
 Success Criteria:
-- Goal Status: Reached target waypoint despite partial perception loss
-- Safety Status: Zero collision/boundary violations
-- Autonomy Assessment: PASS (adapted to fallback) or DEGRADED (slow/inefficient) or FAIL (collided/missed goal)
+- Goal Status: Reached target waypoint despite obstacles blocking primary route
+- Safety Status: Zero collision with dynamic obstacles
+- Autonomy Assessment: PASS (detected and replanned) or DEGRADED (slow/inefficient replanning) or FAIL (collision/deadline miss)
 
-Metrics to Log: LIDAR confidence %, time-to-fallback, camera activation, route deviation, goal ETA
-```
-
----
-
-## Uncertainty Injection Templates
-
-### Sensor Degradation
-```
-Inject {SENSOR} confidence loss: {START}% → {END}% over {DURATION}
-Test: Can rover adapt perception to {FALLBACK_SENSOR}?
-Measure: Time to fallback, goal completion, collision count
-```
-
-### Dynamic Obstacles
-```
-Spawn {OBSTACLE_TYPE} at {LOCATION} when rover is {DISTANCE} away
-Test: Can rover replan route and navigate around obstacle?
-Measure: Route replanning latency, detour distance, deadline miss
-```
-
-### Power Constraints
-```
-Accelerate battery drain: baseline {DRAIN_RATE} → accelerated {NEW_RATE} during {ACTIVITY}
-Test: Can rover switch to energy-conserving behaviors and complete mission?
-Measure: Energy reserve margin, mission completion %, behavior transitions
-```
-
-### Environmental Changes
-```
-Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}
-Test: Can rover handle mission objective changes / environment shifts / weather?
-Measure: Replanning time, goal adjustment, recovery success
+Metrics to Log: Obstacle detection latency, replanning latency, detour distance, route deviation, deadline violation
 ```
 
 ---
@@ -127,68 +156,6 @@ Before using a scenario prompt to generate or implement a driver:
 - [ ] Metrics logging doesn't impact real-time performance
 - [ ] Scenario can run in docker compose environment
 - [ ] Autonomy aspect being tested is clearly documented
-
----
-
-## Examples and Guidance
-
-## Instantiation Examples
-
-### Example 1: Sensor Degradation Scenario
-```
-Given:
-i) BT: src/spacetry_bt/trees/base_bt.xml (contains perception → navigation logic)
-ii) Code: src/spacetry_perception/ (LIDAR, camera nodes)
-iii) Mission: src/spacetry_mission/config/mission_01.yaml (navigate to rock site, sample, return)
-
-Create a driver that:
-- Simulates progressive LIDAR degradation over 5 minutes (start at 100% → drop to 50% → fail)
-- Monitors: Does rover switch from LIDAR-guided navigation to camera-guided fallback?
-- Inject at decision point: Force rover to choose action while perception is partially degraded
-- Measure: Time to adapt, goal progress, safety violations (collisions, boundary crossings)
-```
-
-### Example 2: Dynamic Obstacle Scenario
-```
-Given:
-i) BT: src/spacetry_bt/trees/base_bt.xml (contains obstacle_detection → navigate_around)
-ii) Code: src/spacetry_perception/ + src/spacetry_world/worlds/mars_outpost.sdf
-iii) Mission: src/spacetry_mission/config/mission_01.yaml (traverse open terrain)
-
-Create a driver that:
-- Places dynamic obstacles (moving rocks, sliding terrain) at waypoints
-- Monitors: Does rover detect, replan, and navigate around obstacles?
-- Inject at decision point: Block primary route when rover commits to movement
-- Measure: Route replanning latency, detour distance, goal deadline violation
-```
-
-### Example 3: Power Constraint Scenario
-```
-Given:
-i) BT: src/spacetry_bt/trees/base_bt.xml (contains power_check → mission_adjust logic)
-ii) Code: src/spacetry_battery/battery_manager_node.py
-iii) Mission: src/spacetry_mission/config/mission_01.yaml (multi-waypoint survey)
-
-Create a driver that:
-- Accelerates battery drain during high-power operations (movement, sampling)
-- Monitors: Does rover switch to energy-conserving behaviors (slower motion, sensor throttling)?
-- Inject at decision point: Force choice between completing mission segment vs. reserving energy
-- Measure: Graceful degradation (mission completion %), energy awareness (reserve margin), constraint violations
-```
-
-### Example 4: Basic Benchmark Scenario
-
-```
-Given:
-i) BT: src/spacetry_bt/trees/base_bt.xml with the goal specification and the overall nominal robot behavior.
-ii) Code: src/ with the ros 2 packages
-iii) Mission: src/spacetry_mission/MISSION.md
-iv) Monitors: src/spacetry_monitors with the monitors for safety behavior
-Design and implement a Scenario Driver Software Component that:
-1. Injects Uncertainty during robot execution
-2. Tests Autonomous Adaptation
-3. Challenges Safety and Goal Viability
-```
 
 ---
 

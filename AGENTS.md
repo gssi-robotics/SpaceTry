@@ -1,6 +1,6 @@
 # SpaceTry Project - Agent Instructions
 
-This file defines rules and conventions for LLM agents (Copilot, Codex, etc.) interacting with the SpaceTry robotics project.
+This file defines rules and conventions for LLM agents (Copilot, Codex, Claude Code, etc.) interacting with the SpaceTry robotics project. In case of doubts or missing information, request clarification or input from the user.
 
 ## Hierarchy of Rules
 
@@ -22,17 +22,19 @@ spacetry/
 ├── docker/
 │   ├── docker-compose.yaml (defines spacetry service)
 │   └── Dockerfile (builds spacetry:dev image)
+├── scenarios/
+│   ├── SCENARIO_PROMPT_QUICK_REF.md (quick reference for scenario prompt generation)
+│   └── SCENARIO_PROMPT_TEMPLATE.md  (template for designing autonomous test scenarios with uncertainty injection)
 ├── src/
 │   ├── spacetry_battery/           - Battery manager node
 │   ├── spacetry_bringup/           - Rover launch configurations
-│   ├── spacetry_bt/                - Behavior tree runner (C++)
-│   ├── spacetry_mission/           - Mission planning and execution
+│   ├── spacetry_bt/                - Behavior tree runner node (C++)
+│   ├── spacetry_mission/           - Mission description and configuration files
 │   ├── spacetry_models/            - Gazebo models (rocks, solar panels, station)
-│   ├── spacetry_monitors/          - FRETish monitoring agent
+│   ├── spacetry_monitors/          - Safety properties monitoring node
 │   ├── spacetry_perception/        - Perception nodes
 │   └── spacetry_world/             - Gazebo world configurations
-├── scripts/                        - Utility scripts
-└── docs/                          - Project documentation
+└── scripts/                        - Utility scripts
 ```
 
 ---
@@ -58,24 +60,20 @@ When modifying ROS2 packages:
 3. **Source code** - Follow the package's language conventions (C++, Python)
 4. **Configuration files** - In `config/` subdirectories as YAML
 
-After modifying any ROS2 files:
+After modifying any ROS2 files they should be validated by building the workspace:
+
 ```bash
-docker compose exec spacetry colcon build --packages-select <package-name>
-```
+ source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+
+ ```
 
 ### 2. Running the Simulation
 
 The project uses Docker Compose to orchestrate the simulation environment:
 
-**Terminal 1: Start the services**
-```bash
-cd docker
-docker compose up spacetry
-```
+**Terminal: Start the services and launch the rover**
 
-**Terminal 2: Launch the rover**
 ```bash
-docker compose exec spacetry bash -lc "ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py headless:=0"
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py'
 ```
 
 This starts:
@@ -401,5 +399,5 @@ Before submitting changes:
 
 ---
 
-**Last Updated:** March 26, 2026
+**Last Updated:** March 30, 2026
 **Maintained by:** SpaceTry Team

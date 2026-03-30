@@ -11,39 +11,37 @@ Given the following components:
 
 i) **Robot Behavior Definition** (Behavior Tree):
    Location: {BT_FILE_PATH}
-   Description: This XML file defines the autonomous decision tree for the rover, specifying:
-   - Primary behaviors (e.g., navigate_to_waypoint, collect_sample, return_to_base)
-   - Decision logic (e.g., obstacle_detected → navigate_around)
-   - Contingency actions (e.g., low_battery → abort_mission_and_return)
-   - Sensor-dependent transitions (e.g., perception_failure → fallback_mode)
+   Description: This XML file defines the autonomous behavior tree for the rover, specifying:
+    - Primary robot behavior via control and action tree nodes
 
 ii) **Implementation Source Code**:
-    Modules: {SOURCE_CODE_PATHS}
-    Key files:
-    - Perception nodes: {PERCEPTION_MODULE_PATH}
+    Location: {SOURCE_CODE_PATH}
+    Description: source code with the ROS 2 packages that implement the behavior tree logic and handle real-time decision-making:
+    - Perception: {PERCEPTION_MODULE_PATH}
     - Behavior execution: {BT_RUNNER_PATH}
     - Mission planning: {MISSION_PLANNER_PATH}
     - Battery manager: {BATTERY_MANAGER_PATH}
-    These implement the behavior tree logic and handle real-time decision-making.
+    - Dependency packages: {ROS2_DEPENDENCIES_PATH}
 
-iii) **Mission Description** (Natural Language):
+iii) **Mission Description**:
      Location: {MISSION_CONFIG_FILE}
-     Objectives: {PRIMARY_GOALS}
-     Waypoints: {WAYPOINT_LIST}
-     Success criteria: {SUCCESS_CONDITIONS}
-     Constraints: {SAFETY_CONSTRAINTS}
+     Description: Natural Language description of the mission goals, safety constraints, and robot capabilities.
+     - Success criteria options: Autonomy achieved (adapted & safe), Degraded (adapted, unsafe), or  Failed (not adapted).
 
----
+iv) **Monitors**:
+    Location: {SOURCE_CODE_PATH}
+    Description: ROS 2 package with the monitors for safety constraints
+    - Safety Constraints: {SAFETY_CONSTRAINTS}
 
 ## Objective
 
-Design a **Scenario Driver Software Component** that:
+Design and implement a **Scenario Driver Software Component** that:
 
-1. **Injects Uncertainty** during robot execution:
-   - Simulate sensor degradation or failure (losing perception capability)
-   - Introduce dynamic obstacles or environmental changes (unforeseen hazards)
-   - Impose resource constraints (e.g., battery drain acceleration, actuator failures)
-   - Trigger unexpected state changes (e.g., switch mission objectives mid-execution)
+1. **Injects Uncertainty** during robot execution considering:
+   - Simulated sensors (perception capability)
+   - Dynamic obstacles or other changes in the simulation environment
+   - Impose resource constraints
+   - Trigger unexpected state changes
 
 2. **Tests Autonomous Adaptation**:
    - Can the rover adapt perception strategies when sensors degrade?
@@ -57,7 +55,11 @@ Design a **Scenario Driver Software Component** that:
    - Monitor whether the rover's autonomy resolves conflicts correctly or fails catastrophically
    - Log which autonomy aspects degrade first under uncertainty accumulation
 
----
+4. **Measurement Focus**:
+   - Adaptation speed (time in milliseconds between the uncertainty was injected and the reaction of the robot to it)
+   - Safety preservation (key-value pair with the safety constraints derived from the monitors and their preservation state in boolean) 
+   - Goal viability (key-value pair with the goal and a boolean with indication if the goal is viable)
+   - Recovery rate (time in milliseconds between the reaction of the robot to the triggered uncertainty and the reaction outcome)
 
 ## Component Specification
 
@@ -69,8 +71,55 @@ The driver component should:
 - **Adapt injection intensity** based on observed autonomy performance (gradually increase challenge)
 - **Log behavior** for post-execution analysis (decision timestamps, fallback activations, constraint violations)
 
+## Component Behavior Configuration:
+
+For each autonomy and safety requirement being evaluated, the driver component should target one behavior of each category below:
+
+1. **Injection Timing**:
+   - At decision point of the behavior tree 
+   - Mid-action 
+   - During contingency
+
+2. **Intensity Increase**:
+   - Gradual 
+   - Sudden 
+   - Cascading
+
+
+## Uncertainty Injection Templates
+
+1. Sensor Degradation:
+
+   Inject {SENSOR} confidence loss: {START}% → {END}% over {DURATION}
+   Test: Can rover adapt perception to {FALLBACK_SENSOR}?
+   Measure: Time to fallback, goal completion, collision count
+
+2. Dynamic Obstacles:
+
+      Spawn {OBSTACLE_TYPE} at {LOCATION} when rover is {DISTANCE} away
+      Test: Can rover replan route and navigate around obstacle?
+      Measure: Route replanning latency, detour distance, deadline miss
+
+3. Power Constraints:
+
+      Accelerate battery drain: baseline {DRAIN_RATE} → accelerated {NEW_RATE} during {ACTIVITY}
+      Test: Can rover switch to energy-conserving behaviors and complete mission?
+      Measure: Energy reserve margin, mission completion %, behavior transitions
+
+4. Environmental Changes
+
+      Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}
+      Test: Can rover handle mission objective changes / environment shifts / weather?
+      Measure: Replanning time, goal adjustment, recovery success
+
+
+## Code Style and Guidelines
+- Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
+- Follow additional instructions from the AGENTS.md file in the project and sub-folders (packages).
+```
+
 ---
 
-**Last Updated:** March 27, 2026  
-**Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Curiosity rover
+**Last Updated:** March 30, 2026  
+**Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Testbed
 
