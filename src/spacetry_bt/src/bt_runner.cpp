@@ -13,6 +13,7 @@ int main(int argc, char** argv)
   auto node = std::make_shared<rclcpp::Node>("spacetry_bt_runner");
 
   // Params
+  (void)node->declare_parameter<bool>("use_sim_time", true);
   const auto tree_file = node->declare_parameter<std::string>("tree_file", "");
   const double tick_hz = node->declare_parameter<double>("tick_hz", 10.0);
   const double max_runtime_s =
@@ -33,6 +34,11 @@ int main(int argc, char** argv)
   // Provide ROS node handle to the BT nodes that need it
   spacetry_bt::SetGoal::setNode(node);
   spacetry_bt::NavigateWithAvoidance::setNode(node);
+  spacetry_bt::GoalReached::setNode(node);
+  spacetry_bt::ObstacleInDirection::setNode(node);
+  spacetry_bt::SelectAvoidanceDirection::setNode(node);
+  spacetry_bt::DriveTowardGoal::setNode(node);
+  spacetry_bt::AvoidObstacle::setNode(node);
   spacetry_bt::AlignToGoal::setNode(node);
   spacetry_bt::StopAndObserve::setNode(node);
   spacetry_bt::LogMessage::setNode(node);
@@ -47,6 +53,12 @@ int main(int argc, char** argv)
   // Register only the nodes you actually ship/use
   factory.registerNodeType<spacetry_bt::SetGoal>("SetGoal");
   factory.registerNodeType<spacetry_bt::NavigateWithAvoidance>("NavigateWithAvoidance");
+  factory.registerNodeType<spacetry_bt::GoalReached>("GoalReached");
+  factory.registerNodeType<spacetry_bt::ObstacleInDirection>("ObstacleInDirection");
+  factory.registerNodeType<spacetry_bt::SelectAvoidanceDirection>("SelectAvoidanceDirection");
+  factory.registerNodeType<spacetry_bt::DriveTowardGoal>("DriveTowardGoal");
+  factory.registerNodeType<spacetry_bt::AvoidObstacle>("AvoidObstacle");
+  factory.registerNodeType<spacetry_bt::KeepRunning>("KeepRunning");
   factory.registerNodeType<spacetry_bt::AlignToGoal>("AlignToGoal");
   factory.registerNodeType<spacetry_bt::StopAndObserve>("StopAndObserve");
   factory.registerNodeType<spacetry_bt::LogMessage>("LogMessage");

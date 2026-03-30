@@ -1,10 +1,83 @@
 <root BTCPP_format="4" main_tree_to_execute="Main">
+  <BehaviorTree ID="NavigateWithAvoidanceFlow">
+    <Fallback name="NavigateWithAvoidance">
+      <GoalReached goal="{goal}"
+                   dist_tol="{dist_tol}"
+                   odom_topic="{odom_topic}"
+                   odom_timeout_s="{odom_timeout_s}" />
+
+      <ReactiveSequence name="NavigateLoop">
+        <Fallback name="AvoidOrDrive">
+          <Sequence name="AvoidObstacleFlow">
+            <ObstacleInDirection direction="front"
+                                 obstacle_front_topic="{obstacle_front_topic}"
+                                 obstacle_left_topic="{obstacle_left_topic}"
+                                 obstacle_right_topic="{obstacle_right_topic}" />
+            <SelectAvoidanceDirection obstacle_front_topic="{obstacle_front_topic}"
+                                      obstacle_left_topic="{obstacle_left_topic}"
+                                      obstacle_right_topic="{obstacle_right_topic}"
+                                      memory_seconds="{memory_seconds}"
+                                      turn_direction="{turn_direction}"
+                                      reverse_first="{reverse_first}" />
+            <AvoidObstacle turn_direction="{turn_direction}"
+                           reverse_first="{reverse_first}"
+                           scan_topic="{scan_topic}"
+                           obstacle_front_topic="{obstacle_front_topic}"
+                           obstacle_left_topic="{obstacle_left_topic}"
+                           obstacle_right_topic="{obstacle_right_topic}"
+                           obstacle_threshold_m="{obstacle_threshold_m}"
+                           reverse_speed="{reverse_speed}"
+                           reverse_seconds="{reverse_seconds}"
+                           turn_speed="{turn_speed}"
+                           turn_timeout_s="{turn_timeout_s}"
+                           arc_speed="{arc_speed}"
+                           arc_seconds="{arc_seconds}" />
+          </Sequence>
+
+          <DriveTowardGoal goal="{goal}"
+                           v_lin="{drive_v_lin}"
+                           min_lin="{drive_min_lin}"
+                           v_ang="{drive_v_ang}"
+                           dist_tol="{dist_tol}"
+                           kp_yaw="{kp_yaw}"
+                           yaw_slow_deg="{yaw_slow_deg}"
+                           odom_topic="{odom_topic}"
+                           odom_timeout_s="{odom_timeout_s}" />
+        </Fallback>
+
+        <KeepRunning />
+      </ReactiveSequence>
+    </Fallback>
+  </BehaviorTree>
+
   <BehaviorTree ID="Main">
     <Sequence name="MissionSequence">
       <SetGoal waypoint="science_rock" goal="{goal}" />
 
-      <NavigateWithAvoidance goal="{goal}" v_lin="4.0" min_lin="2.0" v_ang="2.5" dist_tol="1.0" obstacle_threshold_m="1.0" />
-      <AlignToGoal goal="{goal}" v_lin="4.0" min_lin="2.0" v_ang="2.5" yaw_tol_deg="10" />
+      <SubTree ID="NavigateWithAvoidanceFlow"
+               goal="{goal}"
+               dist_tol="1.0"
+               odom_topic="/model/curiosity_mars_rover/odometry"
+               odom_timeout_s="1.0"
+               scan_topic="/scan"
+               obstacle_front_topic="/obstacle/front"
+               obstacle_left_topic="/obstacle/left"
+               obstacle_right_topic="/obstacle/right"
+               obstacle_threshold_m="1.0"
+               memory_seconds="3.0"
+               reverse_speed="0.8"
+               reverse_seconds="1.0"
+               turn_speed="1.4"
+               turn_timeout_s="2.4"
+               arc_speed="0.8"
+               arc_seconds="1.4"
+               drive_v_lin="1.6"
+               drive_min_lin="0.25"
+               drive_v_ang="1.4"
+               kp_yaw="1.4"
+               yaw_slow_deg="20.0" />
+
+      <AlignToGoal goal="{goal}" v_lin="0.0" min_lin="0.0" v_ang="1.0" yaw_tol_deg="10" />
 
       <StopAndObserve seconds="3.0" />
       <LogMessage message="Science rock reached" />
