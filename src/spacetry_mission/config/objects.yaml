@@ -1,16 +1,8 @@
 objects:
   - id: outpost_habitat_01
-    type: comms_asset
-  - id: solar_panel
     type: outpost_asset
 
   - id: science_rock_01
-    type: science_target
-  - id: science_rock_02
-    type: science_target
-  - id: science_rock_03
-    type: science_target
-  - id: science_rock_04
     type: science_target
 
   - id: block_island

@@ -9,16 +9,16 @@
             <visual name="station_visual">
                 <geometry>
                     <mesh>
-                        <uri>model://station/resources/low_poly_antenna_habitat.glb</uri>
+                        <uri>model://station/resources/large_low_poly_habitat_dome.glb</uri>
                     </mesh>
                 </geometry>
             </visual>
+            <!-- Simplified box collision instead of full mesh — much cheaper -->
             <collision name="station_collision">
                 <geometry>
-                    <mesh>
-                        <uri>model://station/resources/low_poly_antenna_habitat.glb</uri>
-                        <scale>6 6 6</scale>
-                    </mesh>
+                    <box>
+                        <size>10 10 5</size>
+                    </box>
                 </geometry>
             </collision>
         </link>

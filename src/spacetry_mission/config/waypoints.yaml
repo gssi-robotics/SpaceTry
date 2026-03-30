@@ -1,16 +1,16 @@
 frame: world
 waypoints:
   outpost_habitat_01:
-    x: 145
-    y: 50
-    yaw: 0.0
+    x: 66.0
+    y: 0.0
+    yaw: 3.07
     tolerance: 1.0
 
-  solar_panel:
-    x: 145
-    y: 60
-    yaw: 0.0
-    tolerance: 0.5
+  science_rock_01:
+    x: 50.10
+    y: -80.0
+    yaw: 3.07
+    tolerance: 1.0
 
   ridge:
     x: 12.0
