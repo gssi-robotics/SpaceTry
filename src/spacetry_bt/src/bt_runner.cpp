@@ -13,7 +13,6 @@ int main(int argc, char** argv)
   auto node = std::make_shared<rclcpp::Node>("spacetry_bt_runner");
 
   // Params
-  (void)node->declare_parameter<bool>("use_sim_time", true);
   const auto tree_file = node->declare_parameter<std::string>("tree_file", "");
   const double tick_hz = node->declare_parameter<double>("tick_hz", 10.0);
   const double max_runtime_s =
