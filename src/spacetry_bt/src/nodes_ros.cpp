@@ -168,7 +168,7 @@ void NavigateWithAvoidance::ensureInterfaces()
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
 
-  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
+  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
         odom_topic_, odom_qos,
@@ -493,7 +493,7 @@ void GoalReached::ensureInterfaces()
     throw BT::RuntimeError("GoalReached: node not set");
   }
 
-  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
+  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
         odom_topic_, odom_qos,
@@ -776,7 +776,7 @@ void DriveTowardGoal::ensureInterfaces()
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
 
-  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
+  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
         odom_topic_, odom_qos,
@@ -1143,7 +1143,7 @@ void AlignToGoal::ensureInterfaces()
     cmd_pub_ = node_->create_publisher<geometry_msgs::msg::Twist>("/cmd_vel", 10);
   }
 
-  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).reliable();
+  const auto odom_qos = rclcpp::QoS(rclcpp::KeepLast(10)).best_effort();
   if (!odom_sub_) {
     odom_sub_ = node_->create_subscription<nav_msgs::msg::Odometry>(
         odom_topic_, odom_qos,
