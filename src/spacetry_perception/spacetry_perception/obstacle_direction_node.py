@@ -48,7 +48,7 @@ class ObstacleDirectionNode(Node):
 
         self.declare_parameter('scan_topic', '/scan')
         self.declare_parameter('base_frame', 'base_link')
-        self.declare_parameter('threshold_m', 3.0)
+        self.declare_parameter('threshold_m', 7.0)
 
         # sector bounds in radians (in base_frame)
         self.declare_parameter('front_min_rad', math.radians(-20.0))
