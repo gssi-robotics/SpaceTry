@@ -284,7 +284,7 @@ BT::NodeStatus NavigateWithAvoidance::onStart()
   yaw_slow_rad_ =
       (getInput<double>("yaw_slow_deg").value_or(25.0)) * (kPi / 180.0);
   obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(1.0);
-  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
+  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(3.0);
   reverse_speed_ = std::fabs(getInput<double>("reverse_speed").value_or(0.6));
   reverse_seconds_ = std::max(0.0, getInput<double>("reverse_seconds").value_or(1.0));
   avoid_arc_seconds_ =
@@ -522,7 +522,7 @@ BT::NodeStatus GoalReached::tick()
   }
 
   const double dist_tol = getInput<double>("dist_tol").value_or(0.6);
-  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
+  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(3.0);
   odom_topic_ =
       getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
   ensureInterfaces();
@@ -830,7 +830,7 @@ BT::NodeStatus DriveTowardGoal::onStart()
   kp_yaw_ = getInput<double>("kp_yaw").value_or(1.5);
   yaw_slow_rad_ =
       (getInput<double>("yaw_slow_deg").value_or(25.0)) * (kPi / 180.0);
-  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
+  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(3.0);
   odom_topic_ =
       getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
   last_odom_time_ = node_->now();
@@ -1196,7 +1196,7 @@ BT::NodeStatus AlignToGoal::onStart()
   kp_yaw_ = getInput<double>("kp_yaw").value_or(2.0);
   yaw_tol_rad_ =
       (getInput<double>("yaw_tol_deg").value_or(10.0)) * (kPi / 180.0);
-  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
+  odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(3.0);
   odom_topic_ =
       getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
 

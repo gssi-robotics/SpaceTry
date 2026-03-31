@@ -60,7 +60,7 @@
                goal="{goal}"
                dist_tol="1.0"
                odom_topic="/mobile_base_controller/odom"
-               odom_timeout_s="1.0"
+               odom_timeout_s="3.0"
                scan_topic="/scan"
                obstacle_front_topic="/obstacle/front"
                obstacle_left_topic="/obstacle/left"
