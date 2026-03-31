@@ -292,7 +292,7 @@ BT::NodeStatus NavigateWithAvoidance::onStart()
   memory_seconds_ = std::max(0.0, getInput<double>("memory_seconds").value_or(3.0));
 
   odom_topic_ =
-      getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
+      getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
   scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
   obstacle_front_topic_ =
       getInput<std::string>("obstacle_front_topic").value_or("/obstacle/front");
@@ -524,7 +524,7 @@ BT::NodeStatus GoalReached::tick()
   const double dist_tol = getInput<double>("dist_tol").value_or(0.6);
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
   odom_topic_ =
-      getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
+      getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
   ensureInterfaces();
 
   double x, y;
@@ -832,7 +832,7 @@ BT::NodeStatus DriveTowardGoal::onStart()
       (getInput<double>("yaw_slow_deg").value_or(25.0)) * (kPi / 180.0);
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
   odom_topic_ =
-      getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
+      getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
   last_odom_time_ = node_->now();
 
   ensureInterfaces();
@@ -1198,7 +1198,7 @@ BT::NodeStatus AlignToGoal::onStart()
       (getInput<double>("yaw_tol_deg").value_or(10.0)) * (kPi / 180.0);
   odom_timeout_s_ = getInput<double>("odom_timeout_s").value_or(1.0);
   odom_topic_ =
-      getInput<std::string>("odom_topic").value_or("/model/curiosity_mars_rover/odometry");
+      getInput<std::string>("odom_topic").value_or("/mobile_base_controller/odom");
 
   last_odom_time_ = node_->now();
   ensureInterfaces();

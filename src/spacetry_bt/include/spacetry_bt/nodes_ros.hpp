@@ -64,7 +64,7 @@ public:
       BT::InputPort<double>("kp_yaw", 1.5, "Yaw P gain"),
       BT::InputPort<double>("yaw_slow_deg", 25.0, "Start scaling down lin above this yaw error (deg)"),
 
-      BT::InputPort<std::string>("odom_topic", "/model/curiosity_mars_rover/odometry"),
+      BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
       BT::InputPort<std::string>("scan_topic", "/scan"),
       BT::InputPort<std::string>("obstacle_front_topic", "/obstacle/front"),
       BT::InputPort<std::string>("obstacle_left_topic", "/obstacle/left"),
@@ -172,7 +172,7 @@ public:
     return {
       BT::InputPort<Goal2D>("goal"),
       BT::InputPort<double>("dist_tol", 0.6, "Goal distance tolerance (m)"),
-      BT::InputPort<std::string>("odom_topic", "/model/curiosity_mars_rover/odometry"),
+      BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
       BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
     };
   }
@@ -309,7 +309,7 @@ public:
       BT::InputPort<double>("dist_tol", 0.6, "Goal distance tolerance (m)"),
       BT::InputPort<double>("kp_yaw", 1.5, "Yaw P gain"),
       BT::InputPort<double>("yaw_slow_deg", 25.0, "Start scaling down lin above this yaw error (deg)"),
-      BT::InputPort<std::string>("odom_topic", "/model/curiosity_mars_rover/odometry"),
+      BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
       BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
     };
   }
@@ -461,7 +461,7 @@ public:
       BT::InputPort<double>("v_ang", 0.4, "Max angular speed (rad/s)"),
       BT::InputPort<double>("kp_yaw", 2.0, "Yaw P gain"),
       BT::InputPort<double>("yaw_tol_deg", 10.0, "Yaw tolerance (deg)"),
-      BT::InputPort<std::string>("odom_topic", "/model/curiosity_mars_rover/odometry"),
+      BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
       BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
     };
   }
