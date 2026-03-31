@@ -13,6 +13,13 @@ namespace spacetry_bt {
 namespace {
 
 constexpr double kPi = 3.14159265358979323846;
+constexpr double kDeg = kPi / 180.0;
+constexpr double kFrontSectorMin = -20.0 * kDeg;
+constexpr double kFrontSectorMax = +20.0 * kDeg;
+constexpr double kLeftSectorMin = +20.0 * kDeg;
+constexpr double kLeftSectorMax = +75.0 * kDeg;
+constexpr double kRightSectorMin = -75.0 * kDeg;
+constexpr double kRightSectorMax = -20.0 * kDeg;
 
 double clamp(double v, double lo, double hi)
 {
@@ -220,10 +227,9 @@ void NavigateWithAvoidance::odomCb(const nav_msgs::msg::Odometry::SharedPtr msg)
 
 void NavigateWithAvoidance::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
-  const double deg = kPi / 180.0;
-  const double front = sectorMin(*msg, -15.0 * deg, +15.0 * deg);
-  const double left = sectorMin(*msg, +15.0 * deg, +60.0 * deg);
-  const double right = sectorMin(*msg, -60.0 * deg, -15.0 * deg);
+  const double front = sectorMin(*msg, kFrontSectorMin, kFrontSectorMax);
+  const double left = sectorMin(*msg, kLeftSectorMin, kLeftSectorMax);
+  const double right = sectorMin(*msg, kRightSectorMin, kRightSectorMax);
 
   std::lock_guard<std::mutex> lk(mtx_);
   scan_front_min_ = front;
@@ -959,10 +965,9 @@ void AvoidObstacle::publishStop()
 
 void AvoidObstacle::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
-  const double deg = kPi / 180.0;
-  const double front = sectorMin(*msg, -15.0 * deg, +15.0 * deg);
-  const double left = sectorMin(*msg, +15.0 * deg, +60.0 * deg);
-  const double right = sectorMin(*msg, -60.0 * deg, -15.0 * deg);
+  const double front = sectorMin(*msg, kFrontSectorMin, kFrontSectorMax);
+  const double left = sectorMin(*msg, kLeftSectorMin, kLeftSectorMax);
+  const double right = sectorMin(*msg, kRightSectorMin, kRightSectorMax);
 
   std::lock_guard<std::mutex> lk(mtx_);
   scan_front_min_ = front;
