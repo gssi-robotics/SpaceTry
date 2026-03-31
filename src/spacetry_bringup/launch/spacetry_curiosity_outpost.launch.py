@@ -163,6 +163,18 @@ def generate_launch_description():
         output="screen",
     )
 
+    odom_relay = Node(
+        package="spacetry_perception",
+        executable="odom_relay_node",
+        name="odom_relay",
+        output="screen",
+        parameters=[{
+            "use_sim_time": True,
+            "input_topic": "/model/curiosity_mars_rover/odometry",
+            "output_topic": "/mobile_base_controller/odom",
+        }],
+    )
+
     image_bridge = Node(
         package="ros_gz_image",
         executable="image_bridge",
@@ -185,6 +197,7 @@ def generate_launch_description():
                 "outpost_x": base_x,
                 "outpost_y": base_y,
                 "initial_soc": ParameterValue(battery, value_type=float),
+                "odom_topic": "/mobile_base_controller/odom",
                 "use_sim_time": True,
             },
         ],
@@ -318,6 +331,7 @@ def generate_launch_description():
             spawn,
             odom_node,
             ros_gz_bridge,
+            odom_relay,
             image_bridge,
             battery_manager,
             obstacle_direction,

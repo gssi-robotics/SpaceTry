@@ -71,7 +71,7 @@ public:
       BT::InputPort<std::string>("obstacle_right_topic", "/obstacle/right"),
 
       BT::InputPort<double>("obstacle_threshold_m", 1.0, "Front obstacle threshold (m)"),
-      BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
+      BT::InputPort<double>("odom_timeout_s", 3.0, "Fail if odom older than this"),
       BT::InputPort<double>("reverse_speed", 0.6, "Reverse speed during avoidance (m/s)"),
       BT::InputPort<double>("reverse_seconds", 1.0, "Reverse time when boxed in (s)"),
       BT::InputPort<double>("avoid_arc_seconds", 1.2, "Short arc duration after clearing the obstacle (s)"),
@@ -139,7 +139,7 @@ private:
   double kp_yaw_{1.5};
   double yaw_slow_rad_{0.44};
   double obstacle_threshold_{1.0};
-  double odom_timeout_s_{1.0};
+  double odom_timeout_s_{3.0};
   double reverse_speed_{0.6};
   double reverse_seconds_{1.0};
   double avoid_arc_seconds_{1.2};
@@ -173,7 +173,7 @@ public:
       BT::InputPort<Goal2D>("goal"),
       BT::InputPort<double>("dist_tol", 0.6, "Goal distance tolerance (m)"),
       BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
-      BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
+      BT::InputPort<double>("odom_timeout_s", 3.0, "Fail if odom older than this"),
     };
   }
 
@@ -190,7 +190,7 @@ private:
   double y_{0.0};
   rclcpp::Time last_odom_time_;
   std::string odom_topic_;
-  double odom_timeout_s_{1.0};
+  double odom_timeout_s_{3.0};
 
   void ensureInterfaces();
   void odomCb(const nav_msgs::msg::Odometry::SharedPtr msg);
@@ -310,7 +310,7 @@ public:
       BT::InputPort<double>("kp_yaw", 1.5, "Yaw P gain"),
       BT::InputPort<double>("yaw_slow_deg", 25.0, "Start scaling down lin above this yaw error (deg)"),
       BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
-      BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
+      BT::InputPort<double>("odom_timeout_s", 3.0, "Fail if odom older than this"),
     };
   }
 
@@ -338,7 +338,7 @@ private:
   double dist_tol_{0.6};
   double kp_yaw_{1.5};
   double yaw_slow_rad_{0.44};
-  double odom_timeout_s_{1.0};
+  double odom_timeout_s_{3.0};
   std::string odom_topic_;
 
   void ensureInterfaces();
@@ -462,7 +462,7 @@ public:
       BT::InputPort<double>("kp_yaw", 2.0, "Yaw P gain"),
       BT::InputPort<double>("yaw_tol_deg", 10.0, "Yaw tolerance (deg)"),
       BT::InputPort<std::string>("odom_topic", "/mobile_base_controller/odom"),
-      BT::InputPort<double>("odom_timeout_s", 1.0, "Fail if odom older than this"),
+      BT::InputPort<double>("odom_timeout_s", 3.0, "Fail if odom older than this"),
     };
   }
 
@@ -491,7 +491,7 @@ private:
   double v_ang_{0.4};
   double kp_yaw_{2.0};
   double yaw_tol_rad_{0.1745};
-  double odom_timeout_s_{1.0};
+  double odom_timeout_s_{3.0};
   std::string odom_topic_;
 
   void ensureInterfaces();

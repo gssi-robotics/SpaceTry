@@ -25,6 +25,7 @@ setup(
     entry_points={
         'console_scripts': [
             'obstacle_direction_node = spacetry_perception.obstacle_direction_node:main',
+            'odom_relay_node = spacetry_perception.odom_relay_node:main',
         ],
     },
 )
