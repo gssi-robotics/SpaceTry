@@ -9,14 +9,32 @@
       <ReactiveSequence name="NavigateLoop">
         <Fallback name="CommitOrDrive">
           <Sequence name="EscapeManeuver">
-            <ObstacleInDirection direction="front"
-                                 obstacle_front_topic="{obstacle_front_topic}"
-                                 obstacle_left_topic="{obstacle_left_topic}"
-                                 obstacle_right_topic="{obstacle_right_topic}" />
+            <Fallback name="ObstacleNearby">
+              <ObstacleInDirection direction="front"
+                                   obstacle_front_topic="{obstacle_front_topic}"
+                                   obstacle_left_topic="{obstacle_left_topic}"
+                                   obstacle_right_topic="{obstacle_right_topic}"
+                                   scan_topic="{scan_topic}"
+                                   obstacle_threshold_m="{obstacle_threshold_m}" />
+              <ObstacleInDirection direction="left"
+                                   obstacle_front_topic="{obstacle_front_topic}"
+                                   obstacle_left_topic="{obstacle_left_topic}"
+                                   obstacle_right_topic="{obstacle_right_topic}"
+                                   scan_topic="{scan_topic}"
+                                   obstacle_threshold_m="{obstacle_threshold_m}" />
+              <ObstacleInDirection direction="right"
+                                   obstacle_front_topic="{obstacle_front_topic}"
+                                   obstacle_left_topic="{obstacle_left_topic}"
+                                   obstacle_right_topic="{obstacle_right_topic}"
+                                   scan_topic="{scan_topic}"
+                                   obstacle_threshold_m="{obstacle_threshold_m}" />
+            </Fallback>
 
             <SelectAvoidanceDirection obstacle_front_topic="{obstacle_front_topic}"
                                       obstacle_left_topic="{obstacle_left_topic}"
                                       obstacle_right_topic="{obstacle_right_topic}"
+                                      scan_topic="{scan_topic}"
+                                      obstacle_threshold_m="{obstacle_threshold_m}"
                                       memory_seconds="{memory_seconds}"
                                       turn_direction="{turn_direction}"
                                       reverse_first="{reverse_first}" />
@@ -65,7 +83,7 @@
                obstacle_front_topic="/obstacle/front"
                obstacle_left_topic="/obstacle/left"
                obstacle_right_topic="/obstacle/right"
-               obstacle_threshold_m="0.9"
+               obstacle_threshold_m="9.0"
                memory_seconds="6.0"
                reverse_speed="1.0"
                reverse_seconds="1.4"

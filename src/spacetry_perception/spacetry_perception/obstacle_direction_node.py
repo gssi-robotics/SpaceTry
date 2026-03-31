@@ -48,7 +48,7 @@ class ObstacleDirectionNode(Node):
 
         self.declare_parameter('scan_topic', '/scan')
         self.declare_parameter('base_frame', 'base_link')
-        self.declare_parameter('threshold_m', 7.0)
+        self.declare_parameter('threshold_m', 9.0)
 
         # sector bounds in radians (in base_frame)
         self.declare_parameter('front_min_rad', math.radians(-20.0))
@@ -132,23 +132,34 @@ class ObstacleDirectionNode(Node):
             elif self.right_min < angle_base < self.right_max:
                 min_right = min(min_right, r)
 
-        front = False
+        front = (min_front < self.threshold)
         left = False
         right = False
         state = "CLEAR"
 
-        sector_ranges = {
-            "FRONT": min_front,
-            "LEFT": min_left,
-            "RIGHT": min_right,
-        }
-        state, state_range = min(sector_ranges.items(), key=lambda item: item[1])
-        if state_range < self.threshold:
-            front = (state == "FRONT")
-            left = (state == "LEFT")
-            right = (state == "RIGHT")
+        if front:
+            # Front gets priority so the BT reacts to hazards ahead.
+            # We still expose only one lateral side as blocked so the tree
+            # has a clear opposite direction to choose for circumvention.
+            side_ranges = {
+                "LEFT": min_left,
+                "RIGHT": min_right,
+            }
+            side_state, side_range = min(side_ranges.items(), key=lambda item: item[1])
+            if side_range < self.threshold:
+                left = (side_state == "LEFT")
+                right = (side_state == "RIGHT")
+            state = "FRONT"
         else:
-            state = "CLEAR"
+            side_ranges = {
+                "LEFT": min_left,
+                "RIGHT": min_right,
+            }
+            side_state, side_range = min(side_ranges.items(), key=lambda item: item[1])
+            if side_range < self.threshold:
+                left = (side_state == "LEFT")
+                right = (side_state == "RIGHT")
+                state = side_state
 
         self.pub_front.publish(Bool(data=front))
         self.pub_left.publish(Bool(data=left))

@@ -578,6 +578,11 @@ void ObstacleInDirection::ensureInterfaces()
         obstacle_right_topic_, qos,
         [this](std_msgs::msg::Bool::SharedPtr msg) { rightCb(std::move(msg)); });
   }
+  if (!scan_sub_) {
+    scan_sub_ = node_->create_subscription<sensor_msgs::msg::LaserScan>(
+        scan_topic_, rclcpp::SensorDataQoS(),
+        [this](sensor_msgs::msg::LaserScan::SharedPtr msg) { scanCb(std::move(msg)); });
+  }
 }
 
 void ObstacleInDirection::frontCb(const std_msgs::msg::Bool::SharedPtr msg)
@@ -604,6 +609,20 @@ void ObstacleInDirection::rightCb(const std_msgs::msg::Bool::SharedPtr msg)
   right_time_ = node_->now();
 }
 
+void ObstacleInDirection::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
+{
+  const double front = sectorMin(*msg, kFrontSectorMin, kFrontSectorMax);
+  const double left = sectorMin(*msg, kLeftSectorMin, kLeftSectorMax);
+  const double right = sectorMin(*msg, kRightSectorMin, kRightSectorMax);
+
+  std::lock_guard<std::mutex> lk(mtx_);
+  scan_front_min_ = front;
+  scan_left_min_ = left;
+  scan_right_min_ = right;
+  have_scan_ = true;
+  scan_time_ = node_->now();
+}
+
 BT::NodeStatus ObstacleInDirection::tick()
 {
   if (!node_) {
@@ -617,12 +636,18 @@ BT::NodeStatus ObstacleInDirection::tick()
       getInput<std::string>("obstacle_left_topic").value_or("/obstacle/left");
   obstacle_right_topic_ =
       getInput<std::string>("obstacle_right_topic").value_or("/obstacle/right");
+  scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
+  obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(9.0);
   freshness_s_ = getInput<double>("freshness_s").value_or(1.0);
   ensureInterfaces();
 
   const auto now = node_->now();
   bool value = false;
   bool fresh = false;
+  bool scan_fresh = false;
+  double scan_front = std::numeric_limits<double>::infinity();
+  double scan_left = std::numeric_limits<double>::infinity();
+  double scan_right = std::numeric_limits<double>::infinity();
   {
     std::lock_guard<std::mutex> lk(mtx_);
     if (direction == "left") {
@@ -635,9 +660,27 @@ BT::NodeStatus ObstacleInDirection::tick()
       value = front_;
       fresh = have_front_ && (now - front_time_).seconds() < freshness_s_;
     }
+    scan_fresh = have_scan_ && (now - scan_time_).seconds() < freshness_s_;
+    scan_front = scan_front_min_;
+    scan_left = scan_left_min_;
+    scan_right = scan_right_min_;
   }
 
-  return (fresh && value) ? BT::NodeStatus::SUCCESS : BT::NodeStatus::FAILURE;
+  if (fresh && value) {
+    return BT::NodeStatus::SUCCESS;
+  }
+
+  if (scan_fresh) {
+    const double scan_value =
+        (direction == "left") ? scan_left :
+        (direction == "right") ? scan_right :
+        scan_front;
+    if (scan_value < obstacle_threshold_) {
+      return BT::NodeStatus::SUCCESS;
+    }
+  }
+
+  return BT::NodeStatus::FAILURE;
 }
 
 // =========================
@@ -670,6 +713,11 @@ void SelectAvoidanceDirection::ensureInterfaces()
         obstacle_right_topic_, qos,
         [this](std_msgs::msg::Bool::SharedPtr msg) { rightCb(std::move(msg)); });
   }
+  if (!scan_sub_) {
+    scan_sub_ = node_->create_subscription<sensor_msgs::msg::LaserScan>(
+        scan_topic_, rclcpp::SensorDataQoS(),
+        [this](sensor_msgs::msg::LaserScan::SharedPtr msg) { scanCb(std::move(msg)); });
+  }
 }
 
 void SelectAvoidanceDirection::frontCb(const std_msgs::msg::Bool::SharedPtr msg)
@@ -696,6 +744,20 @@ void SelectAvoidanceDirection::rightCb(const std_msgs::msg::Bool::SharedPtr msg)
   right_time_ = node_->now();
 }
 
+void SelectAvoidanceDirection::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
+{
+  const double front = sectorMin(*msg, kFrontSectorMin, kFrontSectorMax);
+  const double left = sectorMin(*msg, kLeftSectorMin, kLeftSectorMax);
+  const double right = sectorMin(*msg, kRightSectorMin, kRightSectorMax);
+
+  std::lock_guard<std::mutex> lk(mtx_);
+  scan_front_min_ = front;
+  scan_left_min_ = left;
+  scan_right_min_ = right;
+  have_scan_ = true;
+  scan_time_ = node_->now();
+}
+
 BT::NodeStatus SelectAvoidanceDirection::tick()
 {
   if (!node_) {
@@ -708,6 +770,8 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
       getInput<std::string>("obstacle_left_topic").value_or("/obstacle/left");
   obstacle_right_topic_ =
       getInput<std::string>("obstacle_right_topic").value_or("/obstacle/right");
+  scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
+  obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(9.0);
   freshness_s_ = getInput<double>("freshness_s").value_or(1.0);
   memory_seconds_ = getInput<double>("memory_seconds").value_or(3.0);
   ensureInterfaces();
@@ -719,6 +783,10 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
   bool front_fresh = false;
   bool left_fresh = false;
   bool right_fresh = false;
+  bool scan_fresh = false;
+  double scan_front = std::numeric_limits<double>::infinity();
+  double scan_left = std::numeric_limits<double>::infinity();
+  double scan_right = std::numeric_limits<double>::infinity();
   {
     std::lock_guard<std::mutex> lk(mtx_);
     front = front_;
@@ -727,6 +795,25 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
     front_fresh = have_front_ && (now - front_time_).seconds() < freshness_s_;
     left_fresh = have_left_ && (now - left_time_).seconds() < freshness_s_;
     right_fresh = have_right_ && (now - right_time_).seconds() < freshness_s_;
+    scan_fresh = have_scan_ && (now - scan_time_).seconds() < freshness_s_;
+    scan_front = scan_front_min_;
+    scan_left = scan_left_min_;
+    scan_right = scan_right_min_;
+  }
+
+  if (scan_fresh) {
+    if (!front_fresh) {
+      front = scan_front < obstacle_threshold_;
+      front_fresh = true;
+    }
+    if (!left_fresh) {
+      left = scan_left < obstacle_threshold_;
+      left_fresh = true;
+    }
+    if (!right_fresh) {
+      right = scan_right < obstacle_threshold_;
+      right_fresh = true;
+    }
   }
 
   if (!front_fresh || !left_fresh || !right_fresh) {
