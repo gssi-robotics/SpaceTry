@@ -251,7 +251,14 @@ def generate_launch_description():
             "use_sim_time": True,
             "scan_topic": "/scan",
             "base_frame": "base_link",
-            "threshold_m": 10.0,
+            "threshold_m": 1.4,
+            "front_min_rad": -0.3490658503988659,
+            "front_max_rad": 0.3490658503988659,
+            "left_min_rad": 0.3490658503988659,
+            "left_max_rad": 1.3089969389957472,
+            "right_min_rad": -1.3089969389957472,
+            "right_max_rad": -0.3490658503988659,
+            "log_period_s": 0.5,
         }],
     )
 
