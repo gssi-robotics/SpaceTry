@@ -5,7 +5,7 @@ SpaceTry 🥐 bringup: Curiosity rover in the SpaceTry 🥐 mars_outpost world.
 - Launch mars_outpost
 - Spawn Curiosity via ros_gz_sim create (-param robot_description)
 - Start bridges + controllers
-- Include the demo nodes (mars_rover.launch.py)
+- Optionally include the upstream demo nodes (disabled by default for BT control)
 """
 
 import os
@@ -60,6 +60,7 @@ def generate_launch_description():
     spawn_y_offset = LaunchConfiguration("spawn_y_offset")
     spawn_yaw_offset = LaunchConfiguration("spawn_yaw_offset")
     battery = LaunchConfiguration("battery")
+    enable_demo_nodes = LaunchConfiguration("enable_demo_nodes")
 
     # --- paths
     spacetry_world_share = get_package_share_directory("spacetry_world")
@@ -246,11 +247,22 @@ def generate_launch_description():
         output="screen",
     )
 
-    # --- include demo nodes (arm/mast/wheel/run_demo)
+    # --- BT navigation uses /cmd_vel, but Curiosity expects wheel / steer controller commands.
+    # Keep the upstream wheel adapter active, but leave the demo action publisher disabled
+    # unless explicitly requested.
+    move_wheel_adapter = Node(
+        package="curiosity_rover_demo",
+        executable="move_wheel",
+        name="move_wheel_adapter",
+        output="screen",
+        parameters=[{"use_sim_time": True}],
+    )
+
     mars_rover_demo_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory("curiosity_rover_demo"), "launch", "mars_rover.launch.py")
-        )
+        ),
+        condition=IfCondition(enable_demo_nodes),
     )
 
 
@@ -320,8 +332,13 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "battery",
-                default_value="0.2",
+                default_value="1.0",
                 description="Initial battery SOC fraction (0.0..1.0). Example: battery:=0.2 starts at 20%.",
+            ),
+            DeclareLaunchArgument(
+                "enable_demo_nodes",
+                default_value="false",
+                description="Launch upstream curiosity_rover_demo helper nodes. Keep false for BT-driven navigation.",
             ),
             env_gz_plugin,
             env_gz_resource,
@@ -336,6 +353,7 @@ def generate_launch_description():
             battery_manager,
             obstacle_direction,
             copilot_monitor,
+            move_wheel_adapter,
             # Controller chain
             RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[set_hardware_interface_active])),
             RegisterEventHandler(OnProcessExit(target_action=set_hardware_interface_active, on_exit=[load_joint_state_broadcaster])),

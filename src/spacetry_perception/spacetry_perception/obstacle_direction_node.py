@@ -149,7 +149,9 @@ class ObstacleDirectionNode(Node):
             if side_range < self.threshold:
                 left = (side_state == "LEFT")
                 right = (side_state == "RIGHT")
-            state = "FRONT"
+                state = f"FRONT_{side_state}"
+            else:
+                state = "FRONT"
         else:
             side_ranges = {
                 "LEFT": min_left,

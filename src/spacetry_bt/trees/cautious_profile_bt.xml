@@ -7,33 +7,41 @@
                    odom_timeout_s="{odom_timeout_s}" />
 
       <ReactiveSequence name="NavigateLoop">
-        <Fallback name="AvoidOrDrive">
+        <ReactiveFallback name="AvoidOrDrive">
           <Sequence name="PreemptiveAvoidance">
             <Fallback name="ObstacleNearby">
               <ObstacleInDirection direction="front"
                                    obstacle_front_topic="{obstacle_front_topic}"
                                    obstacle_left_topic="{obstacle_left_topic}"
                                    obstacle_right_topic="{obstacle_right_topic}"
+                                   obstacle_state_topic="{obstacle_state_topic}"
                                    scan_topic="{scan_topic}"
+                                   freshness_s="{obstacle_freshness_s}"
                                    obstacle_threshold_m="{obstacle_threshold_m}" />
               <ObstacleInDirection direction="left"
                                    obstacle_front_topic="{obstacle_front_topic}"
                                    obstacle_left_topic="{obstacle_left_topic}"
                                    obstacle_right_topic="{obstacle_right_topic}"
+                                   obstacle_state_topic="{obstacle_state_topic}"
                                    scan_topic="{scan_topic}"
+                                   freshness_s="{obstacle_freshness_s}"
                                    obstacle_threshold_m="{obstacle_threshold_m}" />
               <ObstacleInDirection direction="right"
                                    obstacle_front_topic="{obstacle_front_topic}"
                                    obstacle_left_topic="{obstacle_left_topic}"
                                    obstacle_right_topic="{obstacle_right_topic}"
+                                   obstacle_state_topic="{obstacle_state_topic}"
                                    scan_topic="{scan_topic}"
+                                   freshness_s="{obstacle_freshness_s}"
                                    obstacle_threshold_m="{obstacle_threshold_m}" />
             </Fallback>
 
             <SelectAvoidanceDirection obstacle_front_topic="{obstacle_front_topic}"
                                       obstacle_left_topic="{obstacle_left_topic}"
                                       obstacle_right_topic="{obstacle_right_topic}"
+                                      obstacle_state_topic="{obstacle_state_topic}"
                                       scan_topic="{scan_topic}"
+                                      freshness_s="{obstacle_freshness_s}"
                                       obstacle_threshold_m="{obstacle_threshold_m}"
                                       memory_seconds="{memory_seconds}"
                                       turn_direction="{turn_direction}"
@@ -45,7 +53,9 @@
                            obstacle_front_topic="{obstacle_front_topic}"
                            obstacle_left_topic="{obstacle_left_topic}"
                            obstacle_right_topic="{obstacle_right_topic}"
+                           obstacle_state_topic="{obstacle_state_topic}"
                            obstacle_threshold_m="{obstacle_threshold_m}"
+                           freshness_s="{obstacle_freshness_s}"
                            reverse_speed="{reverse_speed}"
                            reverse_seconds="{reverse_seconds}"
                            turn_speed="{turn_speed}"
@@ -63,7 +73,7 @@
                            yaw_slow_deg="{yaw_slow_deg}"
                            odom_topic="{odom_topic}"
                            odom_timeout_s="{odom_timeout_s}" />
-        </Fallback>
+        </ReactiveFallback>
 
         <KeepRunning />
       </ReactiveSequence>
@@ -83,7 +93,9 @@
                obstacle_front_topic="/obstacle/front"
                obstacle_left_topic="/obstacle/left"
                obstacle_right_topic="/obstacle/right"
+               obstacle_state_topic="/obstacle/state"
                obstacle_threshold_m="9.0"
+               obstacle_freshness_s="5.0"
                memory_seconds="4.5"
                reverse_speed="0.5"
                reverse_seconds="1.3"

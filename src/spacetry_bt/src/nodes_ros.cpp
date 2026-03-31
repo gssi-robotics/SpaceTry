@@ -88,6 +88,21 @@ int directionToSign(const std::string& direction)
   return (direction == "right") ? -1 : +1;
 }
 
+bool stateMatchesFront(const std::string& state)
+{
+  return state == "FRONT" || state == "FRONT_LEFT" || state == "FRONT_RIGHT";
+}
+
+bool stateMatchesLeft(const std::string& state)
+{
+  return state == "LEFT" || state == "FRONT_LEFT";
+}
+
+bool stateMatchesRight(const std::string& state)
+{
+  return state == "RIGHT" || state == "FRONT_RIGHT";
+}
+
 }  // namespace
 
 rclcpp::Node::SharedPtr SetGoal::node_;
@@ -384,10 +399,11 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
     return BT::NodeStatus::SUCCESS;
   }
 
-  const bool scan_fresh = have_scan && (now - t_scan).seconds() < 1.0;
-  const bool front_fresh = have_front_topic && (now - t_front).seconds() < 1.0;
-  const bool left_fresh = have_left_topic && (now - t_left).seconds() < 1.0;
-  const bool right_fresh = have_right_topic && (now - t_right).seconds() < 1.0;
+  const double obstacle_freshness_s = 5.0;
+  const bool scan_fresh = have_scan && (now - t_scan).seconds() < obstacle_freshness_s;
+  const bool front_fresh = have_front_topic && (now - t_front).seconds() < obstacle_freshness_s;
+  const bool left_fresh = have_left_topic && (now - t_left).seconds() < obstacle_freshness_s;
+  const bool right_fresh = have_right_topic && (now - t_right).seconds() < obstacle_freshness_s;
 
   const bool front_blocked =
       front_fresh ? front_topic : (scan_fresh && front_scan < obstacle_threshold_);
@@ -396,7 +412,7 @@ BT::NodeStatus NavigateWithAvoidance::onRunning()
   const bool right_blocked =
       right_fresh ? right_topic : (scan_fresh && right_scan < obstacle_threshold_);
 
-  if (avoidance_phase_ == AvoidancePhase::None && front_blocked) {
+  if (avoidance_phase_ == AvoidancePhase::None && (front_blocked || left_blocked || right_blocked)) {
     const bool memory_fresh =
         last_turn_memory_sign_ != 0 &&
         (now - last_turn_memory_time_).seconds() < memory_seconds_;
@@ -578,6 +594,11 @@ void ObstacleInDirection::ensureInterfaces()
         obstacle_right_topic_, qos,
         [this](std_msgs::msg::Bool::SharedPtr msg) { rightCb(std::move(msg)); });
   }
+  if (!state_sub_) {
+    state_sub_ = node_->create_subscription<std_msgs::msg::String>(
+        obstacle_state_topic_, qos,
+        [this](std_msgs::msg::String::SharedPtr msg) { stateCb(std::move(msg)); });
+  }
   if (!scan_sub_) {
     scan_sub_ = node_->create_subscription<sensor_msgs::msg::LaserScan>(
         scan_topic_, rclcpp::SensorDataQoS(),
@@ -609,6 +630,14 @@ void ObstacleInDirection::rightCb(const std_msgs::msg::Bool::SharedPtr msg)
   right_time_ = node_->now();
 }
 
+void ObstacleInDirection::stateCb(const std_msgs::msg::String::SharedPtr msg)
+{
+  std::lock_guard<std::mutex> lk(mtx_);
+  obstacle_state_ = msg->data;
+  have_state_ = true;
+  state_time_ = node_->now();
+}
+
 void ObstacleInDirection::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
   const double front = sectorMin(*msg, kFrontSectorMin, kFrontSectorMax);
@@ -636,14 +665,18 @@ BT::NodeStatus ObstacleInDirection::tick()
       getInput<std::string>("obstacle_left_topic").value_or("/obstacle/left");
   obstacle_right_topic_ =
       getInput<std::string>("obstacle_right_topic").value_or("/obstacle/right");
+  obstacle_state_topic_ =
+      getInput<std::string>("obstacle_state_topic").value_or("/obstacle/state");
   scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
   obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(9.0);
-  freshness_s_ = getInput<double>("freshness_s").value_or(1.0);
+  freshness_s_ = getInput<double>("freshness_s").value_or(5.0);
   ensureInterfaces();
 
   const auto now = node_->now();
   bool value = false;
   bool fresh = false;
+  bool state_fresh = false;
+  std::string obstacle_state = "CLEAR";
   bool scan_fresh = false;
   double scan_front = std::numeric_limits<double>::infinity();
   double scan_left = std::numeric_limits<double>::infinity();
@@ -660,6 +693,8 @@ BT::NodeStatus ObstacleInDirection::tick()
       value = front_;
       fresh = have_front_ && (now - front_time_).seconds() < freshness_s_;
     }
+    state_fresh = have_state_ && (now - state_time_).seconds() < freshness_s_;
+    obstacle_state = obstacle_state_;
     scan_fresh = have_scan_ && (now - scan_time_).seconds() < freshness_s_;
     scan_front = scan_front_min_;
     scan_left = scan_left_min_;
@@ -668,6 +703,16 @@ BT::NodeStatus ObstacleInDirection::tick()
 
   if (fresh && value) {
     return BT::NodeStatus::SUCCESS;
+  }
+
+  if (state_fresh) {
+    const bool match =
+        (direction == "left") ? stateMatchesLeft(obstacle_state) :
+        (direction == "right") ? stateMatchesRight(obstacle_state) :
+        stateMatchesFront(obstacle_state);
+    if (match) {
+      return BT::NodeStatus::SUCCESS;
+    }
   }
 
   if (scan_fresh) {
@@ -713,6 +758,11 @@ void SelectAvoidanceDirection::ensureInterfaces()
         obstacle_right_topic_, qos,
         [this](std_msgs::msg::Bool::SharedPtr msg) { rightCb(std::move(msg)); });
   }
+  if (!state_sub_) {
+    state_sub_ = node_->create_subscription<std_msgs::msg::String>(
+        obstacle_state_topic_, qos,
+        [this](std_msgs::msg::String::SharedPtr msg) { stateCb(std::move(msg)); });
+  }
   if (!scan_sub_) {
     scan_sub_ = node_->create_subscription<sensor_msgs::msg::LaserScan>(
         scan_topic_, rclcpp::SensorDataQoS(),
@@ -744,6 +794,14 @@ void SelectAvoidanceDirection::rightCb(const std_msgs::msg::Bool::SharedPtr msg)
   right_time_ = node_->now();
 }
 
+void SelectAvoidanceDirection::stateCb(const std_msgs::msg::String::SharedPtr msg)
+{
+  std::lock_guard<std::mutex> lk(mtx_);
+  obstacle_state_ = msg->data;
+  have_state_ = true;
+  state_time_ = node_->now();
+}
+
 void SelectAvoidanceDirection::scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg)
 {
   const double front = sectorMin(*msg, kFrontSectorMin, kFrontSectorMax);
@@ -770,9 +828,11 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
       getInput<std::string>("obstacle_left_topic").value_or("/obstacle/left");
   obstacle_right_topic_ =
       getInput<std::string>("obstacle_right_topic").value_or("/obstacle/right");
+  obstacle_state_topic_ =
+      getInput<std::string>("obstacle_state_topic").value_or("/obstacle/state");
   scan_topic_ = getInput<std::string>("scan_topic").value_or("/scan");
   obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(9.0);
-  freshness_s_ = getInput<double>("freshness_s").value_or(1.0);
+  freshness_s_ = getInput<double>("freshness_s").value_or(5.0);
   memory_seconds_ = getInput<double>("memory_seconds").value_or(3.0);
   ensureInterfaces();
 
@@ -783,6 +843,8 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
   bool front_fresh = false;
   bool left_fresh = false;
   bool right_fresh = false;
+  bool state_fresh = false;
+  std::string obstacle_state = "CLEAR";
   bool scan_fresh = false;
   double scan_front = std::numeric_limits<double>::infinity();
   double scan_left = std::numeric_limits<double>::infinity();
@@ -795,6 +857,8 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
     front_fresh = have_front_ && (now - front_time_).seconds() < freshness_s_;
     left_fresh = have_left_ && (now - left_time_).seconds() < freshness_s_;
     right_fresh = have_right_ && (now - right_time_).seconds() < freshness_s_;
+    state_fresh = have_state_ && (now - state_time_).seconds() < freshness_s_;
+    obstacle_state = obstacle_state_;
     scan_fresh = have_scan_ && (now - scan_time_).seconds() < freshness_s_;
     scan_front = scan_front_min_;
     scan_left = scan_left_min_;
@@ -812,6 +876,21 @@ BT::NodeStatus SelectAvoidanceDirection::tick()
     }
     if (!right_fresh) {
       right = scan_right < obstacle_threshold_;
+      right_fresh = true;
+    }
+  }
+
+  if (state_fresh) {
+    if (!front_fresh) {
+      front = stateMatchesFront(obstacle_state);
+      front_fresh = true;
+    }
+    if (!left_fresh) {
+      left = stateMatchesLeft(obstacle_state);
+      left_fresh = true;
+    }
+    if (!right_fresh) {
+      right = stateMatchesRight(obstacle_state);
       right_fresh = true;
     }
   }
@@ -1032,6 +1111,11 @@ void AvoidObstacle::ensureInterfaces()
         obstacle_right_topic_, qos,
         [this](std_msgs::msg::Bool::SharedPtr msg) { rightCb(std::move(msg)); });
   }
+  if (!state_sub_) {
+    state_sub_ = node_->create_subscription<std_msgs::msg::String>(
+        obstacle_state_topic_, qos,
+        [this](std_msgs::msg::String::SharedPtr msg) { stateCb(std::move(msg)); });
+  }
 }
 
 void AvoidObstacle::publishCmd(double lin, double ang)
@@ -1088,6 +1172,14 @@ void AvoidObstacle::rightCb(const std_msgs::msg::Bool::SharedPtr msg)
   right_time_ = node_->now();
 }
 
+void AvoidObstacle::stateCb(const std_msgs::msg::String::SharedPtr msg)
+{
+  std::lock_guard<std::mutex> lk(mtx_);
+  obstacle_state_ = msg->data;
+  have_state_ = true;
+  state_time_ = node_->now();
+}
+
 BT::NodeStatus AvoidObstacle::onStart()
 {
   if (!node_) {
@@ -1103,7 +1195,10 @@ BT::NodeStatus AvoidObstacle::onStart()
       getInput<std::string>("obstacle_left_topic").value_or("/obstacle/left");
   obstacle_right_topic_ =
       getInput<std::string>("obstacle_right_topic").value_or("/obstacle/right");
+  obstacle_state_topic_ =
+      getInput<std::string>("obstacle_state_topic").value_or("/obstacle/state");
   obstacle_threshold_ = getInput<double>("obstacle_threshold_m").value_or(1.0);
+  freshness_s_ = getInput<double>("freshness_s").value_or(5.0);
   reverse_speed_ = std::fabs(getInput<double>("reverse_speed").value_or(0.6));
   reverse_seconds_ = std::max(0.0, getInput<double>("reverse_seconds").value_or(1.0));
   turn_speed_ = std::fabs(getInput<double>("turn_speed").value_or(1.2));
@@ -1124,7 +1219,9 @@ BT::NodeStatus AvoidObstacle::onRunning()
   double scan_front, scan_left, scan_right;
   bool front, left, right;
   bool have_front, have_left, have_right;
-  rclcpp::Time t_scan, t_front, t_left, t_right;
+  bool have_state;
+  std::string obstacle_state;
+  rclcpp::Time t_scan, t_front, t_left, t_right, t_state;
   {
     std::lock_guard<std::mutex> lk(mtx_);
     have_scan = have_scan_;
@@ -1137,23 +1234,33 @@ BT::NodeStatus AvoidObstacle::onRunning()
     have_front = have_front_;
     have_left = have_left_;
     have_right = have_right_;
+    have_state = have_state_;
+    obstacle_state = obstacle_state_;
     t_scan = last_scan_time_;
     t_front = front_time_;
     t_left = left_time_;
     t_right = right_time_;
+    t_state = state_time_;
   }
 
-  const bool scan_fresh = have_scan && (now - t_scan).seconds() < 1.0;
-  const bool front_fresh = have_front && (now - t_front).seconds() < 1.0;
-  const bool left_fresh = have_left && (now - t_left).seconds() < 1.0;
-  const bool right_fresh = have_right && (now - t_right).seconds() < 1.0;
+  const bool scan_fresh = have_scan && (now - t_scan).seconds() < freshness_s_;
+  const bool front_fresh = have_front && (now - t_front).seconds() < freshness_s_;
+  const bool left_fresh = have_left && (now - t_left).seconds() < freshness_s_;
+  const bool right_fresh = have_right && (now - t_right).seconds() < freshness_s_;
+  const bool state_fresh = have_state && (now - t_state).seconds() < freshness_s_;
 
   const bool front_blocked =
-      front_fresh ? front : (scan_fresh && scan_front < obstacle_threshold_);
+      front_fresh ? front :
+      (state_fresh ? stateMatchesFront(obstacle_state) :
+      (scan_fresh && scan_front < obstacle_threshold_));
   const bool left_blocked =
-      left_fresh ? left : (scan_fresh && scan_left < obstacle_threshold_);
+      left_fresh ? left :
+      (state_fresh ? stateMatchesLeft(obstacle_state) :
+      (scan_fresh && scan_left < obstacle_threshold_));
   const bool right_blocked =
-      right_fresh ? right : (scan_fresh && scan_right < obstacle_threshold_);
+      right_fresh ? right :
+      (state_fresh ? stateMatchesRight(obstacle_state) :
+      (scan_fresh && scan_right < obstacle_threshold_));
 
   const int turn_sign = directionToSign(turn_direction_);
   const bool chosen_side_blocked = (turn_sign > 0) ? left_blocked : right_blocked;

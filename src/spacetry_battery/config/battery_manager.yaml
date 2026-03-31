@@ -1,7 +1,7 @@
 battery_manager:
   ros__parameters:
     capacity_wh: 120.0
-    initial_soc: 0.23
+    initial_soc: 1.0
     update_rate_hz: 10.0
 
     cmd_vel_topic: /cmd_vel

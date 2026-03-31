@@ -9,6 +9,7 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <sensor_msgs/msg/laser_scan.hpp>
 #include <std_msgs/msg/bool.hpp>
+#include <std_msgs/msg/string.hpp>
 
 #include <limits>
 #include <mutex>
@@ -208,9 +209,10 @@ public:
       BT::InputPort<std::string>("obstacle_front_topic", "/obstacle/front"),
       BT::InputPort<std::string>("obstacle_left_topic", "/obstacle/left"),
       BT::InputPort<std::string>("obstacle_right_topic", "/obstacle/right"),
+      BT::InputPort<std::string>("obstacle_state_topic", "/obstacle/state"),
       BT::InputPort<std::string>("scan_topic", "/scan"),
       BT::InputPort<double>("obstacle_threshold_m", 9.0, "Obstacle threshold when classifying directly from scan"),
-      BT::InputPort<double>("freshness_s", 1.0, "Topic age before considering obstacle state stale"),
+      BT::InputPort<double>("freshness_s", 5.0, "Topic age before considering obstacle state stale"),
     };
   }
 
@@ -223,6 +225,7 @@ private:
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr front_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr left_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr right_sub_;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr state_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
   std::mutex mtx_;
   bool front_{false};
@@ -231,10 +234,13 @@ private:
   bool have_front_{false};
   bool have_left_{false};
   bool have_right_{false};
+  std::string obstacle_state_{"CLEAR"};
+  bool have_state_{false};
   bool have_scan_{false};
   rclcpp::Time front_time_;
   rclcpp::Time left_time_;
   rclcpp::Time right_time_;
+  rclcpp::Time state_time_;
   rclcpp::Time scan_time_;
   double scan_front_min_{std::numeric_limits<double>::infinity()};
   double scan_left_min_{std::numeric_limits<double>::infinity()};
@@ -242,14 +248,16 @@ private:
   std::string obstacle_front_topic_;
   std::string obstacle_left_topic_;
   std::string obstacle_right_topic_;
+  std::string obstacle_state_topic_;
   std::string scan_topic_;
   double obstacle_threshold_{9.0};
-  double freshness_s_{1.0};
+  double freshness_s_{5.0};
 
   void ensureInterfaces();
   void frontCb(const std_msgs::msg::Bool::SharedPtr msg);
   void leftCb(const std_msgs::msg::Bool::SharedPtr msg);
   void rightCb(const std_msgs::msg::Bool::SharedPtr msg);
+  void stateCb(const std_msgs::msg::String::SharedPtr msg);
   void scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg);
 };
 
@@ -264,10 +272,11 @@ public:
       BT::InputPort<std::string>("obstacle_front_topic", "/obstacle/front"),
       BT::InputPort<std::string>("obstacle_left_topic", "/obstacle/left"),
       BT::InputPort<std::string>("obstacle_right_topic", "/obstacle/right"),
+      BT::InputPort<std::string>("obstacle_state_topic", "/obstacle/state"),
       BT::InputPort<std::string>("scan_topic", "/scan"),
       BT::InputPort<double>("obstacle_threshold_m", 9.0, "Obstacle threshold when classifying directly from scan"),
       BT::InputPort<double>("memory_seconds", 3.0, "How long to avoid repeating the same blocked maneuver"),
-      BT::InputPort<double>("freshness_s", 1.0, "Topic age before considering obstacle state stale"),
+      BT::InputPort<double>("freshness_s", 5.0, "Topic age before considering obstacle state stale"),
       BT::OutputPort<std::string>("turn_direction"),
       BT::OutputPort<bool>("reverse_first"),
     };
@@ -282,6 +291,7 @@ private:
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr front_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr left_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr right_sub_;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr state_sub_;
   rclcpp::Subscription<sensor_msgs::msg::LaserScan>::SharedPtr scan_sub_;
   std::mutex mtx_;
   bool front_{false};
@@ -290,10 +300,13 @@ private:
   bool have_front_{false};
   bool have_left_{false};
   bool have_right_{false};
+  std::string obstacle_state_{"CLEAR"};
+  bool have_state_{false};
   bool have_scan_{false};
   rclcpp::Time front_time_;
   rclcpp::Time left_time_;
   rclcpp::Time right_time_;
+  rclcpp::Time state_time_;
   rclcpp::Time scan_time_;
   double scan_front_min_{std::numeric_limits<double>::infinity()};
   double scan_left_min_{std::numeric_limits<double>::infinity()};
@@ -301,9 +314,10 @@ private:
   std::string obstacle_front_topic_;
   std::string obstacle_left_topic_;
   std::string obstacle_right_topic_;
+  std::string obstacle_state_topic_;
   std::string scan_topic_;
   double obstacle_threshold_{9.0};
-  double freshness_s_{1.0};
+  double freshness_s_{5.0};
   double memory_seconds_{3.0};
   std::string last_direction_{"left"};
   bool have_last_direction_{false};
@@ -313,6 +327,7 @@ private:
   void frontCb(const std_msgs::msg::Bool::SharedPtr msg);
   void leftCb(const std_msgs::msg::Bool::SharedPtr msg);
   void rightCb(const std_msgs::msg::Bool::SharedPtr msg);
+  void stateCb(const std_msgs::msg::String::SharedPtr msg);
   void scanCb(const sensor_msgs::msg::LaserScan::SharedPtr msg);
 };
 
@@ -383,7 +398,9 @@ public:
       BT::InputPort<std::string>("obstacle_front_topic", "/obstacle/front"),
       BT::InputPort<std::string>("obstacle_left_topic", "/obstacle/left"),
       BT::InputPort<std::string>("obstacle_right_topic", "/obstacle/right"),
+      BT::InputPort<std::string>("obstacle_state_topic", "/obstacle/state"),
       BT::InputPort<double>("obstacle_threshold_m", 1.0, "Front obstacle threshold (m)"),
+      BT::InputPort<double>("freshness_s", 5.0, "Topic age before considering obstacle state stale"),
       BT::InputPort<double>("reverse_speed", 0.6, "Reverse speed during avoidance (m/s)"),
       BT::InputPort<double>("reverse_seconds", 1.0, "Reverse time when boxed in (s)"),
       BT::InputPort<double>("turn_speed", 1.2, "Angular turn speed while clearing obstacle"),
@@ -406,6 +423,7 @@ private:
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr front_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr left_sub_;
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr right_sub_;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr state_sub_;
   std::mutex mtx_;
   enum class Phase
   {
@@ -428,14 +446,19 @@ private:
   bool have_front_{false};
   bool have_left_{false};
   bool have_right_{false};
+  std::string obstacle_state_{"CLEAR"};
+  bool have_state_{false};
   rclcpp::Time front_time_;
   rclcpp::Time left_time_;
   rclcpp::Time right_time_;
+  rclcpp::Time state_time_;
   std::string scan_topic_;
   std::string obstacle_front_topic_;
   std::string obstacle_left_topic_;
   std::string obstacle_right_topic_;
+  std::string obstacle_state_topic_;
   double obstacle_threshold_{1.0};
+  double freshness_s_{5.0};
   double reverse_speed_{0.6};
   double reverse_seconds_{1.0};
   double turn_speed_{1.2};
@@ -450,6 +473,7 @@ private:
   void frontCb(const std_msgs::msg::Bool::SharedPtr msg);
   void leftCb(const std_msgs::msg::Bool::SharedPtr msg);
   void rightCb(const std_msgs::msg::Bool::SharedPtr msg);
+  void stateCb(const std_msgs::msg::String::SharedPtr msg);
 };
 
 class KeepRunning : public BT::StatefulActionNode
