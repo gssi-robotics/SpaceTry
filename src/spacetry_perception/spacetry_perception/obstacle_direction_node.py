@@ -132,23 +132,29 @@ class ObstacleDirectionNode(Node):
             elif self.right_min < angle_base < self.right_max:
                 min_right = min(min_right, r)
 
-        front = (min_front < self.threshold)
-        left  = (min_left  < self.threshold)
-        right = (min_right < self.threshold)
+        front = False
+        left = False
+        right = False
+        state = "CLEAR"
+
+        sector_ranges = {
+            "FRONT": min_front,
+            "LEFT": min_left,
+            "RIGHT": min_right,
+        }
+        state, state_range = min(sector_ranges.items(), key=lambda item: item[1])
+        if state_range < self.threshold:
+            front = (state == "FRONT")
+            left = (state == "LEFT")
+            right = (state == "RIGHT")
+        else:
+            state = "CLEAR"
 
         self.pub_front.publish(Bool(data=front))
         self.pub_left.publish(Bool(data=left))
         self.pub_right.publish(Bool(data=right))
 
         if self.pub_state is not None:
-            if front:
-                state = "FRONT"
-            elif left:
-                state = "LEFT"
-            elif right:
-                state = "RIGHT"
-            else:
-                state = "CLEAR"
             self.pub_state.publish(String(data=state))
 
         now = self.get_clock().now()
