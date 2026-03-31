@@ -1,0 +1,51 @@
+scenario:
+  name: scenario_navigation_cascading_uncertainty
+  report_topic: /scenario/report
+  events_topic: /scenario/events
+  goal:
+    x: 50.10
+    y: -80.0
+    tolerance_m: 1.5
+  raw_topics:
+    front: /scenario/perception/obstacle/front
+    left: /scenario/perception/obstacle/left
+    right: /scenario/perception/obstacle/right
+    state: /scenario/perception/obstacle/state
+  final_topics:
+    front: /obstacle/front
+    left: /obstacle/left
+    right: /obstacle/right
+    state: /obstacle/state
+    at_goal: /at_science_rock
+  monitor_events_topic: /monitor/events
+  battery_topic: /battery/soc
+  odom_topic: /model/curiosity_mars_rover/odometry
+  cmd_vel_topic: /cmd_vel
+  phases:
+    - name: perception_dropout_corridor
+      type: front_override
+      trigger: mission_elapsed
+      trigger_after_s: 15.0
+      duration_s: 12.0
+      intensity: 1.0
+      left_bias: false
+      right_bias: false
+      notes: Simulate temporary sensor dropout right after the rover commits to traverse.
+    - name: hazard_gate_near_block_island
+      type: front_override
+      trigger: goal_distance_below
+      trigger_distance_m: 60.0
+      duration_s: 10.0
+      intensity: 0.7
+      left_bias: true
+      right_bias: false
+      notes: Force avoidance close to the known hazard corridor and check replanning.
+    - name: final_approach_goal_pressure
+      type: front_override
+      trigger: goal_distance_below
+      trigger_distance_m: 15.0
+      duration_s: 8.0
+      intensity: 0.5
+      left_bias: false
+      right_bias: true
+      notes: Challenge the final approach and observe whether the rover still reaches the rock safely.
