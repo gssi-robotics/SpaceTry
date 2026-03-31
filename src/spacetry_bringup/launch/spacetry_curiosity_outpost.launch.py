@@ -264,7 +264,7 @@ def generate_launch_description():
             "use_sim_time": True,
             "scan_topic": "/scan",
             "base_frame": "base_link",
-            "threshold_m": 1.4,
+            "threshold_m": 3.0,
             "front_min_rad": -0.3490658503988659,
             "front_max_rad": 0.3490658503988659,
             "left_min_rad": 0.3490658503988659,
