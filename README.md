@@ -300,7 +300,7 @@ docker compose -f docker/docker-compose.yaml down
 
 ## Test Scenarios for Autonomy Evaluation
 
-SpaceTry 🥐 includes a framework for generating and running test scenarios that evaluate the rover's autonomous capabilities and self-adaptation to changing/unforeseen conditions.
+SpaceTry 🥐 includes an LLM-Agent [Skill](skills) for generating and running test scenarios that evaluate the rover's autonomous capabilities and self-adaptation to faults or  changing/unforeseen conditions.
 
 ### Overview
 
@@ -317,10 +317,10 @@ Test scenarios inject uncertainty into the rover's mission execution to evaluate
 <details>
 <summary> 1. Understand the Test Scenario Framework </summary>
 
-   Scenario templates are available in the `scenarios/` directory:
+   Scenario templates are available in the `skills/` directory:
 
-   - [**SCENARIO_PROMPT_TEMPLATE.md**](scenarios/SCENARIO_PROMPT_TEMPLATE.md) — Comprehensive guide with base template, instantiation examples, and usage patterns
-   - [**SCENARIO_PROMPT_QUICK_REF.md**](scenarios/SCENARIO_PROMPT_QUICK_REF.md) — Quick reference with one-liners, uncertainty injection templates, and naming conventions
+   - [**SCENARIO_PROMPT_TEMPLATE.md**](skills/spacetry-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md) — Comprehensive guide with base template, instantiation examples, and usage patterns
+   - [**SCENARIO_PROMPT_QUICK_REF.md**](skills/spacetry-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md) — Quick reference with one-liners, uncertainty injection templates, and naming conventions
 
    These templates guide the creation of scenario driver components that:
    - Inject uncertainty at decision-critical moments
@@ -362,7 +362,7 @@ Test scenarios inject uncertainty into the rover's mission execution to evaluate
    to test whether autonomous mission planning can gracefully degrade and complete with limited energy.
    ```
 
-   See [scenarios/SCENARIO_PROMPT_QUICK_REF.md](scenarios/SCENARIO_PROMPT_QUICK_REF.md) for rapid scenario generation templates.
+   See [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md) for rapid scenario generation templates.
 
 </details>
 
@@ -526,7 +526,7 @@ Test scenarios inject uncertainty into the rover's mission execution to evaluate
 
 ### Test Scenario Workflow (Detailed)
 
-For a deeper understanding of the test scenario process and how to create custom scenarios, see the [AGENTS.md](AGENTS.md) section on [Test Scenario Generation Workflow](AGENTS.md#test-scenario-generation-workflow).
+For a deeper understanding of the test scenario process and how to create custom scenarios, see the [AGENTS.md](AGENTS.md) section on [Test Scenario Generation Workflow](AGENTS.md#test-scenario-generation-workflow) and the [Scenario Generation Prompt Template](skills/spacetry-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md).
 
 The workflow consists of:
 1. **Define Autonomy Test Context** — Specify scenario parameters and objectives
@@ -535,12 +535,4 @@ The workflow consists of:
 4. **Execute Test & Monitor Autonomous Behavior** — Observe real-time decision-making
 5. **Analyze Autonomy Results** — Generate evaluation report with metrics
 
-### Scenario Template Files
-
-Quick references for scenario creation:
-- [scenarios/SCENARIO_PROMPT_TEMPLATE.md](scenarios/SCENARIO_PROMPT_TEMPLATE.md) — Comprehensive template with examples
-- [scenarios/SCENARIO_PROMPT_QUICK_REF.md](scenarios/SCENARIO_PROMPT_QUICK_REF.md) — Quick reference guide
-- [AGENTS.md](AGENTS.md) — Project-wide autonomy evaluation framework
-- [src/spacetry_mission/config/mission_01.yaml](src/spacetry_mission/config/mission_01.yaml) — Example mission configuration
-- [src/spacetry_mission/config/waypoints.yaml](src/spacetry_mission/config/waypoints.yaml) — Navigation waypoints
-- [src/spacetry_mission/config/objects.yaml](src/spacetry_mission/config/objects.yaml) — Mission objects and hazards
+A quick reference guide with examples is available at [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md).

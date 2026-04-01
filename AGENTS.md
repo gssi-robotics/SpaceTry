@@ -23,17 +23,20 @@ spacetry/
 │   ├── docker-compose.yaml (defines spacetry service)
 │   └── Dockerfile (builds spacetry:dev image)
 ├── scenarios/
-│   ├── SCENARIO_PROMPT_QUICK_REF.md (quick reference for scenario prompt generation)
-│   └── SCENARIO_PROMPT_TEMPLATE.md  (template for designing autonomous test scenarios with uncertainty injection)
+│   ├── SCENARIO_PROMPT_QUICK_REF.md - quick reference for scenario prompt generation
+│   └── SCENARIO_PROMPT_TEMPLATE.md  - template for designing autonomous test scenarios with uncertainty injection
 ├── src/
-│   ├── spacetry_battery/           - Battery manager node
-│   ├── spacetry_bringup/           - Rover launch configurations
-│   ├── spacetry_bt/                - Behavior tree runner node (C++)
-│   ├── spacetry_mission/           - Mission description and configuration files
-│   ├── spacetry_models/            - Gazebo models (rocks, solar panels, station)
-│   ├── spacetry_monitors/          - Safety properties monitoring node
-│   ├── spacetry_perception/        - Perception nodes
-│   └── spacetry_world/             - Gazebo world configurations
+│   ├── spacetry_battery/            - Battery manager node
+│   ├── spacetry_bringup/            - Rover launch configurations
+│   ├── spacetry_bt/                 - Behavior tree runner node (C++)
+│   ├── spacetry_mission/            - Mission description and configuration files
+│   ├── spacetry_models/             - Gazebo models (rocks, solar panels, station)
+│   ├── spacetry_monitors/           - Safety properties monitoring node
+│   ├── spacetry_perception/         - Perception nodes
+│   └── spacetry_world/              - Gazebo world configurations
+├── docs/
+│   ├── IMPLEMENTATION.md            - Project structure and implementation details
+│   └── RUN.md                       - Instructions to 
 └── scripts/                        - Utility scripts
 ```
 
@@ -212,7 +215,7 @@ A test scenario consists of:
 **Step 1: Define Autonomy Test Context**
 ```bash
 # Specify scenario parameters that test autonomous adaptation
-vim scenarios/mission_01.yaml
+vim scenarios/uncertainty_scenario_01.yaml
 # Examples:
 #   - degraded_sensors: true (test adaptation to sensor loss)
 #   - dynamic_obstacles: true (test obstacle avoidance adaptation)
@@ -228,7 +231,7 @@ docker compose exec spacetry colcon build --packages-select spacetry_mission spa
 ```bash
 docker compose exec spacetry bash -lc \
   "ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
-   headless:=0 spawn_waypoint:=dock_pad_01 battery:=0.5 autonomy_level:=high"
+   headless:=0 spawn_waypoint:=dock_pad_01 battery:=0.5"
 ```
 
 **Step 4: Execute Test & Monitor Autonomous Behavior**
