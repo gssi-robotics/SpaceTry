@@ -22,6 +22,7 @@ from launch.actions import (
     IncludeLaunchDescription,
     RegisterEventHandler,
     SetEnvironmentVariable,
+    TimerAction,
 )
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -61,6 +62,8 @@ def generate_launch_description():
     spawn_yaw_offset = LaunchConfiguration("spawn_yaw_offset")
     battery = LaunchConfiguration("battery")
     enable_demo_nodes = LaunchConfiguration("enable_demo_nodes")
+    enable_bt_runner = LaunchConfiguration("enable_bt_runner")
+    tree_file = LaunchConfiguration("tree_file")
 
     # --- paths
     spacetry_world_share = get_package_share_directory("spacetry_world")
@@ -265,6 +268,31 @@ def generate_launch_description():
         condition=IfCondition(enable_demo_nodes),
     )
 
+    # --- BT Runner (behavior tree mission executor)
+    # Started after controller chain is loaded to ensure rover is fully ready
+    bt_params = PathJoinSubstitution(
+        [FindPackageShare("spacetry_bt"), "bt_params.yaml"]
+    )
+    bt_tree_file_default = PathJoinSubstitution(
+        [FindPackageShare("spacetry_bt"), "trees", "base_bt.xml"]
+    )
+    
+    spacetry_bt_runner = Node(
+        package="spacetry_bt",
+        executable="spacetry_bt_runner",
+        name="spacetry_bt_runner",
+        output="screen",
+        condition=IfCondition(enable_bt_runner),
+        parameters=[
+            bt_params,
+            {
+                "tree_file": tree_file,
+                "use_sim_time": True,
+                "tick_hz": 10,
+            },
+        ],
+    )
+
 
     # --- LiDAR obstacle direction (front/left/right topics for BT)
     obstacle_direction = Node(
@@ -340,16 +368,28 @@ def generate_launch_description():
                 default_value="false",
                 description="Launch upstream curiosity_rover_demo helper nodes. Keep false for BT-driven navigation.",
             ),
+            DeclareLaunchArgument(
+                "enable_bt_runner",
+                default_value="true",
+                description="Launch the behavior tree runner for autonomous mission execution. Set to false to control rover manually.",
+            ),
+            DeclareLaunchArgument(
+                "tree_file",
+                default_value=str(bt_tree_file_default),
+                description="Path to BehaviorTree XML file. Defaults to base_bt.xml. Example: tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml",
+            ),
             env_gz_plugin,
             env_gz_resource,
             SetParameter(name="use_sim_time", value=True),
             mars_outpost_launch,
             robot_state_publisher,
-            spawn,
-            odom_node,
+            # Start bridges early so /clock is available before robot spawns
             ros_gz_bridge,
-            odom_relay,
             image_bridge,
+            # Small delay lets the clock bridge publish before spawn
+            TimerAction(period=2.0, actions=[spawn]),
+            odom_node,
+            odom_relay,
             battery_manager,
             obstacle_direction,
             copilot_monitor,
@@ -367,6 +407,13 @@ def generate_launch_description():
                         load_steer_joint_traj_controller,
                         load_suspension_joint_traj_controller,
                     ],
+                )
+            ),
+            # Start BT runner after suspension controller is loaded (last in chain)
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=load_suspension_joint_traj_controller,
+                    on_exit=[spacetry_bt_runner],
                 )
             ),
             mars_rover_demo_nodes,

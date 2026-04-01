@@ -1,6 +1,6 @@
 <h1>SpaceTry 🥐 — <u>Space</u> <u>T</u>raining <u>R</u>over Autonom<u>Y</u></h1>
 
-SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees. 
+SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees + Autonomy Evaluation Scenario Genaration Skill for LLM Agents. 
 
 **Contents:**
 - [Project Layout](#project-layout) — Repository structure and ROS2 packages
@@ -165,57 +165,101 @@ You should see:
 </details>
 
 <details>
-<summary> 4. Launch SpaceTry 🥐 with the Curiosity Mars Rover </summary>
+<summary> 4. Launch SpaceTry Rover in Simulation with Autonomous Mission 🥐 </summary>
 
-   SpaceTry 🥐 includes a bringup that launches the `mars_outpost` world, the Curiosity rover (spawned near `dock_pad_01`), and ROS↔Gazebo bridges.
+   SpaceTry 🥐 bringup launches the `mars_outpost` world, spawns the Curiosity rover (with proper simulation clock synchronization), starts ROS↔Gazebo bridges, loads the ros2_control controller chain, and **automatically** starts the behavior tree mission runner.
 
-   In the same terminal:
+   **Option A: Run from inside the running container**
 
+   From inside the container (see step 2.), simply launch the rover:
    ```bash
    source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py
    ```
 
-   **Optional** -- If you want to launch from a new terminal:
+   The launch will:
+   1. Start Gazebo with mars_outpost world
+   2. Publish ROS↔Gazebo bridges (including `/clock` for simulation time)
+   3. Spawn Curiosity rover (with 2-second delay to ensure clock is available)
+   4. Load ros2_control controller chain
+   5. Automatically start the behavior tree runner to execute the mission
 
+   To use a different BT tree file:
    ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py'
+   source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml
    ```
 
-   You should see Gazebo open with the outpost scene and rover spawned nearby. Use launch argument `battery:=0.5` to set initial battery state-of-charge (example: 50%).
+   **Option B: Run from a new terminal window**
 
-   **Optional - Headless mode (no Gazebo GUI):**
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75'
+   ```
+
+   To specify a custom BT tree:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75 tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml'
+   ```
+
+   **Option C: Run in Headless Mode (no Gazebo GUI)**
+
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1'
    ```
 
-   **Verify rover is running:**
+   To specify a custom BT tree:
    ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep curiosity'
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1 tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml'
    ```
 
-</details>
+   **Option D: Launch without the Behavior Tree**
 
-<details>
-<summary> 5. Run the Behavior Tree (BT) or drive manually </summary>
+   To launch the rover without the BT runner (for manual testing or debugging):
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py enable_bt_runner:=false'
+   ```
 
-   **Option A: Drive the rover manually in Gazebo GUI**
-   - Open the Entity Tree and select `curiosity_mars_rover`
-   - Open Component Inspector and adjust velocity commands
+   This starts the full simulation stack without the autonomous mission runner. Useful for:
+   - Manual rover control via command-line or external controllers
+   - Testing individual components (perception, battery manager, etc.)
+   - Debugging without BT execution overhead
 
-   **Option B: Run the Behavior Tree autonomously**
+   **Option E: Run the Behavior Tree separately on a new terminal**
 
-   In another terminal:
+   First, launch the rover without the BT runner:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py enable_bt_runner:=false'
+   ```
 
+   Then in another terminal, run the behavior tree runner:
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 run spacetry_bt spacetry_bt_runner --ros-args -p tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/base_bt.xml --params-file /ws/src/spacetry_bt/bt_params.yaml'
    ```
 
-   The BT runner will execute the mission defined in `/ws/src/spacetry_bt/trees/base_bt.xml`.
+   This allows you to start the BT independently, giving you fine-grained control over when the mission execution begins.
+
+   **Option F: Verify the rover and BT are running**
+
+   Check if Curiosity nodes are active:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep curiosity'
+   ```
+
+   Verify the behavior tree runner is executing:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep spacetry_bt_runner'
+   ```
+
+   You should see:
+   - Gazebo window with mars_outpost scene and rover spawned near `dock_pad_01`
+   - Console output from rover nodes and BT runner showing mission execution (if BT enabled)
+   - Use `battery:=0.5` to set initial battery state (example: 50%)
+   - Use `enable_bt_runner:=false` to launch without the behavior tree
+   - Use `tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml` to specify a custom BT tree
+   - The BT executes the mission from [base_bt.xml](src/spacetry_bt/trees/base_bt.xml) automatically (when enabled)
 
 </details>
 
 <details>
-<summary> 6. Stop SpaceTry 🥐 </summary>
+<summary> 5. Stop SpaceTry 🥐 </summary>
 
 After closing Gazebo GUI, exit all the containers bash with:
 
