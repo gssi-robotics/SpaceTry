@@ -111,11 +111,6 @@ For each autonomy and safety requirement being evaluated, the driver component s
       Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}
       Test: Can rover handle mission objective changes / environment shifts / weather?
       Measure: Replanning time, goal adjustment, recovery success
-
-
-## Code Style and Guidelines
-- Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
-- Follow additional instructions from the AGENTS.md file in the project and sub-folders (packages).
 ```
 
 ---

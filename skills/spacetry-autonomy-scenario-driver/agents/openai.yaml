@@ -1,0 +1,4 @@
+interface:
+  display_name: "SpaceTry Scenario Driver"
+  short_description: "Build SpaceTry autonomy scenarios"
+  default_prompt: "Use $spacetry-scenario-driver to design and implement a SpaceTry autonomy test scenario with uncertainty injection and measurable outcomes."

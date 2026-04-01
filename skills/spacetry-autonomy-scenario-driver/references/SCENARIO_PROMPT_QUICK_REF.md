@@ -175,11 +175,9 @@ Use this table to customize the template for your specific scenario:
 
 ## Related Files
 
-- [AGENTS.md](./AGENTS.md) - Project-wide autonomy evaluation framework
-- [.AGENTS.md.template](../.AGENTS.md.template) - Package-specific template with autonomy sections
-- [spacetry_mission/MISSION.md](../src/spacetry_mission/MISSION.md) - Mission planning details
-- [spacetry_bt/README](../src/spacetry_bt/README.md) - Behavior tree execution guide
-
+- [AGENTS.md](../../../AGENTS.md) - Project-wide autonomy evaluation framework
+- [.AGENTS.md.template](../../../.AGENTS.md.template) - Package-specific template with autonomy sections
+- [spacetry_mission/MISSION.md](../../../src/spacetry_mission/MISSION.md) - Mission planning details
 ---
 
 **See Also:** [SCENARIO_PROMPT_TEMPLATE.md](./SCENARIO_PROMPT_TEMPLATE.md) for the template.
