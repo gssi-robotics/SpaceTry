@@ -9,7 +9,7 @@
 .dockerignore
 
 # Log files
-log/
+logs/
 **/*.log
 
 # Build artifacts (already excluded via Dockerfile RUN rm -rf)
