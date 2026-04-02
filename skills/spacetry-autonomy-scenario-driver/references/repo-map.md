@@ -1,4 +1,4 @@
-# SpaceTry Scenario Driver Repo Map
+# SpaceTry Autonomy Scenario Driver Repo Map
 
 Load this file when you need a quick map of where scenario-relevant information lives.
 
@@ -6,13 +6,13 @@ Load this file when you need a quick map of where scenario-relevant information 
 
 - `AGENTS.md`
   Project-wide rules, Docker-only execution, autonomy-evaluation workflow.
-- `scenarios/SCENARIO_PROMPT_TEMPLATE.md`
+- `skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md`
   Full scenario prompt structure and metric vocabulary.
-- `scenarios/SCENARIO_PROMPT_QUICK_REF.md`
+- `skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md`
   Short prompt patterns, naming convention, integration checklist.
-- `scenarios/space-fault-model.md`
+- `skills/spacetry-autonomy-scenario-driver/references/space-fault-model.md`
   Fault subject, domain, trigger, manifestation, and traceability model.
-- `scenarios/Uncertainty_Taxonomy.md`
+- `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md`
   Uncertainty dimensions and sources.
 
 ## Runtime and autonomy sources

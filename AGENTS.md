@@ -14,45 +14,20 @@ When modifying content in a package, always check for package-level `AGENTS.md` 
 
 ---
 
-## Project Structure Overview
-
-```
-spacetry/
-├── AGENTS.md (this file - project-wide rules)
-├── docker/
-│   ├── docker-compose.yaml (defines spacetry service)
-│   └── Dockerfile (builds spacetry:dev image)
-├── scenarios/
-│   ├── SCENARIO_PROMPT_QUICK_REF.md - quick reference for scenario prompt generation
-│   └── SCENARIO_PROMPT_TEMPLATE.md  - template for designing autonomous test scenarios with uncertainty injection
-├── src/
-│   ├── spacetry_battery/            - Battery manager node
-│   ├── spacetry_bringup/            - Rover launch configurations
-│   ├── spacetry_bt/                 - Behavior tree runner node (C++)
-│   ├── spacetry_mission/            - Mission description and configuration files
-│   ├── spacetry_models/             - Gazebo models (rocks, solar panels, station)
-│   ├── spacetry_monitors/           - Safety properties monitoring node
-│   ├── spacetry_perception/         - Perception nodes
-│   └── spacetry_world/              - Gazebo world configurations
-├── docs/
-│   ├── IMPLEMENTATION.md            - Project structure and implementation details
-│   └── RUN.md                       - Instructions to 
-└── scripts/                        - Utility scripts
-```
-
----
-
 ## Development Workflow
+
+The project implementation and structure details are in [IMPLEMENTATION.md](docs/IMPLEMENTATION.md).
 
 ### 1. ROS 2 Packages Changes:
 The rover ROS 2 Packages are:
 - `src/spacetry_battery/`
+- `src/spacetry_bringup/`
 - `src/spacetry_bt/`
+- `src/spacetry_mission/`
 - `src/spacetry_models/`
 - `src/spacetry_monitors/`
 - `src/spacetry_perception/`
-- `src/spacetry_requirements/`
-- `src/spacetry_models/`
+- `src/spacetry_world/`
 
 Modifications to the listed rover ROS 2 packages above are only allowed during the development stage. After evaluation or during scenario driver generation, changes should be done only if there are bugs detected on the initial implemented behavior. In that case, those changes shall be approved by the user.
 
@@ -63,7 +38,7 @@ When modifying ROS2 packages:
 3. **Source code** - Follow the package's language conventions (C++, Python)
 4. **Configuration files** - In `config/` subdirectories as YAML
 
-After modifying any ROS2 files they should be validated by building the workspace:
+After modifying any ROS2 files they should be validated by building and running the simulation:
 
 ```bash
  source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+
@@ -161,130 +136,13 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -l
 
 ### Environment Variables in Docker
 
-When running commands in containers, these are pre-set:
+When running commands in containers, these are pre-set via the [docker compose file](docker/docker-compose.yaml):
 - `ROS_DOMAIN_ID=0` - DDS discovery domain
 - `RMW_IMPLEMENTATION` - Middleware layer
 - `ROS_DISTRO=jazzy` - ROS2 version
 - `PYTHONUNBUFFERED=1` - Real-time output
 
 Do not override these unless specifically needed.
-
----
-
-## Test Scenario Generation and Evaluation Workflow
-
-Test scenarios validate the rover's autonomous capabilities and capacity to self-adapt to changing or unforeseen conditions. This workflow describes how to generate, configure, and execute test scenarios to evaluate robot autonomy.
-
-### Scenario Components
-
-A test scenario consists of:
-
-1. **World Configuration** - `src/spacetry_world/worlds/mars_outpost.sdf`
-   - Terrain complexity and variability
-   - Dynamic/static obstacles
-   - Environmental conditions (lighting, physics parameters)
-   - Unexpected element placement
-
-2. **Rover Configuration** - Launch parameters in `src/spacetry_bringup/`
-   - Initial pose and spawn location
-   - Sensor calibration state
-   - Battery state (nominal, degraded, critical)
-   - Autonomous capability parameters
-
-3. **Mission Configuration** - `src/spacetry_mission/config/`
-   - Primary objectives and waypoints
-   - Tolerance margins for success criteria
-   - Fallback behaviors and contingencies
-   - Autonomy decision thresholds
-
-4. **Monitoring & Validation** - `src/spacetry_monitors/`
-   - Safety constraints (do not violate)
-   - Performance thresholds (self-adaptation indicators)
-   - Behavior state transitions
-   - Deviation detection and logging
-
-### Test Scenario Workflow
-
-- **Step 1** (Define Autonomy Test Context) → The template will be used to guide the generation of the scenario driver for the evaluation of the robot autonomy
-- **Step 2** (Build and Prepare) → Template specifies code modules to build
-- **Step 3** (Launch Scenario) → Driver component executes uncertainty injection during launch
-- **Step 4** (Execute & Monitor) → Measure autonomy metrics defined in template
-- **Step 5** (Analyze Results) → Assess which autonomy aspects succeeded/failed
-
-
-**Step 1: Define Autonomy Test Context**
-```bash
-# Specify scenario parameters that test autonomous adaptation
-vim scenarios/uncertainty_scenario_01.yaml
-# Examples:
-#   - degraded_sensors: true (test adaptation to sensor loss)
-#   - dynamic_obstacles: true (test obstacle avoidance adaptation)
-#   - power_constraints: true (test energy-aware behavior)
-```
-
-**Step 2: Build and Prepare**
-```bash
-docker compose exec spacetry colcon build --packages-select spacetry_mission spacetry_world spacetry_bt
-```
-
-**Step 3: Launch Scenario with Autonomy Variations**
-```bash
-docker compose exec spacetry bash -lc \
-  "ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
-   headless:=0 spawn_waypoint:=dock_pad_01 battery:=0.5"
-```
-
-**Step 4: Execute Test & Monitor Autonomous Behavior**
-- Observe rover decision-making under uncertainty
-- Monitor behavior transitions when conditions change
-- Track adaptation to obstacles and sensor degradation
-- Log autonomy metrics (recovery rate, goal completion, safety violations)
-
-**Step 5: Analyze Autonomy Results**
-- Did the rover adapt to unforeseen conditions?
-- Were contingency behaviors triggered appropriately?
-- Did it maintain safety while pursuing objectives?
-- How did autonomy degrade gracefully with resource constraints?
-
-### Test Scenario Generation
-
-The scenario driver template is in `scenarios/SCENARIO_PROMPT_TEMPLATE.md`.
-
-When generating or creating scenario driver components consider:
-
-1. **Parse the template** - Extract BT location, code paths, mission file
-2. **Identify uncertainty injection points** - Read BT and the monitors to find decision nodes
-3. **Create injection logic** - Implement event triggers (sensor degrade, obstacle spawn, power drain)
-4. **Instrument monitoring** - Subscribe to relevant ROS2 topics for state tracking
-5. **Measure and log** - Record autonomy metrics (recovery rate, goal completion, safety violations)
-6. **Report results** - Generate scenario evaluation with autonomy impact assessment
-
-The initial specified behavior through the BT and the monitors should not be changed because those are exactly what the scenario will evaluate and test.
-
-### Package Impact on Autonomous Capabilities
-
-Different packages contribute to rover autonomy:
-
-- **spacetry_world** - Environmental complexity and uncertainty sources
-- **spacetry_bringup** - Sensor/actuator configuration and reliability baseline
-- **spacetry_mission** - Mission objectives and adaptation thresholds
-- **spacetry_bt** - Autonomous decision trees and contingency behaviors
-- **spacetry_perception** - Autonomy through sensing, adaptation to degradation
-- **spacetry_battery** - Energy-aware autonomy and resource constraints
-- **spacetry_monitors** - Safety constraints on autonomous decisions
-
-When modifying a package, evaluate how it changes the rover's autonomous capabilities and self-adaptation potential.
-
-### Autonomy Evaluation Criteria
-
-Test scenarios assess:
-
-- **Perceptual Adaptation** - Does the rover handle sensor degradation? (spacetry_perception)
-- **Behavioral Flexibility** - Can behaviors transition when conditions change? (spacetry_bt)
-- **Resource-Aware Autonomy** - Does the rover adapt goals to energy constraints? (spacetry_battery)
-- **Obstacle Intelligence** - Does it discover and avoid dynamic obstacles? (spacetry_perception + spacetry_bt)
-- **Mission Resilience** - Can it recover from failures or replanning? (spacetry_mission)
-- **Safety Under Autonomy** - Does self-adaptation never violate safety? (spacetry_monitors)
 
 ---
 
@@ -301,6 +159,12 @@ Located in `src/spacetry_models/models/`:
 - Each model has `model.config` and `model.sdf` (XML/SDF format)
 - Modify carefully - affects physics and visualization
 - Models auto-load in `spacetry_world/worlds/mars_outpost.sdf`
+
+---
+
+## Autonomy Test Scenario Generation and Evaluation Workflow
+
+Autonomy test scenarios validate the rover's capacity to self-adapt to changing or unforeseen conditions. There is a skill defined in this repository in [spacetry-autonomy-scenario-driver](skills/spacetry-autonomy-scenario-driver) that defines the workflow for the generation of autonomy test scenarios drivers for evaluating the rover's autonomy in simulation. To generate a autonomy test scenario users needs to provide a scenario description. The template [SCENARIO_PROMPT_TEMPLATE.md](skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md) can be used for this task. Guidelines and examples on how to use the template are provided in [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md).
 
 ---
 
@@ -374,7 +238,7 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 <comma
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py [args]"
 ```
 
-### Autonomy Evaluation Checklist
+### Autonomy Changes Checklist
 
 Before submitting changes:
 - [ ] Does the change improve, maintain, or degrade autonomous capabilities?
@@ -388,7 +252,7 @@ Before submitting changes:
 
 - **spacetry_bringup**: Launch configurations. Changes here affect all subsequent launches.
 - **spacetry_bt**: Behavior tree definitions. Complex dependency with rover controllers.
-- **spacetry_monitors**: FRETish agent and monitoring. See package-specific rules.
+- **spacetry_monitors**: safety constraints monitoring. See package-specific rules.
 - **spacetry_mission**: Mission planning. Interacts with behaviors and waypoints.
 - **spacetry_perception**: Sensor processing. Latency-sensitive, handle carefully.
 
@@ -402,5 +266,5 @@ Before submitting changes:
 
 ---
 
-**Last Updated:** March 30, 2026
+**Last Updated:** April 2, 2026
 **Maintained by:** SpaceTry Team
