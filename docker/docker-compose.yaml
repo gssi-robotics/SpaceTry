@@ -7,6 +7,7 @@ services:
       - QT_X11_NO_MITSHM=1 #fix some QT bugs
       - XDG_RUNTIME_DIR
       - XAUTHORITY=$XAUTHORITY
+      - ROS_DOMAIN_ID=0
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       # --- GPU vendor-agnostic: let the DRI device + Mesa/driver sort it out ---
       # NVIDIA-specific (ignored by non-NVIDIA drivers)
