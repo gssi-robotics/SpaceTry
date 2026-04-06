@@ -1,7 +1,7 @@
 # Uncertainty Taxonomy
 
 Below we present uncertainty taxonomy from `Mahdavi-Hezavehi, Sara, Paris Avgeriou, and Danny Weyns. "A classification framework of uncertainty in architecture-based self-adaptive systems with multiple quality requirements." Managing trade-offs in adaptable software architectures. Morgan Kaufmann, 2017. 45-77.` avaialable in: https://people.cs.kuleuven.be/~danny.weyns/papers/2015MASA.pdf. Some of the dimensions names were adjusted according to their definition in the paper for better understandibility.
-For the `Location` dimension of uncertainty, the sources of uncertainty are also listed.
+For the `Location` dimension of uncertainty, the types of sources of uncertainty are also listed.
 
 Uncertainty Dimensions:
 - Location:

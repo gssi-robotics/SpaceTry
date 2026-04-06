@@ -56,6 +56,8 @@ Design and implement a **Scenario Driver Software Component** that:
    - Dynamic obstacles or other changes in the simulation environment
    - Impose resource constraints
    - Trigger unexpected state changes
+   - Classify the uncertainty using the uncertainty taxonomy 
+   - Classify any generated faults using the fault model
 
 2. **Tests Autonomous Adaptation**:
    - Can the rover adapt perception strategies when sensors degrade?
