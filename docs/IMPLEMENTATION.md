@@ -5,6 +5,7 @@
 spacetry/
 ├── AGENTS.md                        - this file with project-wide rules
 ├── README.md                        - project overview and usage steps
+├── REF_SCENARIO.md                  - reference scenario description for autonomy evaluation
 ├── deps/
 │   └── spacetry.repos              - repository configuration for dependency management
 ├── docker/
@@ -20,6 +21,7 @@ spacetry/
 │       │   └── SCENARIO_PROMPT_TEMPLATE.md  - template for autonomous test scenario specification
 │       └── references/
 │           ├── SCENARIO_PROMPT_QUICK_REF.md - quick reference for scenario prompt specification
+│           ├── Gazebo.md                     - Gazebo world and sensor capabilities reference
 │           ├── repo-map.md                  - repository autonomy overview
 │           ├── space-fault-model.md         - fault modeling reference
 │           └── Uncertainty_Taxonomy.md      - uncertainty classification taxonomy

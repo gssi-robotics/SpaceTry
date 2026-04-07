@@ -61,7 +61,8 @@ If there is not enough information to infer any of these fields from the mission
 ## Code Style and Guidelines
 
 - Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
-- Follow additional instructions from the `AGENTS.md` (project-wide) and `.instructions.md` (packages in the `src/` sub-folders).
+- Follow additional instructions in `AGENTS.md` files from project-wide and package-specific (in the `src/` sub-folders).
+- In case of doubt, conflicting or missing information, ask clarification from the user.
 
 ## Fault Mapping
 
@@ -92,7 +93,7 @@ When the user wants only a prompt or scenario description, structure it around:
 
 Use `scenarios/SCENARIO_PROMPT_TEMPLATE.md` for the full shape and `scenarios/SCENARIO_PROMPT_QUICK_REF.md` for a concrete example and naming conventions.
 
-## Implementation Guidance
+## Implementation Guidelines
 
 Prefer the least invasive path:
 

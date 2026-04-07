@@ -14,6 +14,8 @@ Load this file when you need a quick map of where scenario-relevant information 
   Fault subject, domain, trigger, manifestation, and traceability model.
 - `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md`
   Uncertainty dimensions and sources.
+- `skills/spacetry-autonomy-scenario-driver/references/Gazebo.md`
+  Gazebo world-configuration options, runtime injection guidance, and Mars-condition constraints for scenario design.
 
 ## Runtime and autonomy sources
 
