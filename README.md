@@ -16,6 +16,7 @@ SpaceTry is an infrastructure to train space rovers autonomy. This repository ha
 spacetry/
 ├── AGENTS.md                        - LLM agents instructions and rules
 ├── README.md                        - project overview and usage
+├── REF_SCENARIO.md                  - autonomy behavior description for the reference scenario
 ├── deps/                            - repository configuration for dependency management
 ├── docker/
 ├── scripts/                        - helper scripts to build, execution, and validation
@@ -331,8 +332,10 @@ Test scenarios inject uncertainty into the rover's mission execution to evaluate
 For a deeper understanding of the test scenario process and how to create custom scenarios, see the [AGENTS.md](AGENTS.md) section on [Autonomy Test Scenario Generation and Evaluation Workflow](AGENTS.md#autonomy-test-scenario-generation-and-evaluation-workflow) and the [Scenario Generation Prompt Template](skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md).
 
 The workflow consists of:
-1. **Define Autonomy Test Context** — Specify scenario parameters and objectives using the prompt template.
-2. **Generate and Execute the Test Scenario** — Use the LLM agent to generate the evaluation scenario and report the execution results by inputing the prompt specified via the template.
-3. **Analyze Autonomy Results** — Use the outputted report from the agent to analyse the self-adaptation capabilities of the rover in the uncertainty test scenario. 
+1. **Scenario Prompt Template** — Specify the autonomy under text and mission context and objectives using the prompt template.
+2. **Scenario Driver Generation** — Use the LLM agent custom Skill to generate and parametrize the evaluation scenario from the prompt.
+3. **Scenario Driver Parametrization** — Configure and fine-tune scenario parameters before execution.
+4. **Scenario Driver Execution** — Execute the generated scenario in the simulation environment.
+5. **Autonomy Evaluation Report** — Analyze the output report from the agent to assess the rover's self-adaptation capabilities in the uncertainty test scenario.
 
 A quick reference guide with examples is available at [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md).
