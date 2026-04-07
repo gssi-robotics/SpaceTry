@@ -31,7 +31,8 @@ iii) **Mission Description**:
 iv) **Monitors**:
     Location: {SOURCE_CODE_PATH}
     Description: ROS 2 package with the monitors for safety constraints
-    - Safety Constraints: {SAFETY_CONSTRAINTS}
+    - Safety Constraints:
+      - {CONSTRAINT_ID}: {SAFETY_CONSTRAINT_DESCRIPTION}
 
 ## Objective
 
@@ -111,6 +112,10 @@ For each autonomy and safety requirement being evaluated, the driver component s
       Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}
       Test: Can rover handle mission objective changes / environment shifts / weather?
       Measure: Replanning time, goal adjustment, recovery success
+
+## Code Style and Guidelines
+- Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
+- Follow additional instructions from the AGENTS.md file in the project and sub-folders (packages).
 ```
 
 ---

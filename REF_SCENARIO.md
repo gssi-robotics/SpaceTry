@@ -14,13 +14,13 @@ The goal of the rover is to navigate safely to a specified point of interest for
 
 ### Safety constraints
 1. **Battery**
-    - Battery levels should be considered to determine the next task and shall always be above 20% (topic /battery/soc 0.2). Otherwise, the rover shall return to the outpost.
+    - Battery levels should be considered to determine the next task and shall always be above 20% (topic /battery/soc >= 0.2). Otherwise, the rover shall return to the outpost.
 2. **Wheel**
-    - On good battery conditions (full), the rover speed should be above a certain threshold to avoid the wheel to get stuck.
+    - On good battery conditions (topic /battery/soc > 0.8), the rover speed should be above a certain threshold to avoid the wheel to get stuck.
 
 
 ### Behavior Tree
-The example tree ([`base_bt.xml`](src/spacetry_bt/trees/base_bt.xml)) demonstrates the primary mission workflow:
+The example tree ([`base_bt.xml`](src/spacetry_bt/trees/base_bt.xml)) with autonomous navigation to a science rock target with obstacle avoidance and alignment for observing the goal. The BT demonstrates the primary mission workflow:
 ```
 MissionSequence (Sequence)
 ├── SetGoal — Set target waypoint to "science_rock"

@@ -37,8 +37,9 @@ iii) **Mission Description**:
      Location: src/spacetry_mission/MISSION.md
      Description: Natural Language description of the mission goals, safety constraints, and robot capabilities.
      - Success criteria options: Autonomy achieved (adapted & safe), Degraded (adapted, unsafe), or  Failed (not adapted).
-     - Constraints:
-        - Constraints: {SAFETY_CONSTRAINTS}
+     - Safety Constraints:
+        - MR_009: Whenever the battery state-of-charge (soc) is less or equal to 20%, the rover shall be in the proximity of the outpost within 60 clock ticks.
+        - MR_011: While the battery state-of-charge (soc) is greater than 80%, the rover linear velocity shall always be greater or equal to 2.0 m/s.
 
 iv) **Monitors**:
     Location: src/spacetry_monitors

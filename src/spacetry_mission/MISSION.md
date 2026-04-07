@@ -46,7 +46,7 @@ The Gazebo world (`mars_outpost.sdf`) defines a Martian environment with reduced
 | `outpost_habitat_01` | `station` | Outpost base station |
 | `science_rock_01` | `rock_5` | Science sampling target |
 | `block_island` | `block_island` | Terrain hazard obstacle |
-| `curiosity_path` | `curiosity_path` | Ground terrain (from `curiosity_gazebo`) |
+| `curiosity_path` | `curiosity_path` | Ground terrain (defined in `curiosity_gazebo` from Space ROS Demos) |
 
 Physics is tuned for performance: 4 ms step size at 250 Hz update rate (ODE solver, `quick` type), with shadows disabled.
 
