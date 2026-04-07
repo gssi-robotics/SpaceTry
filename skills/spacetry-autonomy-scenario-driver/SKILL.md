@@ -110,7 +110,10 @@ Keep scenario logic observable:
 
 ## Execution Guidance
 
-Use Docker for all execution.
+Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. 
+This ensures consistency and reproducibility across different host machines. 
+
+### Verify Running and Built Container Images
 
 If you need to stop the container, run the command:
 
@@ -135,6 +138,8 @@ Then, verify if the docker container is running with:
 ```bash
 docker compose -f docker/docker-compose.yaml ps
 ```
+
+### Running the container image and building the project
 
 If the docker container is not running, start it with:
 
@@ -161,6 +166,11 @@ If you changed `src/spacetry_world`, also run:
 ```bash
 docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
 ```
+
+### Execute the scenario driver to generate the report
+When the scenario driver implementation is complete, run the associated launch file created to execute the scenario and generate the report with the defined metrics and logged signals.
+
+Use the project-wide running instructions for executing a launch file in Docker, and specify the scenario driver launch file path.
 
 In the final answer, report:
 
