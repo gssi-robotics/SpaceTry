@@ -51,7 +51,7 @@ The project uses Docker Compose to orchestrate the simulation environment:
 **Terminal: Start the services and launch the rover**
 
 ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py'
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py'
 ```
 
 This starts:
@@ -112,29 +112,37 @@ docker compose -f docker/docker-compose.yaml ps
 
 ### Standard Docker Commands for Agents
 
+When running build, ROS 2, Gazebo, or simulation commands in the `spacetry` container, always source the full environment in this order before the command itself:
+
+```bash
+source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash
+```
+
+This ensures the base ROS environment, dependency overlays, and the workspace install tree are all available during execution.
+
 **Build/Compile The Whole Project:**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry colcon build --merge-install --event-handlers console_direct+
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
 ```
 
 **Build/Compile Specific Package:**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry colcon build --packages-select <package-name>
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --packages-select <package-name>"
 ```
 
 **Run ROS2 Commands:**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 <command>"
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 <command>"
 ```
 
 **Launch Rover:**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py [args]"
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py [args]"
 ```
 
 **Install Python Packages (in spacetry container):**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry pip install <package>
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && pip install <package>"
 ```
 
 **Interactive Shell:**
@@ -263,13 +271,13 @@ This file is the canonical source for project-wide rules. Package-specific `AGEN
 **Every** ROS2 command, compilation, or testing MUST happen in the container. Standard commands:
 ```bash
 # Build
-docker compose -f docker/docker-compose.yaml exec spacetry colcon build --packages-select <package>
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --packages-select <package>"
 
 # Run ROS2
-docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 <command>"
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 <command>"
 
 # Launch Rover
-docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py [args]"
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py [args]"
 ```
 
 ### Autonomy Changes Checklist
