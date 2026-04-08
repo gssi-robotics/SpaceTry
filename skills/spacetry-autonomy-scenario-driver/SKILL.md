@@ -197,6 +197,8 @@ docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_wo
 
 - Store the generated report in the bind-mounted host `log/` folder with the name `scenario_{scenario_name}_report.md`, ideally inside `log/scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 
+- If necessary, mount the `log/` folder as a volume in Docker (e.g., `-v $(pwd)/log:/ws/log` - from the repository root) to ensure that all outputs from the scenario execution, including rosbags, metrics files, runtime logs, and the final report, are saved to the host machine for analysis and record-keeping.
+
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario. This includes rosbags, derived metrics files, and runtime logs, all of which should be placed under the host `log/` folder.
 
 
