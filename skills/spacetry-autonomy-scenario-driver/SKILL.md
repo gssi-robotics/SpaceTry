@@ -69,11 +69,11 @@ Write the scenario in terms of these fields:
 - `space_domain`: isolated, contiguous, or scattered when the fault is spatial
 - `time_domain`: transient, permanent, or intermittent when the fault is temporal
 - `trigger`: simulation time or robot-state predicate
-- `measurements`: Details below under **Measurement Focus**
+- `measurements`: Details below under **Metrics**
 - `success_outcome`: achieved, degraded, or failed
 - `report`: the file with results of running the scenario, including metric values and logged signals
 
-### Measurement Focus
+### Metrics
 
 Define measurable metrics for autonomy evaluation:
 
@@ -81,6 +81,7 @@ Define measurable metrics for autonomy evaluation:
 - **Safety preservation**: Key-value pairs with safety constraints (from monitors) and boolean preservation state
 - **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
 - **Recovery rate**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
+- Consider any other metrics requested by the user
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception and world packages, ask the user for clarification instead of making assumptions.
 
@@ -167,13 +168,18 @@ For each autonomy and safety requirement being evaluated, specify injection stra
 
 ### Logging and Observability
 
-The logging signals and events related to the scenario should be stored in a rosbag and included in the final report with the metric values and scenario outcomes. If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
+- The logging signals and events related to the scenario should be stored in a rosbag and included in the final report with the metric values and scenario outcomes. 
+- Use ROS 2 logging and rosbag existing solutions when possible, and avoid adding new logging topics or custom solutions that are not already part of the rover's ROS 2 packages.
+- If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks. 
 
 Keep scenario logic observable:
 
 - log injection timestamps
 - log the exact fault state applied
 - log the rover response signal
+- log obstacle spawn event, 
+- log rover pose, 
+- log BT branch transition
 - write metrics that match the scenario contract
 
 ## Validation

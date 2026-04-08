@@ -1,20 +1,18 @@
-# Quick Scenario Prompt Template
+# Quick Scenario Prompt Reference
 
-Use this concise template to rapidly generate natural language prompts for mission scenario drivers.
+Compact reference for using the scenario prompt template consistently.
 
-## One-Liner Format
-
-```
-Given the behavior tree at src/spacetry_bt/trees/base_bt.xml, source code in src/spacetry_perception and src/spacetry_world,
-and mission defined in src/spacetry_mission/MISSION.md, create a scenario driver that injects
-uncertainty to test whether autonomous navigation and replanning can maintain obstacle avoidance.
-```
+For the parametrizable template, see [SCENARIO_PROMPT_TEMPLATE.md](../assets/SCENARIO_PROMPT_TEMPLATE.md).
 
 ---
 
-## Template Instantiation Examples
+## Quick Rules
 
-### Example 1: Basic Benchmark Scenario
+- Keep mission description focused on mission intent, environment, and capabilities.
+- Fill every placeholder you keep. Delete lines that are not relevant to the scenario.
+---
+
+## Reference Scenario Example (Template-Conformant)
 
 ```
 Given the following components:
@@ -29,121 +27,72 @@ ii) **Implementation Source Code**:
     Description: source code with the ROS 2 packages that implement the behavior tree logic and handle real-time decision-making:
     - Perception: spacetry_perception
     - Behavior execution: spacetry_bt
-    - Mission Details: spacetry_mission
+    - Mission planning: spacetry_mission
     - Battery manager: spacetry_battery
     - Dependency packages: ../deps/spacetry.repos
 
-iii) **Mission Description**:
-     Location: src/spacetry_mission/MISSION.md
-     Description: Natural Language description of the mission goals, safety constraints, and robot capabilities.
-     - Success criteria options: Autonomy achieved (adapted & safe), Degraded (adapted, unsafe), or  Failed (not adapted).
-     - Safety Constraints:
-        - MR_009: Whenever the battery state-of-charge (soc) is less or equal to 20%, the rover shall be in the proximity of the outpost within 60 clock ticks.
-        - MR_011: While the battery state-of-charge (soc) is greater than 80%, the rover linear velocity shall always be greater or equal to 2.0 m/s.
-
-iv) **Monitors**:
+iii) **Monitors**:
     Location: src/spacetry_monitors
     Description: ROS 2 package with the monitors for safety constraints
     - Safety Constraints:
       - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
       - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
 
+iv) **Mission Goals Description**:
+     Location: REF_SCENARIO.md
+     Description: Traverse open terrain to reach mission waypoints while preserving rover safety and completing the route under changing environmental conditions.
+    - Outcome assessment:
+      - Goal status: PASS if waypoint_02 is reached before timeout; otherwise FAIL
+      - Safety status: PASS if no collision occurs and monitor constraints stay preserved; otherwise DEGRADED or FAIL depending on severity
+      - Autonomy assessment: PASS if the rover detects, replans, and continues safely; DEGRADED if it recovers unsafely or too slowly; FAIL if it deadlocks, collides, or abandons the objective
+
 ## Objective
 
-Design and implement a **Scenario Driver Software Component** that:
+Design, implement, and execute a **Autonomy Test Scenario Driver Software Component** that:
 
-1. **Injects Uncertainty** during robot execution considering:
-   - Simulated sensors (perception capability)
-   - Dynamic obstacles or other changes in the simulation environment
-   - Impose resource constraints
-   - Trigger unexpected state changes
-   - Classify the uncertainty using the uncertainty taxonomy 
-   - Classify any generated faults using the fault model
+1. **Injects Uncertainty**:
+   - Autonomy aspect: behavior flexibility
+   - Uncertainty type: dynamic obstacles
+   - Uncertainty location: environment
+   - Uncertainty nature: variability
+   - Fault subject: traversable path near mission waypoint
+   - Fault attribute: obstacle occupancy along nominal route
+   - Manifestation: intermittent
+   - Space domain: contiguous
+   - Time domain: intermittent
+   - Trigger: when the rover is 3 m away from waypoint_02 while executing the navigation branch of the BT
 
 2. **Tests Autonomous Adaptation**:
-   - Can the rover adapt perception strategies when sensors degrade?
-   - Does the behavior tree transition to contingency actions appropriately?
-   - Does the rover maintain safety constraints while adapting to uncertainty?
-   - Can mission planning adjust goals when resources become limited?
+   - Can the rover detect a newly introduced obstacle on the nominal route?
+   - Does the behavior tree transition to replanning or avoidance actions without stalling?
+   - Can the rover continue toward the waypoint after the route is blocked?
 
 3. **Challenges Safety and Goal Viability**:
-   - Insert conditions that could violate safety constraints (e.g., approach hazards, collide with obstacles)
-   - Create tradeoffs between goal completion and safety (e.g., reach target vs. avoid collision)
-   - Monitor whether the rover's autonomy resolves conflicts correctly or fails catastrophically
-   - Log which autonomy aspects degrade first under uncertainty accumulation
+   - Insert a rock obstacle directly on the preferred route to waypoint_02
+   - Force a tradeoff between shortest path completion and collision avoidance
+   - Verify that monitor constraints remain preserved during replanning
 
-4. **Measurement Focus**:
-   - Adaptation speed (time in milliseconds between the uncertainty was injected and the reaction of the robot to it)
-   - Safety preservation (key-value pair with the safety constraints derived from the monitors and their preservation state in boolean) 
-   - Goal viability (key-value pair with the goal and a boolean with indication if the goal is viable)
-   - Recovery rate (time in milliseconds between the reaction of the robot to the triggered uncertainty and the reaction outcome)
+## Uncertainty Injection Plan
 
-## Component Specification
+- Injection pattern: Dynamic obstacles
+- Fill-in template:
+  - Inject/change rock obstacle occupancy from absent to present at/when rover is 3 m from waypoint_02
+  - Test: Can rover replan route and navigate around the obstacle while continuing toward waypoint_02?
+  - Measure: Route replanning latency (ms), detour distance (m), deadline miss (0/1)
+  - Injection timing: At decision point of the behavior tree during navigation to waypoint_02
+  - Intensity strategy: Cascading
 
-The driver component should:
+## Additional Mission-Specific Metrics to Consider
 
-- **Monitor** the rover's execution state (position, battery, sensor status)
-- **Trigger** uncertainty events at decision-critical moments (e.g., when rover commits to action)
-- **Measure** adaptation success (goal completion, safety violations, contingency activations)
-- **Adapt injection intensity** based on observed autonomy performance (gradually increase challenge)
-- **Log behavior** for post-execution analysis (decision timestamps, fallback activations, constraint violations)
-
-## Component Behavior Configuration:
-
-For each autonomy and safety requirement being evaluated, the driver component should target one behavior of each category below:
-
-1. **Injection Timing**:
-   - At decision point of the behavior tree 
-   - Mid-action 
-   - During contingency
-
-2. **Intensity Increase**:
-   - Gradual 
-   - Sudden 
-   - Cascading
-
-## Code Style and Guidelines
-- Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
-- Follow additional instructions from the AGENTS.md file in the project and sub-folders (packages).
+- Safety preservation (boolean per constraint): Boolean status for each relevant monitor or safety condition, for example `MR_009=true`, `MR_011=true`, `collision_with_dynamic_obstacle=false`
+- Goal viability (boolean per goal): Boolean status for each mission objective, for example `waypoint_02_reached=true`, `mission_deadline_met=true`
+- Recovery rate (ms): Time from replanning activation to stable progress on a collision-free route
+- Obstacle detection latency (ms): Time from obstacle injection to the first confirmed obstacle detection by the autonomy stack
+- Detour distance (m): Extra path length traveled relative to the nominal route after replanning around the obstacle
+- Route deviation (m): Maximum or average lateral distance between the executed path and the nominal planned path
 ```
 
-**Example Expansion:**
-```
-Scenario: Dynamic Obstacle Avoidance
-
-Given:
-- Behavior Tree: src/spacetry_bt/trees/base_bt.xml
-- Source: src/spacetry_perception, src/spacetry_world/worlds/mars_outpost.sdf
-- Mission: src/spacetry_mission/config/mission_01.yaml (traverse open terrain)
-
-Uncertainty: Dynamic obstacles (moving rocks, sliding terrain) placed at waypoints
-- Injection Point: When rover commits to movement toward waypoint
-- Intensity Progression: Single obstacle → Multiple obstacles → Cascading obstacle placement every 30 seconds
-
-Test Objective: Verify autonomous navigation and replanning can detect obstacles and navigate around them
-
-Success Criteria:
-- Goal Status: Reached target waypoint despite obstacles blocking primary route
-- Safety Status: Zero collision with dynamic obstacles
-- Autonomy Assessment: PASS (detected and replanned) or DEGRADED (slow/inefficient replanning) or FAIL (collision/deadline miss)
-
-Metrics to Log: Obstacle detection latency, replanning latency, detour distance, route deviation, deadline violation
-```
-
----
-
-## Scenario Naming Convention
-
-For consistency, name scenarios:
-```
-scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
-```
-
-**Examples:**
-- `scenario_perception_lidar_degradation_gradual`
-- `scenario_navigation_dynamic_obstacles_dense`
-- `scenario_mission_power_constraints_critical`
-- `scenario_safety_cascading_failures_multiple`
+For detailed guidance on measurement definitions, component specification, and behavior configuration, see [SKILL.md](../SKILL.md#measurement-focus), [Component Specification](../SKILL.md#component-specification), and [Behavior Configuration](../SKILL.md#behavior-configuration) sections.
 
 ---
 
@@ -170,9 +119,9 @@ Use this table to customize the template for your specific scenario:
 |--------|-----------|---------|
 | **Uncertainty Type** | Sensor degradation, dynamic obstacles, resource constraints, environmental change | "LIDAR fails at 50% confidence" |
 | **Injection Timing** | At decision point, mid-action, during contingency | "When rover commits to navigate_to (waypoint 3)" |
-| **Measurement Focus** | Adaptation speed, safety preservation, goal viability, recovery rate | "Time to activate obstacle_avoidance behavior" |
+| **Additional Metrics** | Mission-specific metrics with units or boolean status | "Obstacle detection latency (ms)" |
 | **Intensity Increase** | Gradual, sudden, cascading | "LIDAR quality: 100% → 80% → 50% → 0% over 10 minutes" |
-| **Success Criteria** | Autonomy achieved (adapted & safe), degraded (adapted, unsafe), failed (not adapted) | "Goal completed + 0 safety violations = SUCCESS" |
+| **Outcome Assessment** | PASS, DEGRADED, FAIL rules tied to goal and safety evidence | "Goal completed + 0 safety violations = PASS" |
 
 ---
 
@@ -183,5 +132,6 @@ Use this table to customize the template for your specific scenario:
 - [spacetry_mission/MISSION.md](../../../src/spacetry_mission/MISSION.md) - Mission planning details
 ---
 
-**See Also:** [SCENARIO_PROMPT_TEMPLATE.md](./SCENARIO_PROMPT_TEMPLATE.md) for the template.
+**See Also:** [SCENARIO_PROMPT_TEMPLATE.md](../assets/SCENARIO_PROMPT_TEMPLATE.md) for the parametrizable template.
 
+**Last Updated:** April 8, 2026

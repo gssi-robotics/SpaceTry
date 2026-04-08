@@ -1,10 +1,8 @@
-# Test Scenario Prompt Template
+# Scenario Prompt Template
 
-This template guides the creation of natural language prompts for autonomous test scenario drivers. Use this to generate or design scenario components that inject uncertainty and challenge the rover's self-adaptation capabilities.
+Parametrizable template for autonomous test scenario driver prompts. Fill in placeholders with scenario-specific values.
 
 ---
-
-## Base Template
 
 ```
 Given the following components:
@@ -23,103 +21,71 @@ ii) **Implementation Source Code**:
     - Battery manager: {BATTERY_MANAGER_PATH}
     - Dependency packages: {ROS2_DEPENDENCIES_PATH}
 
-iii) **Mission Description**:
-     Location: {MISSION_CONFIG_FILE}
-     Description: Natural Language description of the mission goals, safety constraints, and robot capabilities.
-     - Success criteria options: Autonomy achieved (adapted & safe), Degraded (adapted, unsafe), or  Failed (not adapted).
-
-iv) **Monitors**:
-    Location: {SOURCE_CODE_PATH}
+iii) **Monitors**:
+    Location: {MONITORS_PATH}
     Description: ROS 2 package with the monitors for safety constraints
     - Safety Constraints:
       - {CONSTRAINT_ID}: {SAFETY_CONSTRAINT_DESCRIPTION}
 
+iv) **Mission Goals Description**:
+     Location: {MISSION_GOAL_FILE}
+     Description: {MISSION_DESCRIPTION}
+     - Outcome assessment:
+      - Goal status: {GOAL_STATUS_RULE}
+      - Safety status: {SAFETY_STATUS_RULE}
+      - Autonomy assessment: {PASS_DEGRADED_FAIL_RULE}
+
 ## Objective
 
-Design and implement a **Scenario Driver Software Component** that:
+Design, implement, and execute a **Autonomy Test Scenario Driver Software Component** that:
 
-1. **Injects Uncertainty** during robot execution considering:
-   - Simulated sensors (perception capability)
-   - Dynamic obstacles or other changes in the simulation environment
-   - Impose resource constraints
-   - Trigger unexpected state changes
+1. **Injects Uncertainty**:
+   - Autonomy aspect: {AUTONOMY_ASPECT}
+   - Uncertainty type: {UNCERTAINTY_TYPE}
+   - Uncertainty location: {UNCERTAINTY_LOCATION}
+   - Uncertainty nature: {UNCERTAINTY_NATURE}
+   - Fault subject: {FAULT_SUBJECT}
+   - Fault attribute: {FAULT_ATTRIBUTE}
+   - Manifestation: {MANIFESTATION}
+   - Space domain: {SPACE_DOMAIN_OR_NA}
+   - Time domain: {TIME_DOMAIN_OR_NA}
+   - Trigger: {TRIGGER_CONDITION}
 
 2. **Tests Autonomous Adaptation**:
-   - Can the rover adapt perception strategies when sensors degrade?
-   - Does the behavior tree transition to contingency actions appropriately?
-   - Does the rover maintain safety constraints while adapting to uncertainty?
-   - Can mission planning adjust goals when resources become limited?
+   - {ADAPTATION_TEST_1}
+   - {ADAPTATION_TEST_2}
+   - {ADAPTATION_TEST_3}
 
 3. **Challenges Safety and Goal Viability**:
-   - Insert conditions that could violate safety constraints (e.g., approach hazards, collide with obstacles)
-   - Create tradeoffs between goal completion and safety (e.g., reach target vs. avoid collision)
-   - Monitor whether the rover's autonomy resolves conflicts correctly or fails catastrophically
-   - Log which autonomy aspects degrade first under uncertainty accumulation
+   - {SAFETY_CHALLENGE_1}
+   - {SAFETY_CHALLENGE_2}
+   - {GOAL_VIABILITY_CHALLENGE_1}
 
-4. **Measurement Focus**:
-   - Adaptation speed (time in milliseconds between the uncertainty was injected and the reaction of the robot to it)
-   - Safety preservation (key-value pair with the safety constraints derived from the monitors and their preservation state in boolean) 
-   - Goal viability (key-value pair with the goal and a boolean with indication if the goal is viable)
-   - Recovery rate (time in milliseconds between the reaction of the robot to the triggered uncertainty and the reaction outcome)
+## Uncertainty Injection Plan
 
-## Component Specification
+- Injection pattern: {INJECTION_PATTERN}
+- Fill-in template:
+  - Inject/change {TARGET} from {INITIAL_STATE} to {FINAL_STATE} at/when {INJECTION_POINT}
+  - Test: {PRIMARY_ADAPTATION_EXPECTATION}
+  - Measure: {METRICS_WITH_UNITS}
+  - Injection timing: {INJECTION_TIMING}
+  - Intensity strategy: {INTENSITY_STRATEGY}
 
-The driver component should:
+Choose the closest pattern and fill in the blanks:
+- Sensor degradation: `Inject {SENSOR} confidence loss from {START}% to {END}% over {DURATION}`
+- Dynamic obstacles: `Spawn {OBSTACLE_TYPE} at {LOCATION} when rover is {DISTANCE_OR_STATE} from {REFERENCE_POINT}`
+- Power constraints: `Accelerate battery drain from {BASELINE_RATE} to {NEW_RATE} during {ACTIVITY}`
+- Environmental changes: `Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}`
 
-- **Monitor** the rover's execution state (position, battery, sensor status)
-- **Trigger** uncertainty events at decision-critical moments (e.g., when rover commits to action)
-- **Measure** adaptation success (goal completion, safety violations, contingency activations)
-- **Adapt injection intensity** based on observed autonomy performance (gradually increase challenge)
-- **Log behavior** for post-execution analysis (decision timestamps, fallback activations, constraint violations)
+## Additional Mission-Specific Metrics to Consider
 
-## Component Behavior Configuration:
-
-For each autonomy and safety requirement being evaluated, the driver component should target one behavior of each category below:
-
-1. **Injection Timing**:
-   - At decision point of the behavior tree 
-   - Mid-action 
-   - During contingency
-
-2. **Intensity Increase**:
-   - Gradual 
-   - Sudden 
-   - Cascading
-
-
-## Uncertainty Injection Templates
-
-1. Sensor Degradation:
-
-   Inject {SENSOR} confidence loss: {START}% → {END}% over {DURATION}
-   Test: Can rover adapt perception to {FALLBACK_SENSOR}?
-   Measure: Time to fallback, goal completion, collision count
-
-2. Dynamic Obstacles:
-
-      Spawn {OBSTACLE_TYPE} at {LOCATION} when rover is {DISTANCE} away
-      Test: Can rover replan route and navigate around obstacle?
-      Measure: Route replanning latency, detour distance, deadline miss
-
-3. Power Constraints:
-
-      Accelerate battery drain: baseline {DRAIN_RATE} → accelerated {NEW_RATE} during {ACTIVITY}
-      Test: Can rover switch to energy-conserving behaviors and complete mission?
-      Measure: Energy reserve margin, mission completion %, behavior transitions
-
-4. Environmental Changes
-
-      Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}
-      Test: Can rover handle mission objective changes / environment shifts / weather?
-      Measure: Replanning time, goal adjustment, recovery success
-
-## Code Style and Guidelines
-- Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
-- Follow additional instructions from the AGENTS.md file in the project and sub-folders (packages).
+- {METRIC_NAME} ({UNIT_OR_BOOLEAN}): {METRIC_DESCRIPTION}
+- {METRIC_NAME} ({UNIT_OR_BOOLEAN}): {METRIC_DESCRIPTION}
+- {METRIC_NAME} ({UNIT_OR_BOOLEAN}): {METRIC_DESCRIPTION}
 ```
-
 ---
 
-**Last Updated:** March 30, 2026  
-**Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Testbed
+For a completed example that matches this template, see [SCENARIO_PROMPT_QUICK_REF.md](../references/SCENARIO_PROMPT_QUICK_REF.md).
 
+**Last Updated:** April 8, 2026  
+**Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Testbed
