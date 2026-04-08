@@ -17,6 +17,7 @@ services:
       - MESA_LOADER_DRIVER_OVERRIDE=${MESA_LOADER_DRIVER_OVERRIDE:-}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ../log:/ws/log
       - /tmp/.X11-unix:/tmp/.X11-unix:rw # for UI
       - /run/user:/run/user:ro # for UI
       #- /home/$(whoami)/.Xauthority:/home/$(whoami)/.Xauthority:ro  # Mount XAUTHORITY file

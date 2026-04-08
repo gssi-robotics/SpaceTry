@@ -1,6 +1,13 @@
 # Markdown files
 **/*.md
 
+# Images
+**/*.png
+**/*.jpeg
+**/*.jpg
+**/*.gif
+**/*.svg
+
 # Git
 .git
 .gitignore
@@ -11,6 +18,14 @@
 # Log files
 logs/
 **/*.log
+
+# Templates
+**/*.template
+
+# LLM agents
+skills/
+.codex
+.agents/
 
 # Build artifacts (already excluded via Dockerfile RUN rm -rf)
 # but good to be explicit
