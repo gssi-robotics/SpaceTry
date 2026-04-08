@@ -10,10 +10,8 @@ Load this file when you need a quick map of where scenario-relevant information 
   Full scenario prompt structure and metric vocabulary.
 - `skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md`
   Short prompt patterns, naming convention, integration checklist.
-- `skills/spacetry-autonomy-scenario-driver/references/space-fault-model.md`
-  Fault subject, domain, trigger, manifestation, and traceability model.
 - `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md`
-  Uncertainty dimensions and sources.
+  Uncertainty dimensions, sources and fault subject, domain, trigger, manifestation, and traceability model.
 - `skills/spacetry-autonomy-scenario-driver/references/Gazebo.md`
   Gazebo world-configuration options, runtime injection guidance, and Mars-condition constraints for scenario design.
 

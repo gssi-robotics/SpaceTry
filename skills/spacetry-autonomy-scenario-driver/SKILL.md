@@ -96,16 +96,16 @@ If there is not enough information to infer any of these fields from the mission
 - Follow additional instructions in `AGENTS.md` files from project-wide and package-specific (in the `src/` sub-folders).
 - In case of doubt, conflicting or missing information, ask clarification from the user.
 
-## Fault Mapping
+## Uncertainty and Fault Mapping
 
-Use `skills/spacetry-autonomy-scenario-driver/references/space-fault-model.md` to map the fault model to implementation details for the scenario driver.
+Use `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md` to map the uncertainty and associated fault to implementation details for the scenario driver.
 
 For each fault, the scenario driver maintains traceability:
 
 1. Between fault subjects/attributes and their corresponding ROS 2 nodes and Gazebo objects
 2. ROS 2 topic, parameter, service, node, launch arg, or config file that exposes it
 3. Gazebo model, world element, or plugin involved
-4. Trigger condition
+4. Trigger condition and timing for injection
 5. Logging signal that proves the injection happened
 6. Monitor or metric that detects the rover response
 
