@@ -67,7 +67,6 @@ Write the scenario in terms of these fields:
 
 - `autonomy_aspect`: perception, behavior flexibility, resource awareness, mission resilience, obstacle intelligence, or safety
 - `uncertainty_location`: environment, model, adaptation functions, goals, managed system, or resources
-- `uncertainty_nature`: epistemic or variability
 - `fault_subject`: environment object or robot subsystem
 - `fault_attribute`: the targetable property that changes
 - `manifestation`: stuck, noisy, or degrading

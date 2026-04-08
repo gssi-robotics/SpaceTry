@@ -51,15 +51,11 @@ iv) **Mission Goals Description**:
 Design, implement, and execute a **Autonomy Test Scenario Driver Software Component** that:
 
 1. **Injects Uncertainty**:
-   - Autonomy aspect: behavior flexibility
-   - Uncertainty type: dynamic obstacles
-   - Uncertainty location: environment
-   - Uncertainty nature: variability
-   - Fault subject: traversable path near mission waypoint
-   - Fault attribute: obstacle occupancy along nominal route
-   - Manifestation: intermittent
-   - Space domain: contiguous
-   - Time domain: intermittent
+   - Uncertainty locations: dynamic obstacles or other changes in the simulation environment, simulated sensors, target waypoint goals, managed system (robot)
+   - Uncertainty emerging time: runtime
+   - Fault subjects: simulation environment from starting point (dock_pad_01)  to target mission waypoint (science_rock_01), robot perception and battery resources, safety constraints
+   - Fault Manifestation: any
+   - Fault Trigger Timming: any
 
 2. **Tests Autonomous Adaptation**:
    - Can the rover detect a newly introduced obstacle on the nominal route?

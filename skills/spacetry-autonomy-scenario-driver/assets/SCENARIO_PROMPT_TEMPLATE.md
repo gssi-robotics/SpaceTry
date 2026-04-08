@@ -40,16 +40,11 @@ iv) **Mission Goals Description**:
 Design, implement, and execute a **Autonomy Test Scenario Driver Software Component** that:
 
 1. **Injects Uncertainty**:
-   - Autonomy aspect: {AUTONOMY_ASPECT}
-   - Uncertainty type: {UNCERTAINTY_TYPE}
-   - Uncertainty location: {UNCERTAINTY_LOCATION}
-   - Uncertainty nature: {UNCERTAINTY_NATURE}
-   - Fault subject: {FAULT_SUBJECT}
-   - Fault attribute: {FAULT_ATTRIBUTE}
-   - Manifestation: {MANIFESTATION}
-   - Space domain: {SPACE_DOMAIN_OR_NA}
-   - Time domain: {TIME_DOMAIN_OR_NA}
-   - Trigger: {TRIGGER_CONDITION}
+   - Uncertainty locations: {ENVIRONMENT_SENSING_MANAGED_SYSTEM_RESOURCES_GOALS}
+   - Uncertainty emerging time: {RUNTIME_OR_DESIGN-TIME}
+   - Fault subjects: {SPECIFY_FROM_UNCERTAINTY_LOCATIONS}
+   - Fault Manifestation: {FIXED-VALUE_OR_NOISY_OR_DEGRADING_OR_ANY}
+   - Fault Trigger Timming: {TRANSIENT_OR_PERMANENT_OR INTERMITTENT_OR_ANY}
 
 2. **Tests Autonomous Adaptation**:
    - {ADAPTATION_TEST_1}
