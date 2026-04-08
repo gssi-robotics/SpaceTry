@@ -20,7 +20,7 @@ Load this file when you need a quick map of where scenario-relevant information 
 - `src/spacetry_bt/trees/`
   Behavior trees and decision points for injection timing.
 - `src/spacetry_mission/`
-  Mission goals, configs, and expected waypoint or task structure.
+  Mission planning, configs, and expected waypoint or task structure.
 - `src/spacetry_monitors/`
   Safety constraints and monitorable properties.
 - `src/spacetry_perception/`

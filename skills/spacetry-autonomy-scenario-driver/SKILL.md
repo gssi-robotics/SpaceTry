@@ -23,7 +23,20 @@ Define the scenario before implementing it. Follow the **[Non-Negotiables](#non-
    - monitor definitions
    - world/model files
    - project documentation at `docs/`
-5. Define the scenario contract before editing code (see **[Scenario Contract](#scenario-contract)** section for all required fields).
+5. Run a provenance check before reusing any existing scenario artifact:
+   - allowed implementation inputs: `src/`, `docs/`, `skills/spacetry-autonomy-scenario-driver/assets/`, `skills/spacetry-autonomy-scenario-driver/references/`
+   - forbidden implementation inputs: `log/`, `logs/`
+   - if provenance is unclear, do not reuse the artifact
+6. Define the scenario contract before editing code (see **[Scenario Contract](#scenario-contract)** section for all required fields).
+
+### Provenance Check
+
+Before reusing any existing artifact, confirm all of the following:
+
+- the artifact path is under `src/` or another canonical source directory listed above
+- the artifact path is not under `log/` or `logs/`
+- the artifact is a maintained source artifact, not a generated execution output
+- if any of the above is unclear, do not reuse it
 
 ### 2. Scenario Driver Parametrization (Implementation)
 
@@ -37,8 +50,9 @@ Follow the **[Implementation Guidelines](#implementation-guidelines)** and **[Co
 
 Validate the implementation before execution using the **[Validation](#validation)** section.
 
-1. Rebuild scenario packages with Docker (see **[Validation](#validation)**).
-2. If changes were made to `src/spacetry_world`, run world verification (see **[Validation](#validation)**).
+1. Sync the scenario package from the host repository into `/ws/src` inside the running container before rebuilding.
+2. Rebuild scenario packages with Docker (see **[Validation](#validation)**).
+3. If changes were made to `src/spacetry_world`, run world verification (see **[Validation](#validation)**).
 
 ### 4. Scenario Driver Execution (Execution & Reporting)
 
@@ -52,10 +66,15 @@ Execute the scenario driver to generate the report with metrics and logging sign
 
 Policies that must be followed during scenario driver generation, implementation, validation, and execution:
 
-- Do not consider anything under the host `log/` folder as scenario input. This bind-mounted folder is reserved for scenario execution outputs such as reports, metrics artifacts, rosbags, and runtime logs.
+- Treat both `log/` and `logs/` as output-only directories.
+- Never read scenario code, launch files, configs, reports, generated packages, or package templates from `log/` or `logs/` in order to design, scaffold, restore, or implement a scenario driver.
+- Files under `log/` or `logs/` may be inspected only to report execution results from the current run, not to recover prior implementations or bootstrap new ones.
+- If a similarly named scenario exists only under `log/` or `logs/`, ignore it as implementation input and recreate the scenario from canonical repository sources unless the user explicitly asks to restore or migrate it.
+- Before reusing any existing scenario artifact as a starting point, verify that it lives under `src/`, `docs/`, `skills/spacetry-autonomy-scenario-driver/assets/`, or `skills/spacetry-autonomy-scenario-driver/references/`. If it does not, do not reuse it.
 - Treat the behavior tree and monitors as the baseline under evaluation. Do not change them unless the user explicitly approves a bug fix.
 - During scenario-driver generation, avoid modifying rover ROS 2 packages unless a genuine implementation bug is found and the user approves the change.
 - Run every ROS2, Gazebo, build, or simulation command in Docker.
+- Because the repository source tree is not bind-mounted into `/ws/src`, copy any new or modified scenario package into the running container before building or launching it.
 - When a scenario touches `src/spacetry_world`, follow `src/spacetry_world/AGENTS.md` for world-specific constraints and validation.
 - Do not modify existing Markdown files in the repository during scenario-driver generation, implementation, testing, or reporting. This includes templates, quick references, skill files, AGENTS files, guides, and READMEs.
 - If the scenario requires new documentation, instructions, prompt text, or reports, keep implementation-facing Markdown in the new scenario package under `src/spacetry_scenario_<scenario_name>/`, but write execution outputs such as generated reports to the bind-mounted host `log/` folder.
@@ -119,6 +138,11 @@ Prefer the least invasive path:
 2. Only changes on the mission and world packages are allowed within the remaining `src/` sub-folders.
 3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline bringup unchanged launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
 4. When including baseline bringup, inspect the target node’s YAML defaults before relying on launch overrides for mission-specific values such as battery SOC, odom topics, spawn targets, waypoint files, or scenario-specific thresholds.
+5. Before any Dockerized build or launch of the scenario package, copy it into the running container:
+
+```bash
+docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/
+```
 
 ### Scenario Naming Convention
 
@@ -182,6 +206,20 @@ Keep scenario logic observable:
 
 Rebuild packages if scenario components have changed or new ones were added:
 
+If the scenario package is new or has changed on the host, copy it into the running container first:
+
+```bash
+docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/
+```
+
+Use bootstrap build mode when `/ws/install/setup.bash` does not exist yet, such as the first build in a fresh container:
+
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+"
+```
+
+Use overlay build mode after the workspace install tree already exists:
+
 ```bash
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
 ```
@@ -195,6 +233,7 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 ## Execution Guidelines
 
 - Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. This ensures consistency and reproducibility across different host machines. 
+- Before executing a scenario launch, confirm the scenario package has been copied into `/ws/src` and that the workspace has already been built so `/ws/install/setup.bash` exists.
 
 - Store the generated report in the bind-mounted host `log/` folder with the name `spacetry_scenario_{scenario_name}_report.md`, ideally inside `log/spacetry_scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 
@@ -202,7 +241,7 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario. This includes rosbags, derived metrics files, and runtime logs, all of which should be placed under the host `log/` folder.
 
-- The created scenario driver package should be copied into the docker container image after it is built. Use: `docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/`
+- The created or updated scenario driver package should be copied into the running Docker container before it is built or executed. Use: `docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/`
 
 
 

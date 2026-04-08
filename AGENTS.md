@@ -109,25 +109,60 @@ Then, verify if the docker container is running with:
 docker compose -f docker/docker-compose.yaml ps
 ```
 
+### Workspace Sync Model
+
+The project workspace inside the container is prepared during the Docker image build phase so dependency packages are already available under `/ws`. The repository source tree is **not** bind-mounted into `/ws/src` at runtime.
+
+This means:
+
+- new or modified host packages are not automatically visible inside `/ws/src`
+- agents must copy new or updated packages into the running container before building or launching them
+- `log/` remains the bind-mounted output location for reports, rosbags, metrics, and runtime logs
+
+When you add or update a scenario package or another repo-local package that must exist in `/ws/src`, copy it into the container first:
+
+```bash
+docker cp $(pwd)/src/<package-name> docker-spacetry-1:/ws/src/
+```
+
+If the package already exists in the container and must be refreshed from the host copy, replace the container copy before rebuilding.
 
 ### Standard Docker Commands for Agents
 
-When running build, ROS 2, Gazebo, or simulation commands in the `spacetry` container, always source the full environment in this order before the command itself:
+When running build, ROS 2, Gazebo, or simulation commands in the `spacetry` container, use one of the two environment modes below.
+
+**Bootstrap mode** — use this when `/ws/install/setup.bash` may not exist yet, such as the first build in a fresh container:
+
+```bash
+source /opt/ros/spaceros/setup.bash && source /etc/profile
+```
+
+**Overlay mode** — use this after the workspace has already been built and `/ws/install/setup.bash` exists:
 
 ```bash
 source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash
 ```
 
-This ensures the base ROS environment, dependency overlays, and the workspace install tree are all available during execution.
+Bootstrap mode initializes the base ROS environment so `colcon build` can create `/ws/install`. Overlay mode additionally loads the workspace install tree for package execution and incremental rebuilds.
 
-**Build/Compile The Whole Project:**
+**Bootstrap Build/Compile The Whole Project:**
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+"
+```
+
+**Overlay Build/Compile The Whole Project:**
 ```bash
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
 ```
 
-**Build/Compile Specific Package:**
+**Bootstrap Build/Compile Specific Package:**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --packages-select <package-name>"
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --packages-select <package-name>"
+```
+
+**Overlay Build/Compile Specific Package:**
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --packages-select <package-name>"
 ```
 
 **Run ROS2 Commands:**
@@ -253,6 +288,8 @@ When making changes to this codebase:
 3. **Check package-specific rules** - Look for AGENTS.md in the package being modified (package rules override project-wide rules)
 
 4. **ALL commands must run in Docker** - ROS2, Gazebo, build, test, or compilation commands must execute in the spacetry container
+
+4a. **Sync host package changes into `/ws/src` before Docker builds or launches** - Because `/ws/src` is not a runtime bind mount, agents must copy any new or modified repo-local package into the running container before building or executing it
 
 5. **Test autonomy impact** - Run relevant test scenarios to validate autonomous adaptation:
    - Sensor degradation scenarios (verify perception adaptation)
