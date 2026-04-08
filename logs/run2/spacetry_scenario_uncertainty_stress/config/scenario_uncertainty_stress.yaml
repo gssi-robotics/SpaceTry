@@ -1,0 +1,27 @@
+scenario_driver:
+  ros__parameters:
+    timer_period_s: 0.1
+    override_publish_hz: 20.0
+    report_dir: /tmp/spacetry_scenario_uncertainty_stress
+    contract_path: ""
+    scenario_timeout_s: 90.0
+    response_timeout_s: 18.0
+    recovery_timeout_s: 25.0
+    movement_commit_linear_threshold: 0.15
+    movement_mid_action_linear_threshold: 0.5
+    reaction_linear_drop_threshold: 0.2
+    reaction_turn_threshold: 0.25
+    cruise_linear_threshold: 0.45
+    settle_turn_threshold: 0.18
+    decision_event_duration_s: 8.0
+    decision_ramp_step_s: 2.0
+    battery_drop_soc: 0.15
+    battery_event_duration_s: 18.0
+    contingency_duration_s: 12.0
+    contingency_pulse_period_s: 1.5
+    science_goal_x: 50.1
+    science_goal_y: -80.0
+    science_goal_tolerance_m: 2.0
+    outpost_x: 66.0
+    outpost_y: 0.0
+    outpost_tolerance_m: 2.0
