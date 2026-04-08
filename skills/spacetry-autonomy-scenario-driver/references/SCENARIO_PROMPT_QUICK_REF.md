@@ -40,7 +40,7 @@ iii) **Monitors**:
 
 iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
-     Description: Traverse open terrain to reach mission waypoints while preserving rover safety and completing the route under changing environmental conditions.
+     Description: Navigate in the open terrain to reach mission target waypoint while preserving rover safety.
     - Outcome assessment:
       - Goal status: PASS if waypoint_02 is reached before timeout; otherwise FAIL
       - Safety status: PASS if no collision occurs and monitor constraints stay preserved; otherwise DEGRADED or FAIL depending on severity

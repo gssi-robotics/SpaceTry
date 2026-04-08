@@ -224,6 +224,8 @@ When making changes to this codebase:
 
 7. **Update related files** - If changing launch configs, sensors, behaviors, or missions, update documentation and validate impact on other systems
 
+This file is the canonical source for project-wide rules. Package-specific `AGENTS.md` files should only add package-specific constraints and validation steps, and skills should only add task-specific workflow or output requirements.
+
 ### Docker is Mandatory
 
 **Every** ROS2 command, compilation, or testing MUST happen in the container. Standard commands:
@@ -256,7 +258,7 @@ Before submitting changes:
 - **spacetry_mission**: Mission planning. Interacts with behaviors and waypoints.
 - **spacetry_perception**: Sensor processing. Latency-sensitive, handle carefully.
 
----
+Package-specific instruction files should avoid repeating the project-wide autonomy checklist unless they add package-specific checks that are not already covered here.
 
 ## References
 
@@ -266,5 +268,5 @@ Before submitting changes:
 
 ---
 
-**Last Updated:** April 2, 2026
+**Last Updated:** April 8, 2026
 **Maintained by:** SpaceTry Team

@@ -43,7 +43,6 @@ Modifications to `spacetry_world` affect autonomous capabilities:
 ### Validation Checklist for World Changes
 
 Before submitting world modifications:
-- [ ] Does the change add/remove obstacles or environmental features that test autonomy?
 - [ ] Are all mission targets (from scenarios/) still reachable?
 - [ ] Have physics parameters been documented if changed?
 - [ ] Does the world still load without errors in Gazebo?
@@ -61,7 +60,7 @@ Before submitting world modifications:
 
 **Verification Steps:**
 
-### Option 1: Automated Verification Script (Recommended)
+### Recommended Verification Path
 
 A verification script is provided: `scripts/verify_world.sh`
 
@@ -91,7 +90,7 @@ This script:
 4. Checks that all model URIs are resolvable
 5. Reports results (PASS/FAIL for each check)
 
-### Option 2: Manual Verification (Step-by-Step)
+### Fallback Manual Verification
 
 If the automated script is unavailable, perform these steps manually in the container:
 
@@ -188,7 +187,7 @@ Before submitting changes to `spacetry_world`:
    docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
    ```
 2. **Test in Simulation** — Launch the world in Gazebo headless mode to ensure no runtime errors
-3. **Check Autonomy Impact** — Verify that test scenarios still run and measure autonomy correctly
+3. **Check World-Specific Autonomy Impact** — Verify that mission targets remain reachable and that world changes do not silently invalidate autonomy evaluation
 4. **Document Changes** — If adding new models, obstacles, or physics parameters, update this file
 5. **Update Mission Targets** — If modifying waypoint locations or adding new landmarks, verify scenarios still reference valid targets
 
@@ -225,6 +224,7 @@ If modifying gravity, friction, or simulation time scale:
 - [.AGENTS.md.template](../../.AGENTS.md.template) — Template for other package-specific AGENTS.md
 - [Verification Script](../../scripts/verify_world.sh) — World validation script
 - [README.md](README.md) — Package description and usage
-- [Test Scenarios Guide](../../scenarios/SCENARIO_PROMPT_TEMPLATE.md) — How scenarios interact with the world
+- [Scenario Driver Skill](../../skills/spacetry-autonomy-scenario-driver/SKILL.md) — Scenario-specific workflow
+- [Scenario Prompt Template](../../skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md) — How scenarios interact with the world
 
-**Last Updated:** March 30, 2026
+**Last Updated:** April 8, 2026
