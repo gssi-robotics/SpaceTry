@@ -114,7 +114,7 @@ docker compose -f docker/docker-compose.yaml ps
 
 **Build/Compile The Whole Project:**
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry colcon build --event-handlers console_direct+
+docker compose -f docker/docker-compose.yaml exec spacetry colcon build --merge-install --event-handlers console_direct+
 ```
 
 **Build/Compile Specific Package:**

@@ -44,7 +44,7 @@ iv) **Mission Goals Description**:
     - Outcome assessment:
       - Goal status: PASS if science_rock_01 is reached before timeout; otherwise FAIL
       - Safety status: PASS if no collision occurs and monitor constraints stay preserved; otherwise DEGRADED or FAIL depending on severity
-      - Autonomy assessment: PASS if the rover detects, replans, and continues safely; DEGRADED if it recovers unsafely or too slowly; FAIL if it deadlocks, collides, or abandons the objective
+      - Autonomy assessment: PASS if the rover detects, replans, and continues safely; DEGRADED if it recovers unsafely or too slowly; FAIL if it deadlocks, collides, abandons the objective, or runs out of battery
 
 ## Objective
 

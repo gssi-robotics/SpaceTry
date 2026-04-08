@@ -1,14 +1,12 @@
 ---
 name: spacetry-autonomy-scenario-driver
-description: Create or update SpaceTry autonomy test scenarios, scenario-generation prompts, and scenario driver implementations that inject uncertainty and evaluate the rover's autonomy in simulation. Use when Codex needs to turn SpaceTry behavior trees, missions, monitors, world files, fault-model notes, or scenario prompt templates into a scenario plan, fault-to-object traceability, scenario-specific launch or config changes, execution guidance, or validation steps for autonomy evaluation in this repo.
+description: Create or update SpaceTry autonomy test scenarios and report results for the execution of scenario driver implementations that inject uncertainty and evaluate the rover's autonomy in simulation. Use when Codex needs to turn SpaceTry behavior trees, missions, monitors, world files, fault-model notes, or scenario prompt templates into a scenario plan, fault-to-object traceability, scenario-specific launch or config changes, execution guidance, or validation steps for autonomy evaluation in this repo.
 ---
 
 # SpaceTry Scenario Driver
 
-Use this skill to design or implement autonomy-evaluation scenarios for the SpaceTry rover.
+Use this skill to design, implement, or execute autonomy-evaluation scenarios for the SpaceTry rover.
 After the implementation, validate and execute the scenario driver in a Dockerized environment, and generate a report with the defined metrics and logged signals.
-
-If the user only wants a prompt or scenario description, stop after defining the scenario contract and producing the prompt output. Only continue into implementation, validation, and execution when the user asks for a runnable scenario driver.
 
 ## Workflow
 
@@ -54,12 +52,13 @@ Execute the scenario driver to generate the report with metrics and logging sign
 
 Policies that must be followed during scenario driver generation, implementation, validation, and execution:
 
+- Do not consider anything under the host `log/` folder as scenario input. This bind-mounted folder is reserved for scenario execution outputs such as reports, metrics artifacts, rosbags, and runtime logs.
 - Treat the behavior tree and monitors as the baseline under evaluation. Do not change them unless the user explicitly approves a bug fix.
 - During scenario-driver generation, avoid modifying rover ROS 2 packages unless a genuine implementation bug is found and the user approves the change.
 - Run every ROS2, Gazebo, build, or simulation command in Docker.
 - When a scenario touches `src/spacetry_world`, follow `src/spacetry_world/AGENTS.md` for world-specific constraints and validation.
 - Do not modify existing Markdown files in the repository during scenario-driver generation, implementation, testing, or reporting. This includes templates, quick references, skill files, AGENTS files, guides, and READMEs.
-- If the scenario requires new documentation, instructions, prompt text, or reports, create new Markdown files only inside the new scenario package under `src/spacetry_scenario_<scenario_name>/`.
+- If the scenario requires new documentation, instructions, prompt text, or reports, keep implementation-facing Markdown in the new scenario package under `src/spacetry_scenario_<scenario_name>/`, but write execution outputs such as generated reports to the bind-mounted host `log/` folder.
 - Treat repository Markdown files outside the new scenario package as read-only unless the user explicitly asks to edit them.
 
 ## Scenario Contract
@@ -78,7 +77,7 @@ Write the scenario in terms of these fields:
 - `core_metrics`: Details below under **Core Metrics**
 - `additional_metrics`: mission-specific metrics requested by the user or needed for the scenario
 - `outcome_assessment`: PASS, DEGRADED, or FAIL
-- `report`: the file with results of running the scenario, including metric values and logged signals
+- `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 
 ### Core Metrics
 
@@ -112,20 +111,6 @@ For each fault, the scenario driver maintains traceability:
 6. Monitor or metric that detects the rover response
 
 If traceability is incomplete, call that out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
-
-## Prompt Generation
-
-When the user wants only a prompt or scenario description, structure it around:
-
-- BT path
-- implementation packages
-- mission file
-- monitors and safety constraints
-- uncertainty injection design
-- metric definitions
-- expected outputs or reports
-
-Use `skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md` for the full shape and `skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md` for a concrete example and naming conventions.
 
 ## Implementation Guidelines
 
@@ -175,9 +160,16 @@ For each autonomy and safety requirement being evaluated, specify injection stra
 
 ### Logging and Observability
 
-- The logging signals and events related to the scenario should be stored in a rosbag and included in the final report with the metric values and scenario outcomes. 
+- The logging signals and events related to the scenario should be stored in a rosbag under the bind-mounted host `log/` folder and included in the final report with the metric values and scenario outcomes.
 - Use ROS 2 logging and rosbag existing solutions when possible, and avoid adding new logging topics or custom solutions that are not already part of the rover's ROS 2 packages.
 - If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks. 
+
+Write scenario outputs to the bind-mounted host `log/` folder using a per-scenario subdirectory, for example:
+
+- `log/scenario_<scenario_name>/scenario_<scenario_name>_report.md`
+- `log/scenario_<scenario_name>/metrics/`
+- `log/scenario_<scenario_name>/rosbags/`
+- `log/scenario_<scenario_name>/runtime/`
 
 Keep scenario logic observable:
 
@@ -204,9 +196,9 @@ docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_wo
 
 - Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. This ensures consistency and reproducibility across different host machines. 
 
-- Store the report in the scenario driver package folder with the name `scenario_{scenario_name}_report.md`, and make sure the package folder is binded to a volume in Docker so the report is accessible from the host machine after running the scenario.
+- Store the generated report in the bind-mounted host `log/` folder with the name `scenario_{scenario_name}_report.md`, ideally inside `log/scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 
-- Make sure all the folders and files needed for the report are also binded to volumes in Docker, so they are accessible from the host machine after running the scenario. This includes the rosbag files with the logged signals and events.
+- Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario. This includes rosbags, derived metrics files, and runtime logs, all of which should be placed under the host `log/` folder.
 
 
 ### Execute the scenario driver to generate the report
@@ -223,4 +215,4 @@ In the final answer, report in a markdown format the following information:
 - Which Docker validations ran
 - Any remaining traceability or observability gaps
 
-The markdown file should be placed in the scenario driver package folder, and named `scenario_{scenario_name}_report.md`.
+The generated execution report should be placed under the bind-mounted host `log/` folder, preferably at `log/scenario_{scenario_name}/scenario_{scenario_name}_report.md`.
