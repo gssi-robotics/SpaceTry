@@ -306,14 +306,28 @@ This file is the canonical source for project-wide rules. Package-specific `AGEN
 ### Docker is Mandatory
 
 **Every** ROS2 command, compilation, or testing MUST happen in the container. Standard commands:
+
+# Build the Docker Container Image
+
 ```bash
-# Build
+sh scripts/build.sh
+```
+
+# Build ROS 2 Workspace
+
+```bash
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --packages-select <package>"
+```
 
 # Run ROS2
+
+```bash
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 <command>"
+```
 
 # Launch Rover
+
+```bash
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py [args]"
 ```
 
