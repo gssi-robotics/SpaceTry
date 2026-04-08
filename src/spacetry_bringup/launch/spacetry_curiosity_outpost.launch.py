@@ -31,7 +31,6 @@ from launch.conditions import IfCondition
 
 from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.parameter_descriptions import ParameterValue
 
 def _load_waypoint_pose(waypoints_yaml: str, waypoint_name: str):
     """
@@ -200,7 +199,7 @@ def generate_launch_description():
             {
                 "outpost_x": base_x,
                 "outpost_y": base_y,
-                "initial_soc": ParameterValue(battery, value_type=float),
+                "initial_soc": battery,
                 "odom_topic": "/mobile_base_controller/odom",
                 "use_sim_time": True,
             },
