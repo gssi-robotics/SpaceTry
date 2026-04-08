@@ -6,10 +6,15 @@ description: Create or update SpaceTry autonomy test scenarios, scenario-generat
 # SpaceTry Scenario Driver
 
 Use this skill to design or implement autonomy-evaluation scenarios for the SpaceTry rover.
+After the implementation, validate and execute the scenario driver in a Dockerized environment, and generate a report with the defined metrics and logged signals. 
 
 ## Workflow
 
-1. Read `AGENTS.md` first.
+### 1. Scenario Driver Generation (Planning & Preparation)
+
+Define the scenario before implementing it. Follow the **[Non-Negotiables](#non-negotiables)** section and the **[Scenario Contract](#scenario-contract)** section for detailed field definitions.
+
+1. Read `AGENTS.md` first and review **[Non-Negotiables](#non-negotiables)**.
 2. Read package-specific `AGENTS.md` or `.instructions.md` files for every package you may modify.
 3. Load `skills/spacetry-autonomy-scenario-driver/references/repo-map.md` for the usual files and decision points.
 4. Inspect the source files and dependencies needed for the scenario:
@@ -17,19 +22,31 @@ Use this skill to design or implement autonomy-evaluation scenarios for the Spac
    - mission config or mission docs
    - monitor definitions
    - world/model files
-   - scenario docs in `scenarios/`
    - project documentation at `docs/`
-5. Define the scenario contract before editing code:
-   - autonomy aspect under test
-   - uncertainty source and taxonomy
-   - fault subject, attribute, manifestation, and domain
-   - trigger conditions
-   - measurements, logging signals, and success criteria
-   - scenario configurable parameters
-   - scenario execution
-   - scenario execution report structure, expected contents, and store location at the host machine
-6. Prefer adding scenario-specific artifacts over modifying baseline autonomy logic.
-7. Validate with Docker-only ROS2/build/test commands.
+5. Define the scenario contract before editing code (see **[Scenario Contract](#scenario-contract)** section for all required fields).
+
+### 2. Scenario Driver Parametrization (Implementation)
+
+Follow the **[Implementation Guidelines](#implementation-guidelines)** and **[Code Style and Guidelines](#code-style-and-guidelines)** sections to implement the scenario driver.
+
+1. Add scenario-specific artifacts instead of modifying baseline autonomy logic.
+2. Create scenario package, launch file, and configuration as described in **[Implementation Guidelines](#implementation-guidelines)**.
+3. Implement logging and observability per **[Logging and Observability](#logging-and-observability)**.
+
+### 3. Scenario Driver Validation
+
+Validate the implementation before execution using the **[Validation](#validation)** section.
+
+1. Rebuild scenario packages with Docker (see **[Validation](#validation)**).
+2. If changes were made to `src/spacetry_world`, run world verification (see **[Validation](#validation)**).
+
+### 4. Scenario Driver Execution (Execution & Reporting)
+
+Execute the scenario driver to generate the report with metrics and logging signals using the **[Execution Guidelines](#execution-guidelines)** and **[Logging and Observability](#logging-and-observability)** sections.
+
+1. Follow **[Execution Guidelines](#execution-guidelines)** to verify Docker setup and build the project.
+2. Launch the scenario driver and ensure logging signals are captured per **[Logging and Observability](#logging-and-observability)**.
+3. Generate and write the final report with metrics, logged signals, and outcomes per **[Execution Guidelines](#execution-guidelines)** final answer guidelines.
 
 ## Non-Negotiables
 
@@ -52,9 +69,18 @@ Write the scenario in terms of these fields:
 - `space_domain`: isolated, contiguous, or scattered when the fault is spatial
 - `time_domain`: transient, permanent, or intermittent when the fault is temporal
 - `trigger`: simulation time or robot-state predicate
-- `measurements`: adaptation speed, recovery rate, safety preservation, goal viability
+- `measurements`: Details below under **Measurement Focus**
 - `success_outcome`: achieved, degraded, or failed
 - `report`: the file with results of running the scenario, including metric values and logged signals
+
+### Measurement Focus
+
+Define measurable metrics for autonomy evaluation:
+
+- **Adaptation speed**: Time in milliseconds between uncertainty injection and rover reaction
+- **Safety preservation**: Key-value pairs with safety constraints (from monitors) and boolean preservation state
+- **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
+- **Recovery rate**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception and world packages, ask the user for clarification instead of making assumptions.
 
@@ -101,6 +127,48 @@ Prefer the least invasive path:
 2. Only changes on the mission and world packages are allowed within the remaining `src/` sub-folders.
 3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline mission launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
 
+### Scenario Naming Convention
+
+For consistency, name scenarios:
+```
+scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
+```
+
+**Examples:**
+- `scenario_perception_lidar_degradation_gradual`
+- `scenario_navigation_dynamic_obstacles_dense`
+- `scenario_mission_power_constraints_critical`
+- `scenario_safety_cascading_failures_multiple`
+
+
+### Component Specification
+
+Specify what the driver component should perform:
+
+- **Monitor** the rover's execution state (position, battery, sensor status)
+- **Trigger** uncertainty events at decision-critical moments (e.g., when rover commits to action)
+- **Measure** adaptation success (goal completion, safety violations, contingency activations)
+- **Adapt injection intensity** based on observed autonomy performance (gradually increase challenge)
+- **Log behavior** for post-execution analysis (decision timestamps, fallback activations, constraint violations)
+
+### Behavior Configuration
+
+For each autonomy and safety requirement being evaluated, specify injection strategy:
+
+**1. Injection Timing** — When uncertainty is triggered relative to rover behavior:
+- At decision point of the behavior tree
+- Mid-action (during active execution)
+- During contingency (fallback paths)
+
+**2. Intensity Increase** — How uncertainty level evolves during execution:
+- Gradual (progressive increase over time)
+- Sudden (immediate step change)
+- Cascading (multiple overlapping uncertainties)
+
+### Logging and Observability
+
+The logging signals and events related to the scenario should be stored in a rosbag and included in the final report with the metric values and scenario outcomes. If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
+
 Keep scenario logic observable:
 
 - log injection timestamps
@@ -108,10 +176,28 @@ Keep scenario logic observable:
 - log the rover response signal
 - write metrics that match the scenario contract
 
-## Execution Guidance
+## Validation
 
-Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. 
-This ensures consistency and reproducibility across different host machines. 
+Rebuild packages if scenario components have changed or new ones were added:
+
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry colcon build --merge-install --event-handlers console_direct+
+```
+
+If you changed `src/spacetry_world`, also run:
+
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+```
+
+## Execution Guidelines
+
+- Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. This ensures consistency and reproducibility across different host machines. 
+
+- Store the report in the scenario driver package folder with the name `scenario_{scenario_name}_report.md`, and make sure the package folder is binded to a volume in Docker so the report is accessible from the host machine after running the scenario.
+
+- Make sure all the folders and files needed for the report are also binded to volumes in Docker, so they are accessible from the host machine after running the scenario. This includes the rosbag files with the logged signals and events.
+
 
 ### Verify Running and Built Container Images
 
@@ -153,29 +239,19 @@ Make sure the project is built:
 docker compose -f docker/docker-compose.yaml exec spacetry colcon build --event-handlers console_direct+
 ```
 
-## Validation
-
-Rebuild packages if scenario components have changed or new ones were added:
-
-```bash
-docker compose -f docker/docker-compose.yaml exec spacetry colcon build --merge-install --event-handlers console_direct+
-```
-
-If you changed `src/spacetry_world`, also run:
-
-```bash
-docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
-```
-
 ### Execute the scenario driver to generate the report
 When the scenario driver implementation is complete, run the associated launch file created to execute the scenario and generate the report with the defined metrics and logged signals.
 
 Use the project-wide running instructions for executing a launch file in Docker, and specify the scenario driver launch file path.
 
-In the final answer, report:
+In the final answer, report in a markdown format the following information:
 
-- what scenario was created or updated
-- what assumptions were made
-- what was the baseline autonomy logic, intentionally left untouched, that was being evaluated
-- which Docker validations ran
-- any remaining traceability or observability gaps
+- Which tasks were performed
+- What scenario was created or updated
+- What assumptions were made
+- What was the baseline autonomy logic, intentionally left untouched, that was being evaluated
+- Which Docker validations ran
+- Any remaining traceability or observability gaps
+
+The markdown file should be placed in the scenario driver package folder, and named `scenario_{scenario_name}_report.md`.
+
