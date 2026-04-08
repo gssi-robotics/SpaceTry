@@ -117,7 +117,8 @@ Prefer the least invasive path:
 
 1. The scenario driver should not make changes on the autonomy behavior being evaluated. New packages needed for implementing the scenario driver can be added inside `src/` and should be named `spacetry_scenario_<scenario_name>`. 
 2. Only changes on the mission and world packages are allowed within the remaining `src/` sub-folders.
-3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline mission launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
+3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline bringup unchanged launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
+4. When including baseline bringup, inspect the target node’s YAML defaults before relying on launch overrides for mission-specific values such as battery SOC, odom topics, spawn targets, waypoint files, or scenario-specific thresholds.
 
 ### Scenario Naming Convention
 
@@ -182,13 +183,13 @@ Keep scenario logic observable:
 Rebuild packages if scenario components have changed or new ones were added:
 
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry colcon build --merge-install --event-handlers console_direct+
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
 ```
 
 If you changed `src/spacetry_world`, also run:
 
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && /ws/scripts/verify_world.sh"
 ```
 
 ## Execution Guidelines
@@ -201,7 +202,7 @@ docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_wo
 
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario. This includes rosbags, derived metrics files, and runtime logs, all of which should be placed under the host `log/` folder.
 
-- The created scenario driver package should be copied into the docker container image after it is built. Use: `docker cp $(pwd)/src/spacetry_spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/`
+- The created scenario driver package should be copied into the docker container image after it is built. Use: `docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/`
 
 
 

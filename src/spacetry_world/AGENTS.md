@@ -21,11 +21,11 @@ All commands that validate or test the world must run in Docker:
 
 ```bash
 # Validate SDF syntax and model URIs (see Verification below)
-docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && /ws/scripts/verify_world.sh"
 
 # Launch the world headless for testing
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc '\
-  source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && \
+  source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && \
   timeout 10 ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py \
     headless:=1 spawner_node:=false 2>&1 | head -50
 '
@@ -47,6 +47,9 @@ Before submitting world modifications:
 - [ ] Have physics parameters been documented if changed?
 - [ ] Does the world still load without errors in Gazebo?
 - [ ] Do all model URIs resolve (no missing external dependencies)?
+- [ ] Do nested model assets resolve for local models, including meshes, material scripts, and textures referenced from model SDF files?
+- [ ] If any model is intended for runtime spawning, has it been validated both from its installed file path and with Gazebo resource-path resolution enabled?
+- [ ] If runtime insertion is part of the workflow, is success confirmed by Gazebo entity listing or equivalent world-side verification rather than process exit code alone?
 - [ ] Have autonomy test scenarios been re-run to verify impact?
 
 ## Verification: Validate World SDF and Model URIs
@@ -66,7 +69,7 @@ A verification script is provided: `scripts/verify_world.sh`
 
 Run from the repo root with Docker:
 ```bash
-docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && /ws/scripts/verify_world.sh"
 ```
 
 Or run in a fresh container from the repo root:
@@ -90,6 +93,8 @@ This script:
 4. Checks that all model URIs are resolvable
 5. Reports results (PASS/FAIL for each check)
 
+When adding or updating models that may be spawned dynamically, also validate nested asset references inside each model's `model.sdf`, not just top-level `model://model_name` world references. This includes mesh paths, material scripts, and texture URIs.
+
 ### Fallback Manual Verification
 
 If the automated script is unavailable, perform these steps manually in the container:
@@ -97,7 +102,7 @@ If the automated script is unavailable, perform these steps manually in the cont
 **Step 1: Set up environment**
 ```bash
 docker compose -f docker/docker-compose.yaml exec spacetry bash -lc '\
-  source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && bash
+  source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && bash
 '
 ```
 
@@ -161,6 +166,27 @@ else
 fi
 ```
 
+**Step 6: Validate runtime-spawned models and nested assets**
+```bash
+export GZ_SIM_RESOURCE_PATH="/ws/src/spacetry_models/models:/tmp/ext_models"
+export SDF_PATH="/ws/src/spacetry_models/models:/tmp/ext_models"
+
+# Prefer relative paths inside a model package for meshes and textures that live
+# under the same model directory. If model:// URIs are used inside model.sdf,
+# verify they resolve with the resource path above.
+grep -nE 'model://|<uri>|_map>' /ws/src/spacetry_models/models/rock_5/model.sdf
+
+# Optional runtime insertion check for models intended to be spawned during scenarios.
+timeout 10 ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py headless:=1 > /tmp/world_launch.log 2>&1 &
+LAUNCH_PID=$!
+sleep 5
+ros2 run ros_gz_sim create -world mars_outpost -name runtime_validation_rock -allow_renaming true \
+  -file /ws/src/spacetry_models/models/rock_5/model.sdf -x 0 -y 0 -z 0
+sleep 2
+gz model --list | grep runtime_validation_rock
+kill $LAUNCH_PID || true
+```
+
 ## Known Constraints
 
 **World Dependencies:**
@@ -172,6 +198,8 @@ fi
 - `gz sdf -k` requires Gazebo Harmonic to be installed
 - External models must be available at build time or validation will fail
 - Model URIs must follow format: `model://model_name` (no spaces, lowercase preferred)
+- Nested asset URIs inside model SDF files are not fully covered by top-level world URI checks; meshes, textures, and material scripts must be verified separately when models are added or changed
+- Models spawned with `ros_gz_sim create -file` may resolve assets differently from models loaded directly by the world file, so runtime-spawn validation is required when scenarios depend on dynamic insertion
 
 **Physics Simulation Constraints:**
 - `use_sim_time:=true` is required for synchronized ROS2/Gazebo operation
@@ -184,12 +212,13 @@ Before submitting changes to `spacetry_world`:
 
 1. **Run Verification** — Execute `scripts/verify_world.sh` to validate SDF and model URIs:
    ```bash
-   docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && /ws/scripts/verify_world.sh"
    ```
 2. **Test in Simulation** — Launch the world in Gazebo headless mode to ensure no runtime errors
-3. **Check World-Specific Autonomy Impact** — Verify that mission targets remain reachable and that world changes do not silently invalidate autonomy evaluation
-4. **Document Changes** — If adding new models, obstacles, or physics parameters, update this file
-5. **Update Mission Targets** — If modifying waypoint locations or adding new landmarks, verify scenarios still reference valid targets
+3. **Verify Runtime-Spawned Models** — If the change affects models that scenarios spawn dynamically, confirm Gazebo can insert the model at runtime and that `gz model --list` or an equivalent world-side query shows the inserted entity
+4. **Check World-Specific Autonomy Impact** — Verify that mission targets remain reachable and that world changes do not silently invalidate autonomy evaluation
+5. **Document Changes** — If adding new models, obstacles, or physics parameters, update this file
+6. **Update Mission Targets** — If modifying waypoint locations or adding new landmarks, verify scenarios still reference valid targets
 
 ### Example: Adding a New Obstacle
 
@@ -199,10 +228,11 @@ If adding a new rock or hazard to the world:
 2. Add to `mars_outpost.sdf`: `<model name="new_hazard">...`
 3. Run verification:
    ```bash
-   docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && /ws/scripts/verify_world.sh"
    ```
-4. Test impact on autonomy scenarios (may block waypoints or require replanning)
-5. Update documentation if autonomy evaluation changes
+4. If the obstacle will be spawned dynamically during scenarios, validate runtime insertion and confirm its presence with `gz model --list`
+5. Test impact on autonomy scenarios (may block waypoints or require replanning)
+6. Update documentation if autonomy evaluation changes
 
 ### Example: Changing Physics Parameters
 
@@ -211,7 +241,7 @@ If modifying gravity, friction, or simulation time scale:
 1. Edit appropriate `<physics>` section in `mars_outpost.sdf`
 2. Run verification:
    ```bash
-   docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_world.sh
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && /ws/scripts/verify_world.sh"
    ```
 3. Re-run autonomy test scenarios to measure performance delta
 4. Document the rationale for changes in this file

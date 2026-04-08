@@ -33,6 +33,26 @@ To configure the robot simulation environment the following Gazebo features can 
             - Friction: useful for control and navigation
             - Contact: objects can be collided with or without contact
 
+### Runtime Model Insertion
+
+Gazebo runtime model insertion is a valid mechanism for uncertainty injection in autonomy scenarios, but it requires explicit validation.
+
+- Dynamic model insertion:
+    - `ros_gz_sim create` can spawn models from an installed file path during scenario execution.
+    - A successful process exit code is not sufficient evidence that the model is usable in the world.
+- Resource path handling:
+    - When a scenario driver spawns a model from a file at runtime, the subprocess should explicitly provide `GZ_SIM_RESOURCE_PATH` and `SDF_PATH` so Gazebo can resolve repository-provided models and their assets.
+    - The resource path should include the installed or source models root, for example the parent directory that contains `rock_5/`.
+- Asset resolution:
+    - Nested assets referenced from `model.sdf`, such as meshes, material scripts, albedo maps, normal maps, and roughness maps, must resolve in the runtime environment as well as in static world loading.
+    - Prefer relative paths inside a model package for assets that live under the same model directory. Use `model://...` URIs only when the model is expected to be discoverable through Gazebo resource paths.
+- Post-spawn verification:
+    - Scenario drivers should verify the spawned entity exists in Gazebo after insertion, for example with a world-side query such as `gz model --list`.
+    - The scenario should only report physical obstacle insertion success after both the spawn command and entity verification succeed.
+- Observability:
+    - Log the resolved model file path, spawn command, effective Gazebo resource-path environment, and the post-spawn verification result.
+    - If the spawn command succeeds but Gazebo cannot verify the entity, record that as an observability or injection failure and fall back only if the scenario design allows it.
+
 ### Sensors
 
 Gazebo Harmonic sensors are defined in SDF under model links or frames and publish simulation data through configured topics. For this project, the most relevant capability is that sensor behavior can be controlled through SDF parameters such as topic name, update rate, visualization, pose, and sensor-specific measurement ranges, which makes sensors a practical target for uncertainty injection and observability during autonomy evaluation.
@@ -53,6 +73,7 @@ Gazebo Harmonic sensors are defined in SDF under model links or frames and publi
 ## Implementation Guidelines
 - World features should be preferably implemented at design time, i.e., during the generation of autonomy test scenario driver, changing the properties in runtime to trigger adaptation.
 - Best performant implementation strategy should be considered when implementing Gazebo-related uncertainty.
+- If runtime spawning is used for uncertainty injection, prefer repository models whose assets have already been validated in Docker with the same resource-path environment used by the scenario driver.
 
 ## Non-Negotiables
 - The Gazebo world configured gravity and lighting are matching the conditions in Mars and should not be changed at any point of the implementation.
@@ -62,6 +83,7 @@ Gazebo Harmonic sensors are defined in SDF under model links or frames and publi
 
 ## Code Style and Guidelines
 - For uncertainty injection in the simulation environment, existing models in the spacetry_models are prefered since they are more realistic. 
+- When using existing Gazebo models from `spacetry_models`, inspect the model SDF for nested asset references before assuming the model is runtime-spawn safe.
 - For additional details about Gazebo Harmonic features and good practices can be found in the official documentation in: https://gazebosim.org/docs/harmonic/getstarted/. 
 - Follow additional instructions in `AGENTS.md` files from project-wide and package-specific (in the `src/` sub-folders).
 - In case of doubt, conflicting or missing information, ask clarification from the user.
