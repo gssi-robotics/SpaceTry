@@ -123,14 +123,14 @@ Prefer the least invasive path:
 
 For consistency, name scenarios:
 ```
-scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
+spacetry_scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
 ```
 
 **Examples:**
-- `scenario_perception_lidar_degradation_gradual`
-- `scenario_navigation_dynamic_obstacles_dense`
-- `scenario_mission_power_constraints_critical`
-- `scenario_safety_cascading_failures_multiple`
+- `spacetry_scenario_perception_lidar_degradation_gradual`
+- `spacetry_scenario_navigation_dynamic_obstacles_dense`
+- `spacetry_scenario_mission_power_constraints_critical`
+- `spacetry_scenario_safety_cascading_failures_multiple`
 
 
 ### Component Specification
@@ -195,11 +195,15 @@ docker compose -f docker/docker-compose.yaml exec spacetry /ws/scripts/verify_wo
 
 - Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. This ensures consistency and reproducibility across different host machines. 
 
-- Store the generated report in the bind-mounted host `log/` folder with the name `scenario_{scenario_name}_report.md`, ideally inside `log/scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
+- Store the generated report in the bind-mounted host `log/` folder with the name `spacetry_scenario_{scenario_name}_report.md`, ideally inside `log/spacetry_scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 
 - If necessary, mount the `log/` folder as a volume in Docker (e.g., `-v $(pwd)/log:/ws/log` - from the repository root) to ensure that all outputs from the scenario execution, including rosbags, metrics files, runtime logs, and the final report, are saved to the host machine for analysis and record-keeping.
 
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario. This includes rosbags, derived metrics files, and runtime logs, all of which should be placed under the host `log/` folder.
+
+- The created scenario driver package should be copied into the docker container image after it is built. Use: `docker cp $(pwd)/src/spacetry_spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/`
+
+
 
 
 ### Execute the scenario driver to generate the report
@@ -216,4 +220,4 @@ In the final answer, report in a markdown format the following information:
 - Which Docker validations ran
 - Any remaining traceability or observability gaps
 
-The generated execution report should be placed under the bind-mounted host `log/` folder, preferably at `log/scenario_{scenario_name}/scenario_{scenario_name}_report.md`.
+The generated execution report should be placed under the bind-mounted host `log/` folder, preferably at `log/spacetry_scenario_{scenario_name}/spacetry_scenario_{scenario_name}_report.md`.
