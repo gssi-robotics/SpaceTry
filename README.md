@@ -292,7 +292,6 @@ docker compose -f docker/docker-compose.yaml down
 ## SpaceTry 🥐 Mission Configuration
 
    Mission configuration files live in:
-   * ```src/spacetry_mission/config/mission_01.yaml``` — mission objectives
    * ```src/spacetry_mission/config/objects.yaml``` — mission objects (IDs must match model instance names in the world)
    * ```src/spacetry_mission/config/waypoints.yaml``` — named navigation waypoints (frame: world)
 

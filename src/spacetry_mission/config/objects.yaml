@@ -8,3 +8,4 @@ objects:
   - id: block_island
     type: hazard
     hazard_kind: rock_block
+

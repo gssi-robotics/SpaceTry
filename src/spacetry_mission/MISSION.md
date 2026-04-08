@@ -93,8 +93,6 @@ YAML-based mission configuration consisting of three files:
 
 - **`objects.yaml`** — World objects with semantic types (validated against the SDF by `validate_mission_config.py`)
 
-- **`mission_01.yaml`** — Ordered objective list with associated task type.
-
 ## Mars Outpost World
 
 The Gazebo world (`mars_outpost.sdf`) defines a Martian environment with reduced gravity (3.711 m/s²) and the following scene entities:
