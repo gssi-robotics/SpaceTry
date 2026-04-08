@@ -72,16 +72,6 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
    - Force a tradeoff between shortest path completion and collision avoidance
    - Verify that monitor constraints remain preserved during replanning
 
-## Uncertainty Injection Plan
-
-- Injection pattern: Dynamic obstacles
-- Fill-in template:
-  - Inject/change rock obstacle occupancy from absent to present at/when rover is 3 m from waypoint_02
-  - Test: Can rover replan route and navigate around the obstacle while continuing toward waypoint_02?
-  - Measure: Route replanning latency (ms), detour distance (m), deadline miss (0/1)
-  - Injection timing: At decision point of the behavior tree during navigation to waypoint_02
-  - Intensity strategy: Cascading
-
 ## Additional Mission-Specific Metrics to Consider
 
 - Safety preservation (boolean per constraint): Boolean status for each relevant monitor or safety condition, for example `MR_009=true`, `MR_011=true`, `collision_with_dynamic_obstacle=false`

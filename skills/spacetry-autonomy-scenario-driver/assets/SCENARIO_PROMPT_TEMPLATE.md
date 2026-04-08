@@ -61,15 +61,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
    - {SAFETY_CHALLENGE_2}
    - {GOAL_VIABILITY_CHALLENGE_1}
 
-## Uncertainty Injection Plan
-
-- Injection pattern: {INJECTION_PATTERN}
-- Fill-in template:
-  - Inject/change {TARGET} from {INITIAL_STATE} to {FINAL_STATE} at/when {INJECTION_POINT}
-  - Test: {PRIMARY_ADAPTATION_EXPECTATION}
-  - Measure: {METRICS_WITH_UNITS}
-  - Injection timing: {INJECTION_TIMING}
-  - Intensity strategy: {INTENSITY_STRATEGY}
+## [Optional] Uncertainty Injection Plan 
 
 Choose the closest pattern and fill in the blanks:
 - Sensor degradation: `Inject {SENSOR} confidence loss from {START}% to {END}% over {DURATION}`
@@ -77,7 +69,7 @@ Choose the closest pattern and fill in the blanks:
 - Power constraints: `Accelerate battery drain from {BASELINE_RATE} to {NEW_RATE} during {ACTIVITY}`
 - Environmental changes: `Change {PARAMETER} from {INITIAL} to {FINAL} at {TIMING}`
 
-## Additional Mission-Specific Metrics to Consider
+## [Optional] Additional Mission-Specific Metrics to Consider
 
 - {METRIC_NAME} ({UNIT_OR_BOOLEAN}): {METRIC_DESCRIPTION}
 - {METRIC_NAME} ({UNIT_OR_BOOLEAN}): {METRIC_DESCRIPTION}
