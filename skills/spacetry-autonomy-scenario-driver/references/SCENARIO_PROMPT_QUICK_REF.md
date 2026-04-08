@@ -42,7 +42,7 @@ iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
      Description: Navigate in the open terrain to reach mission target waypoint while preserving rover safety.
     - Outcome assessment:
-      - Goal status: PASS if waypoint_02 is reached before timeout; otherwise FAIL
+      - Goal status: PASS if science_rock_01 is reached before timeout; otherwise FAIL
       - Safety status: PASS if no collision occurs and monitor constraints stay preserved; otherwise DEGRADED or FAIL depending on severity
       - Autonomy assessment: PASS if the rover detects, replans, and continues safely; DEGRADED if it recovers unsafely or too slowly; FAIL if it deadlocks, collides, or abandons the objective
 
@@ -60,7 +60,6 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
    - Manifestation: intermittent
    - Space domain: contiguous
    - Time domain: intermittent
-   - Trigger: when the rover is 3 m away from waypoint_02 while executing the navigation branch of the BT
 
 2. **Tests Autonomous Adaptation**:
    - Can the rover detect a newly introduced obstacle on the nominal route?
@@ -68,14 +67,14 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
    - Can the rover continue toward the waypoint after the route is blocked?
 
 3. **Challenges Safety and Goal Viability**:
-   - Insert a rock obstacle directly on the preferred route to waypoint_02
+   - Insert a rock obstacle directly on the preferred route to science_rock_01
    - Force a tradeoff between shortest path completion and collision avoidance
    - Verify that monitor constraints remain preserved during replanning
 
 ## Additional Mission-Specific Metrics to Consider
 
 - Safety preservation (boolean per constraint): Boolean status for each relevant monitor or safety condition, for example `MR_009=true`, `MR_011=true`, `collision_with_dynamic_obstacle=false`
-- Goal viability (boolean per goal): Boolean status for each mission objective, for example `waypoint_02_reached=true`, `mission_deadline_met=true`
+- Goal viability (boolean per goal): Boolean status for each mission objective, for example `science_rock_01_reached=true`, `mission_deadline_met=true`
 - Recovery rate (ms): Time from replanning activation to stable progress on a collision-free route
 - Obstacle detection latency (ms): Time from obstacle injection to the first confirmed obstacle detection by the autonomy stack
 - Detour distance (m): Extra path length traveled relative to the nominal route after replanning around the obstacle

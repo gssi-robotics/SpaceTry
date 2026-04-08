@@ -83,9 +83,41 @@ This starts:
 4. **Isolation** - Multiple projects can coexist without interference
 5. **CI/CD Ready** - Same environment as automated testing
 
+### Verify Running and Built Container Images
+
+If you need to stop the container, run the command:
+
+```bash
+docker compose -f docker/docker-compose.yaml down
+```
+ 
+Before running any command, verify if the docker container is built with:
+
+```bash
+docker compose -f docker/docker-compose.yaml images
+```
+
+If the docker container is not built, build it with:
+
+```bash
+bash scripts/build.sh
+```
+
+Then, verify if the docker container is running with:
+
+```bash
+docker compose -f docker/docker-compose.yaml ps
+```
+
+
 ### Standard Docker Commands for Agents
 
-**Build/Compile:**
+**Build/Compile The Whole Project:**
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry colcon build --event-handlers console_direct+
+```
+
+**Build/Compile Specific Package:**
 ```bash
 docker compose -f docker/docker-compose.yaml exec spacetry colcon build --packages-select <package-name>
 ```
@@ -112,14 +144,14 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -l
 
 ### When NOT to Use Docker
 
-❌ **Don't** use Docker for:
+**Don't** use Docker for:
 - Reading files (use native file operations)
 - Text/code analysis
 - Planning changes
 - Querying git history
 - Generating code to propose
 
-✅ **Only run in Docker** when:
+**Only run in Docker** when:
 - Actually executing the code
 - Testing code behavior
 - Building/compiling
