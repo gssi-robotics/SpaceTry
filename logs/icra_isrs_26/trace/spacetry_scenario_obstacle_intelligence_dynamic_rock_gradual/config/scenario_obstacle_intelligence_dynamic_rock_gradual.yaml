@@ -1,0 +1,42 @@
+scenario:
+  ros__parameters:
+    scenario_name: scenario_obstacle_intelligence_dynamic_rock_gradual
+    world_name: mars_outpost
+    start_waypoint: dock_pad_01
+    goal_waypoint: science_rock_01
+    goal_tolerance_m: 1.5
+    scenario_timeout_s: 100.0
+    obstacle_model: rock_5
+    obstacle_name: scenario_dynamic_rock
+    obstacle_route_fraction: 0.64
+    trigger_progress_fraction: 0.20
+    trigger_after_s: 20.0
+    obstacle_z: 0.0
+    obstacle_yaw: 0.0
+    collision_radius_m: 3.5
+    nominal_linear_speed_mps: 1.6
+    reaction_angular_threshold_radps: 0.35
+    reaction_linear_drop_fraction: 0.75
+    stable_progress_window_s: 4.0
+    stable_progress_delta_m: 2.0
+    degraded_recovery_ms: 12000.0
+    output_root: /ws/log/scenario_obstacle_intelligence_dynamic_rock_gradual
+    log_topics:
+      - /mobile_base_controller/odom
+      - /scan
+      - /cmd_vel
+      - /battery/soc
+      - /battery/near_outpost
+      - /obstacle/front
+      - /obstacle/left
+      - /obstacle/right
+      - /monitor/events
+      - /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+      - /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
+    baseline_map_assessment: >
+      The active world already contains the canonical mission target science_rock_01 at
+      approximately (50.10, -80.0) and a pre-existing hazard block_island near (20.0, -40.5).
+      The direct dock_pad_01 to science_rock_01 segment is therefore not obstacle-free, so this
+      scenario injects a new runtime rock farther down-route near 64 percent of the nominal
+      dock-to-science segment to avoid trivially overlapping the baseline hazard while still
+      blocking the preferred path toward the existing mission target.

@@ -1,0 +1,27 @@
+scenario_contract:
+  autonomy_aspect: obstacle intelligence
+  uncertainty_location: environment
+  fault_subject: nominal route segment between dock_pad_01 and science_rock_01
+  fault_attribute: traversability on the preferred route
+  manifestation: stuck
+  space_domain: contiguous
+  time_domain: permanent
+  trigger: inject runtime obstacle 20 seconds after mission start while the rover is traversing the dock-to-goal route
+  core_metrics:
+    adaptation_speed: Time from rock insertion to first motion response (ms)
+    safety_preservation:
+      MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: boolean
+      MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: boolean
+      collision_with_dynamic_obstacle: boolean
+    goal_viability:
+      science_rock_01_reached: boolean
+      mission_deadline_met: boolean
+    recovery_rate: Time from first motion response to stable forward progress on a collision-free route (ms)
+  additional_metrics:
+    obstacle_detection_latency_ms: Time from rock insertion to first obstacle topic assertion
+    detour_distance_m: Executed post-injection path length minus straight-line distance from injection point to goal
+    route_deviation_m: Maximum cross-track distance from the nominal dock-to-goal segment after injection
+  outcome_assessment:
+    goal_status: PASS if science_rock_01 is reached before timeout, otherwise FAIL
+    safety_status: PASS if monitor constraints remain preserved and no dynamic-obstacle collision is inferred, otherwise DEGRADED or FAIL
+    autonomy_assessment: PASS if rover detects, reacts, and resumes safe progress; DEGRADED if recovery is too slow; FAIL if deadlock, collision, abandonment, or battery exhaustion occurs

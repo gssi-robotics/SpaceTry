@@ -1,0 +1,75 @@
+{
+  "scenario_name": "scenario_obstacle_intelligence_dynamic_rock_gradual",
+  "run_stamp": "20260409T011716Z",
+  "finish_reason": "timeout",
+  "baseline_map_assessment": "The active world already contains the canonical mission target science_rock_01 at approximately (50.10, -80.0) and a pre-existing hazard block_island near (20.0, -40.5). The direct dock_pad_01 to science_rock_01 segment is therefore not obstacle-free, so this scenario injects a new runtime rock farther down-route near 64 percent of the nominal dock-to-science segment to avoid trivially overlapping the baseline hazard while still blocking the preferred path toward the existing mission target.\n",
+  "start_waypoint": "dock_pad_01",
+  "goal_waypoint": "science_rock_01",
+  "obstacle_xy": {
+    "x": 32.064,
+    "y": -51.2
+  },
+  "timing": {
+    "elapsed_s": 100.0,
+    "obstacle_detection_latency_ms": 800.0000000000007,
+    "adaptation_speed_ms": 292.0000000000016,
+    "recovery_rate_ms": null
+  },
+  "safety_preservation": {
+    "MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY": true,
+    "MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY": false,
+    "collision_with_dynamic_obstacle": false
+  },
+  "goal_viability": {
+    "science_rock_01_reached": false,
+    "mission_deadline_met": false
+  },
+  "additional_metrics": {
+    "detour_distance_m": 0.0,
+    "route_deviation_m": 5.013995219401015,
+    "minimum_obstacle_clearance_m": 28.319176636570624,
+    "final_battery_soc": 0.9773299694061279
+  },
+  "outcome_assessment": {
+    "goal_status": "FAIL",
+    "safety_status": "DEGRADED",
+    "autonomy_assessment": "FAIL"
+  },
+  "spawn_result": {
+    "return_code": 0,
+    "output_tail": "[INFO] [1775697479.978865976] [ros_gz_sim]: Entity creation successful."
+  },
+  "contract": {
+    "autonomy_aspect": "obstacle intelligence",
+    "uncertainty_location": "environment",
+    "fault_subject": "nominal route segment between dock_pad_01 and science_rock_01",
+    "fault_attribute": "traversability on the preferred route",
+    "manifestation": "stuck",
+    "space_domain": "contiguous",
+    "time_domain": "permanent",
+    "trigger": "inject runtime obstacle 20 seconds after mission start while the rover is traversing the dock-to-goal route",
+    "core_metrics": {
+      "adaptation_speed": "Time from rock insertion to first motion response (ms)",
+      "safety_preservation": {
+        "MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY": "boolean",
+        "MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY": "boolean",
+        "collision_with_dynamic_obstacle": "boolean"
+      },
+      "goal_viability": {
+        "science_rock_01_reached": "boolean",
+        "mission_deadline_met": "boolean"
+      },
+      "recovery_rate": "Time from first motion response to stable forward progress on a collision-free route (ms)"
+    },
+    "additional_metrics": {
+      "obstacle_detection_latency_ms": "Time from rock insertion to first obstacle topic assertion",
+      "detour_distance_m": "Executed post-injection path length minus straight-line distance from injection point to goal",
+      "route_deviation_m": "Maximum cross-track distance from the nominal dock-to-goal segment after injection"
+    },
+    "outcome_assessment": {
+      "goal_status": "PASS if science_rock_01 is reached before timeout, otherwise FAIL",
+      "safety_status": "PASS if monitor constraints remain preserved and no dynamic-obstacle collision is inferred, otherwise DEGRADED or FAIL",
+      "autonomy_assessment": "PASS if rover detects, reacts, and resumes safe progress; DEGRADED if recovery is too slow; FAIL if deadlock, collision, abandonment, or battery exhaustion occurs"
+    }
+  }
+}

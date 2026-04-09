@@ -240,6 +240,30 @@ def load_waypoints(repo_root: Path) -> Dict[str, Tuple[float, float]]:
     return result
 
 
+def load_world_landmarks(repo_root: Path) -> Dict[str, Tuple[float, float]]:
+    world_path = repo_root / "src" / "spacetry_world" / "worlds" / "mars_outpost.sdf"
+    if not world_path.exists():
+        return {}
+
+    content = world_path.read_text(encoding="utf-8")
+    landmarks: Dict[str, Tuple[float, float]] = {}
+
+    for name in ("block_island", "science_rock_01", "outpost_habitat_01"):
+        pattern = re.compile(
+            rf"<name>{re.escape(name)}</name>.*?<pose>([^<]+)</pose>",
+            re.DOTALL,
+        )
+        match = pattern.search(content)
+        if not match:
+            continue
+        pose_values = match.group(1).split()
+        if len(pose_values) < 2:
+            continue
+        landmarks[name] = (float(pose_values[0]), float(pose_values[1]))
+
+    return landmarks
+
+
 def scenario_root_for_bag(bag_path: Path) -> Optional[Path]:
     if bag_path.parent.name != "rosbags":
         if bag_path.parent.parent.name == "rosbags":
@@ -266,6 +290,7 @@ def build_scenario_markers(
         timeline = []
 
     waypoints = load_waypoints(repo_root)
+    world_landmarks = load_world_landmarks(repo_root)
     markers: List[Dict[str, object]] = []
 
     start_waypoint = metrics.get("start_waypoint")
@@ -306,6 +331,19 @@ def build_scenario_markers(
                 "color": "#ff7f0e",
                 "marker": "^",
                 "annotation": "runtime rock",
+            }
+        )
+
+    if "block_island" in world_landmarks:
+        x, y = world_landmarks["block_island"]
+        markers.append(
+            {
+                "x": x,
+                "y": y,
+                "label": "Baseline hazard",
+                "color": "#7f7f7f",
+                "marker": "v",
+                "annotation": "block_island",
             }
         )
 
@@ -554,7 +592,7 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument(
         "--title",
-        default="Rover 2D Navigation Path",
+        default="Autonomy Evaluation: Runtime Obstacle Response Against Baseline Hazards",
         help="Plot title",
     )
     parser.add_argument("--start-label", default="Start")
