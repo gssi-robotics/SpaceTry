@@ -77,7 +77,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 - Route deviation (m): Maximum or average lateral distance between the executed path and the nominal planned path
 ```
 
-For detailed guidance on measurement definitions, component specification, and behavior configuration, see [SKILL.md](../SKILL.md#measurement-focus), [Component Specification](../SKILL.md#component-specification), and [Behavior Configuration](../SKILL.md#behavior-configuration) sections.
+For detailed guidance on measurement definitions and attribution rules, see [Scenario_Contract.md](./Scenario_Contract.md) and [Observability_and_Attribution.md](./Observability_and_Attribution.md). For component specification and behavior configuration, see [Component Specification](../SKILL.md#component-specification) and [Behavior Configuration](../SKILL.md#behavior-configuration).
 
 ---
 

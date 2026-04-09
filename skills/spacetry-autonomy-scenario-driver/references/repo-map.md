@@ -6,10 +6,18 @@ Load this file when you need a quick map of where scenario-relevant information 
 
 - `AGENTS.md`
   Project-wide rules, Docker-only execution, autonomy-evaluation workflow.
+- `skills/spacetry-autonomy-scenario-driver/references/Scenario_Driver_Policies.md`
+  Mandatory scenario-driver policies, artifact provenance rules, reuse restrictions, and interrupted-run requirements.
+- `skills/spacetry-autonomy-scenario-driver/references/Scenario_Contract.md`
+  Required scenario fields, core metrics, attribution rules, ambiguity handling, and control-rationale requirements.
 - `skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md`
   Full scenario prompt structure and metric vocabulary.
 - `skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md`
   Short prompt patterns, naming convention, integration checklist.
+- `skills/spacetry-autonomy-scenario-driver/references/Observability_and_Attribution.md`
+  Logging requirements, attribution evidence, event naming, and `cmd_vel` rationale guidance.
+- `skills/spacetry-autonomy-scenario-driver/references/Validation_and_Execution.md`
+  Docker validation flow, execution steps, interrupted-run checks, and final reporting expectations.
 - `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md`
   Uncertainty dimensions, sources and fault subject, domain, trigger, manifestation, and traceability model.
 - `skills/spacetry-autonomy-scenario-driver/references/Gazebo.md`
