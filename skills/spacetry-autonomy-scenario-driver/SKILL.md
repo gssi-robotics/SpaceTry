@@ -108,13 +108,15 @@ Write the scenario in terms of these fields:
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 - `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
 - `fault_attribution_rule`: explicit rule for deciding whether a detection or reaction is attributable to the injected uncertainty rather than baseline hazards, nominal behavior, or unrelated monitor violations
+- `control_rationale_rule`: explicit rule for how the scenario records and classifies control-command changes such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 
 ### Core Metrics
 
 Define measurable metrics for autonomy evaluation:
 
-- **Adaptation speed**: Time in milliseconds between uncertainty injection and rover reaction
+- **Adaptation speed**: Time in milliseconds between uncertainty injection and the first attributable rover reaction
 - **Reaction attribution status**: Boolean indicating whether the credited reaction can be distinguished from nominal behavior, baseline hazards, or unrelated monitor-triggered behavior
+- **Control rationale at reaction**: The logged rationale attached to the credited control response, such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 - **Safety preservation**: Key-value pairs with safety constraints (from monitors) and boolean preservation state
 - **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
 - **Recovery rate**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
@@ -125,6 +127,8 @@ Define measurable metrics for autonomy evaluation:
 
 Fault or reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
 
+Motion reactions must not be credited from `cmd_vel` deviation alone. A credited rover reaction must be supported by a logged control rationale and by scenario state that distinguishes injected-fault response from nominal goal alignment, baseline hazards, monitor enforcement, or unrelated runtime behavior.
+
 If attribution is ambiguous, report the relevant detection or reaction metric as `AMBIGUOUS` or `NOT ATTRIBUTABLE` instead of presenting a numeric value as though it were confidently caused by the injected uncertainty.
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception and world packages, ask the user for clarification instead of making assumptions.
@@ -134,6 +138,19 @@ If there is not enough information to infer any of these fields from the mission
 - Follow instructions provided by the ROS2 community, available in: https://docs.ros.org/en/rolling/The-ROS2-Project/Contributing/Code-Style-Language-Versions.html
 - Follow additional instructions in `AGENTS.md` files from project-wide and package-specific (in the `src/` sub-folders).
 - In case of doubt, conflicting or missing information, ask clarification from the user.
+
+### Scenario Naming Convention
+
+For consistency, name scenarios:
+```
+spacetry_scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
+```
+
+**Examples:**
+- `spacetry_scenario_perception_lidar_degradation_gradual`
+- `spacetry_scenario_navigation_dynamic_obstacles_dense`
+- `spacetry_scenario_mission_power_constraints_critical`
+- `spacetry_scenario_safety_cascading_failures_multiple`
 
 ## Uncertainty and Fault Mapping
 
@@ -151,6 +168,8 @@ For each fault, the scenario driver maintains traceability:
 If traceability is incomplete, call that out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
 
 Do not claim that the injected uncertainty was detected or that the rover reacted to it unless the report includes explicit evidence that separates the injected fault from baseline hazards, pre-existing obstacles, or unrelated monitor-triggered behavior.
+
+If the first significant post-injection control change is labeled `goal_alignment`, `unknown`, or another non-attributable rationale, do not credit it as adaptation to the injected fault.
 
 ## Implementation Guidelines
 
@@ -172,19 +191,6 @@ Before choosing a trigger, injected obstacle pose, timeout, or derived goal logi
 - Avoid injecting a new obstacle that duplicates or trivially overlaps an existing hazard unless the scenario explicitly intends to intensify that known obstacle field.
 - Place runtime uncertainty relative to the nominal route that actually exists in the baseline map, not an assumed straight-line route through empty terrain.
 - Scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal.
-
-### Scenario Naming Convention
-
-For consistency, name scenarios:
-```
-spacetry_scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
-```
-
-**Examples:**
-- `spacetry_scenario_perception_lidar_degradation_gradual`
-- `spacetry_scenario_navigation_dynamic_obstacles_dense`
-- `spacetry_scenario_mission_power_constraints_critical`
-- `spacetry_scenario_safety_cascading_failures_multiple`
 
 
 ### Component Specification
@@ -218,7 +224,7 @@ For each autonomy and safety requirement being evaluated, specify injection stra
 - If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks. 
 - Before depending on an existing SpaceTry topic for scenario triggers, derived mission state, or report metrics, confirm that the scenario node subscription QoS matches the publisher QoS used in the stack. In case of doubt, use an explicitly compatible QoS profile instead of the default subscription QoS. If there is a mismatch, treat that as an observability/integration issue to fix before evaluating the autonomy behavior.
 
-Write scenario outputs to the bind-mounted host `log/` folder using a per-scenario subdirectory, for example:
+Write scenario outputs to the bind-mounted host `log/` folder using the following per-scenario subdirectories:
 
 - `log/scenario_<scenario_name>/scenario_<scenario_name>_report.md`
 - `log/scenario_<scenario_name>/metrics/`
@@ -235,6 +241,8 @@ Keep scenario logic observable:
 - log rover pose at every credited detection and credited reaction event
 - log rover-to-fault distance when detection or reaction is credited
 - log which sensor, topic, or monitor signal produced each detection or reaction candidate
+- log each significant `cmd_vel` change with its command values and an explicit control rationale such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
+- log the scenario state used to classify each `cmd_vel` rationale, such as obstacle flags, monitor status, planner state, or BT state when available
 - log whether each credited detection passed the scenario's `fault_attribution_rule`
 - log whether each credited reaction passed the scenario's `fault_attribution_rule`
 - log whether any baseline obstacle, monitor violation, or other confounding condition was active when a detection or reaction candidate was evaluated
@@ -250,6 +258,8 @@ Prefer attribution-aware event names when scenario outputs include a runtime tim
 - `reaction_attributed`
 - `reaction_rejected_due_to_baseline_hazard`
 - `baseline_monitor_violation_active`
+- `cmd_vel_changed`
+- `control_rationale_classified`
 
 ## Validation
 
@@ -284,6 +294,8 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Use Docker for all execution. Use the commands below to build, run, and validate the scenario in a containerized ROS 2 environment. This ensures consistency and reproducibility across different host machines. 
 - Before executing a scenario launch, confirm the scenario package has been copied into `/ws/src` and that the workspace has already been built so `/ws/install/setup.bash` exists.
 
+- Validate incrementally, starting with the launch and adjust the launch configuration and parameters if needed. Then move into the full scenario uninterruped execution. 
+
 - Store the generated report in the bind-mounted host `log/` folder with the name `spacetry_scenario_{scenario_name}_report.md`, ideally inside `log/spacetry_scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 
 - If necessary, mount the `log/` folder as a volume in Docker (e.g., `-v $(pwd)/log:/ws/log` - from the repository root) to ensure that all outputs from the scenario execution, including rosbags, metrics files, runtime logs, and the final report, are saved to the host machine for analysis and record-keeping.
@@ -291,9 +303,6 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario. This includes rosbags, derived metrics files, and runtime logs, all of which should be placed under the host `log/` folder.
 
 - The created or updated scenario driver package should be copied into the running Docker container before it is built or executed. Use: `docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/`
-
-
-
 
 ### Execute the scenario driver to generate the report
 
