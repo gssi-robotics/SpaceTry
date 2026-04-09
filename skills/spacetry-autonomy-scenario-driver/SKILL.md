@@ -81,6 +81,14 @@ Policies that must be followed during scenario driver generation, implementation
 - Do not modify existing Markdown files in the repository during scenario-driver generation, implementation, testing, or reporting. This includes templates, quick references, skill files, AGENTS files, guides, and READMEs.
 - If the scenario requires new documentation, instructions, prompt text, or reports, keep implementation-facing Markdown in the new scenario package under `src/spacetry_scenario_<scenario_name>/`, but write execution outputs such as generated reports to the bind-mounted host `log/` folder.
 - Treat repository Markdown files outside the new scenario package as read-only unless the user explicitly asks to edit them.
+- Scenario drivers must generate a final report not only on nominal completion but also on interrupted execution.
+- If a scenario run is stopped by `SIGINT`, `SIGTERM`, launch shutdown, timeout, or user interruption, the driver must still write:
+  - the scenario report Markdown file
+  - the metrics JSON file
+  - the runtime timeline or equivalent event log
+- Interrupted-run reports must explicitly mark the termination reason as `interrupted`, `signal`, `timeout`, or equivalent.
+- A scenario evaluation is not considered valid unless an interrupted run is tested and confirmed to produce the required report artifacts under the bind-mounted host `log/` folder.
+
 
 ## Scenario Contract
 
@@ -99,16 +107,25 @@ Write the scenario in terms of these fields:
 - `outcome_assessment`: PASS, DEGRADED, or FAIL
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 - `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
+- `fault_attribution_rule`: explicit rule for deciding whether a detection or reaction is attributable to the injected uncertainty rather than baseline hazards, nominal behavior, or unrelated monitor violations
 
 ### Core Metrics
 
 Define measurable metrics for autonomy evaluation:
 
 - **Adaptation speed**: Time in milliseconds between uncertainty injection and rover reaction
+- **Reaction attribution status**: Boolean indicating whether the credited reaction can be distinguished from nominal behavior, baseline hazards, or unrelated monitor-triggered behavior
 - **Safety preservation**: Key-value pairs with safety constraints (from monitors) and boolean preservation state
 - **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
 - **Recovery rate**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
+- **Detection attribution status**: Boolean indicating whether the credited detection can be distinguished from baseline hazards, unrelated obstacle signals, or other confounding runtime events
+- **Minimum fault distance at detection**: Rover-to-injected-fault distance in meters when detection is credited
+- **Baseline-confound status**: Boolean or short string indicating whether a baseline obstacle, monitor violation, or unrelated runtime condition could explain the credited detection or reaction
 - **Additional mission-specific metrics**: Any extra metrics requested by the user or needed for the scenario, each with an explicit unit or boolean status and a short description
+
+Fault or reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
+
+If attribution is ambiguous, report the relevant detection or reaction metric as `AMBIGUOUS` or `NOT ATTRIBUTABLE` instead of presenting a numeric value as though it were confidently caused by the injected uncertainty.
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception and world packages, ask the user for clarification instead of making assumptions.
 
@@ -133,6 +150,8 @@ For each fault, the scenario driver maintains traceability:
 
 If traceability is incomplete, call that out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
 
+Do not claim that the injected uncertainty was detected or that the rover reacted to it unless the report includes explicit evidence that separates the injected fault from baseline hazards, pre-existing obstacles, or unrelated monitor-triggered behavior.
+
 ## Implementation Guidelines
 
 Prefer the least invasive path:
@@ -148,11 +167,11 @@ docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src
 ```
 
 Before choosing a trigger, injected obstacle pose, timeout, or derived goal logic:
-- inspect the active world SDF and mission waypoint files together
-- reuse prompt-specified goals when they already correspond to baseline world entities or mission waypoints
-- avoid injecting a new obstacle that duplicates or trivially overlaps an existing hazard unless the scenario explicitly intends to intensify that known obstacle field
-- place runtime uncertainty relative to the nominal route that actually exists in the baseline map, not an assumed straight-line route through empty terrain
-- scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal
+- Inspect the active world SDF and mission waypoint files together.
+- Reuse prompt-specified goals when they already correspond to baseline world entities or mission waypoints.
+- Avoid injecting a new obstacle that duplicates or trivially overlaps an existing hazard unless the scenario explicitly intends to intensify that known obstacle field.
+- Place runtime uncertainty relative to the nominal route that actually exists in the baseline map, not an assumed straight-line route through empty terrain.
+- Scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal.
 
 ### Scenario Naming Convention
 
@@ -212,6 +231,25 @@ Keep scenario logic observable:
 - log the exact fault state applied
 - log the rover response signal
 - write metrics that match the scenario contract
+- log the injected fault pose, time, and unique identifier
+- log rover pose at every credited detection and credited reaction event
+- log rover-to-fault distance when detection or reaction is credited
+- log which sensor, topic, or monitor signal produced each detection or reaction candidate
+- log whether each credited detection passed the scenario's `fault_attribution_rule`
+- log whether each credited reaction passed the scenario's `fault_attribution_rule`
+- log whether any baseline obstacle, monitor violation, or other confounding condition was active when a detection or reaction candidate was evaluated
+- if a detection or reaction candidate is rejected, log the rejection reason
+
+Prefer attribution-aware event names when scenario outputs include a runtime timeline or event log, for example:
+
+- `fault_injected`
+- `fault_detection_candidate`
+- `fault_detection_attributed`
+- `fault_detection_rejected`
+- `reaction_candidate`
+- `reaction_attributed`
+- `reaction_rejected_due_to_baseline_hazard`
+- `baseline_monitor_violation_active`
 
 ## Validation
 
@@ -258,6 +296,7 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 
 
 ### Execute the scenario driver to generate the report
+
 When the scenario driver implementation is complete, run the associated launch file created to execute the scenario and generate the report with the defined metrics and logged signals.
 
 Use the project-wide Docker and execution instructions from `AGENTS.md`, and specify the scenario driver launch file path.
