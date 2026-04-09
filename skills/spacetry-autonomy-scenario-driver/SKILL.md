@@ -25,11 +25,13 @@ Define the scenario before implementing it. Follow the **[Non-Negotiables](#non-
    - monitor definitions
    - world SDF files and related models files
    - project documentation at `docs/`
-5. Run a provenance check before reusing any existing scenario artifact:
-   - allowed implementation inputs: `src/`, `docs/`, `skills/spacetry-autonomy-scenario-driver/assets/`, `skills/spacetry-autonomy-scenario-driver/references/`
-   - forbidden implementation inputs: `log/`, `logs/`
-   - if provenance is unclear, do not reuse the artifact
-6. Define the scenario contract before editing code (see **[Scenario Contract](#scenario-contract)** section for all required fields).
+5. Build a baseline world-and-mission map before designing uncertainty injection:
+   - compare the prompt or reference scenario goals against the existing mission waypoints and the active world SDF
+   - identify which goals, landmarks, obstacles, and hazards already exist in the baseline world
+   - estimate whether the launch point, route length, and mission deadline are mutually realistic in the existing map
+   - if the prompt goal already matches an existing waypoint or world entity, treat that baseline target as the goal under evaluation instead of inventing a new one
+6. Verify artifact provenance per the **[Non-Negotiables](#non-negotiables)** before reusing any existing scenario artifact.
+7. Define the scenario contract before editing code (see **[Scenario Contract](#scenario-contract)** section for all required fields).
 
 ### 2. Scenario Driver Parametrization (Implementation)
 
@@ -74,6 +76,8 @@ Policies that must be followed during scenario driver generation, implementation
 - Run every ROS2, Gazebo, build, or simulation command in Docker.
 - Because the repository source tree is not bind-mounted into `/ws/src`, copy any new or modified scenario package into the running container before building or launching it.
 - When a scenario touches `src/spacetry_world`, follow `src/spacetry_world/AGENTS.md` for world-specific constraints and validation.
+- Do not assume the world is empty. Before adding obstacles, hazards, or alternate goals, inspect the active world SDF and mission waypoint files to account for mission-relevant objects already present in the baseline map.
+- Do not set deadlines, route expectations, or injection locations without checking that they are realistic for the baseline start pose, existing target placement, and existing obstacle field.
 - Do not modify existing Markdown files in the repository during scenario-driver generation, implementation, testing, or reporting. This includes templates, quick references, skill files, AGENTS files, guides, and READMEs.
 - If the scenario requires new documentation, instructions, prompt text, or reports, keep implementation-facing Markdown in the new scenario package under `src/spacetry_scenario_<scenario_name>/`, but write execution outputs such as generated reports to the bind-mounted host `log/` folder.
 - Treat repository Markdown files outside the new scenario package as read-only unless the user explicitly asks to edit them.
@@ -94,6 +98,7 @@ Write the scenario in terms of these fields:
 - `additional_metrics`: mission-specific metrics requested by the user or needed for the scenario
 - `outcome_assessment`: PASS, DEGRADED, or FAIL
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
+- `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
 
 ### Core Metrics
 
@@ -141,6 +146,13 @@ Prefer the least invasive path:
 ```bash
 docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/
 ```
+
+Before choosing a trigger, injected obstacle pose, timeout, or derived goal logic:
+- inspect the active world SDF and mission waypoint files together
+- reuse prompt-specified goals when they already correspond to baseline world entities or mission waypoints
+- avoid injecting a new obstacle that duplicates or trivially overlaps an existing hazard unless the scenario explicitly intends to intensify that known obstacle field
+- place runtime uncertainty relative to the nominal route that actually exists in the baseline map, not an assumed straight-line route through empty terrain
+- scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal
 
 ### Scenario Naming Convention
 

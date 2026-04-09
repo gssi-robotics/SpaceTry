@@ -40,10 +40,24 @@ Modifications to `spacetry_world` affect autonomous capabilities:
 - **Physics Parameters** — Changes to gravity, friction, or time scaling affect rover mobility autonomy
 - **Lighting & Visibility** — Affects perception-based autonomy (sensor degradation tests rely on modifiable sensor properties)
 
+### Baseline Map Responsibilities for Scenario Generation
+
+When scenario drivers use this package as context, they must first understand the baseline map that already exists in `worlds/mars_outpost.sdf`.
+
+- Treat world entities already placed in `mars_outpost.sdf` as part of the evaluated baseline environment.
+- Cross-check prompt goals and mission waypoints against existing world entities before defining new goals, deadlines, or obstacle injections.
+- If a prompt goal already exists in both the mission config and the world, such as `science_rock_01`, treat it as the canonical target under evaluation.
+- Account for known baseline hazards, such as `block_island`, when reasoning about nominal routes, detours, and whether an injected obstacle is genuinely new.
+- Validate that the deadline and timeout used by a scenario are realistic for the route from the launch point, such as `dock_pad_01`, to the evaluated goal in the existing world layout.
+- Do not add or instruct scenario code to add duplicate mission targets or redundant obstacles unless the scenario explicitly studies intensified clutter around a known baseline object.
+
 ### Validation Checklist for World Changes
 
 Before submitting world modifications:
 - [ ] Are all mission targets (from scenarios/) still reachable?
+- [ ] Have prompt/reference goals been checked against existing world entities and mission waypoints so scenarios do not duplicate baseline targets?
+- [ ] Have baseline hazards and obstacle fields been reviewed before adding new scenario-specific obstacles?
+- [ ] Are route length, start pose, and scenario deadlines still realistic for the active world layout?
 - [ ] Have physics parameters been documented if changed?
 - [ ] Does the world still load without errors in Gazebo?
 - [ ] Do all model URIs resolve (no missing external dependencies)?
@@ -217,8 +231,9 @@ Before submitting changes to `spacetry_world`:
 2. **Test in Simulation** — Launch the world in Gazebo headless mode to ensure no runtime errors
 3. **Verify Runtime-Spawned Models** — If the change affects models that scenarios spawn dynamically, confirm Gazebo can insert the model at runtime and that `gz model --list` or an equivalent world-side query shows the inserted entity
 4. **Check World-Specific Autonomy Impact** — Verify that mission targets remain reachable and that world changes do not silently invalidate autonomy evaluation
-5. **Document Changes** — If adding new models, obstacles, or physics parameters, update this file
-6. **Update Mission Targets** — If modifying waypoint locations or adding new landmarks, verify scenarios still reference valid targets
+5. **Check Prompt-to-World Consistency** — If scenario generation depends on prompt goals or reference scenarios, verify they align with the actual world entities and mission waypoints already present
+6. **Document Changes** — If adding new models, obstacles, landmarks, or physics parameters, update this file
+7. **Update Mission Targets** — If modifying waypoint locations or adding new landmarks, verify scenarios still reference valid targets
 
 ### Example: Adding a New Obstacle
 

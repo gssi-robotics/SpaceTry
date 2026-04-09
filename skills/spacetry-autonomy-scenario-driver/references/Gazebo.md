@@ -33,6 +33,17 @@ To configure the robot simulation environment the following Gazebo features can 
             - Friction: useful for control and navigation
             - Contact: objects can be collided with or without contact
 
+### Baseline World Awareness
+
+Scenario generation must treat the active Gazebo world as a populated mission map, not a blank canvas.
+
+- Inspect the active world SDF before planning uncertainty injection or mission deadlines.
+- Identify mission-relevant entities that already exist in the world, including baseline goals, landmarks, hazards, and route blockers.
+- Cross-check those entities against the mission waypoint configuration and the user prompt or reference scenario so the generated scenario evaluates the intended baseline goal rather than a duplicate or conflicting one.
+- If the prompt names an existing target, such as a science rock already placed in the world, reuse that target as the evaluated goal unless the user explicitly asks for a different one.
+- When placing new runtime obstacles, justify their placement relative to the existing world layout and nominal route instead of assuming open terrain.
+- When defining timeouts or deadlines, account for the actual start pose, waypoint distance, and known baseline obstacles already present in the world.
+
 ### Runtime Model Insertion
 
 Gazebo runtime model insertion is a valid mechanism for uncertainty injection in autonomy scenarios, but it requires explicit validation.
@@ -74,6 +85,7 @@ Gazebo Harmonic sensors are defined in SDF under model links or frames and publi
 - World features should be preferably implemented at design time, i.e., during the generation of autonomy test scenario driver, changing the properties in runtime to trigger adaptation.
 - Best performant implementation strategy should be considered when implementing Gazebo-related uncertainty.
 - If runtime spawning is used for uncertainty injection, prefer repository models whose assets have already been validated in Docker with the same resource-path environment used by the scenario driver.
+- Before adding or spawning an obstacle for a scenario, verify that the world does not already contain an equivalent obstacle or hazard serving the same evaluation purpose.
 
 ## Non-Negotiables
 - The Gazebo world configured gravity and lighting are matching the conditions in Mars and should not be changed at any point of the implementation.
