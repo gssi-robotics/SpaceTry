@@ -50,6 +50,9 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Validate incrementally, starting with the launch and adjusting launch configuration and parameters if needed. Then move into the full scenario uninterrupted execution.
 - During incremental launch validation, confirm that contract/config file paths arrive as ordinary string ROS parameters and that the node does not receive those YAML files via `--params-file`.
 - Before claiming injected-autonomy results, confirm from runtime artifacts that the rover actually encountered the injected uncertainty according to the scenario contract's `encounter_rule`.
+- Before classifying autonomy outcome, separate:
+  - whether a real autonomy reaction occurred
+  - whether that reaction is attributable to injected uncertainty, baseline uncertainty, or both
 - If runtime artifacts show that only baseline uncertainties were exercised, report that explicitly and classify the injected-autonomy portion as `UNTESTED`.
 - Store the generated report in the bind-mounted host `log/` folder with the name `spacetry_scenario_{scenario_name}_report.md`, ideally inside `log/spacetry_scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 - If necessary, mount the `log/` folder as a volume in Docker, for example `-v $(pwd)/log:/ws/log`, to ensure that rosbags, metrics files, runtime logs, and the final report are saved to the host machine.

@@ -129,7 +129,12 @@ For each fault, the scenario driver maintains traceability:
 
 If traceability is incomplete, call that out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
 
-If the rover only responds to baseline uncertainty and never reaches the injected uncertainty, report the baseline autonomy exercised and mark the injected-autonomy outcome as `UNTESTED` rather than claiming the injected challenge failed.
+Evaluate rover response in two dimensions throughout reporting:
+
+1. whether a real autonomy reaction occurred at all, such as obstacle avoidance, replanning, monitor-driven recovery, or another non-nominal navigation response
+2. whether that reaction is attributable to baseline uncertainty, injected uncertainty, or both
+
+If the rover performs a genuine autonomy reaction to baseline uncertainty but never reaches the injected uncertainty, report that reaction as exercised baseline autonomy and mark the injected-autonomy outcome as `UNTESTED` rather than claiming the injected challenge failed.
 
 The same traceability discipline applies to ROS parameter consumption:
 

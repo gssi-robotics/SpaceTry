@@ -20,6 +20,7 @@ Write the scenario in terms of these fields:
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 - `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
 - `fault_attribution_rule`: explicit rule for deciding whether a detection or reaction is attributable to the injected uncertainty rather than baseline hazards, nominal behavior, or unrelated monitor violations
+- `reaction_scope_rule`: explicit rule for deciding whether a real rover reaction counts as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - `control_rationale_rule`: explicit rule for how the scenario records and classifies control-command changes such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 - `encounter_rule`: explicit rule for deciding whether the rover actually encountered the injected uncertainty or whether the run only exercised baseline uncertainty
 - `runtime_parameter_interface`: explicit list of ROS node parameters passed at launch time as inline launch-dict values, including parameter name, type, meaning, and the contract field or file path that feeds each one
@@ -60,6 +61,7 @@ where `transport` should be `inline_launch_dict` for scenario-driver ROS paramet
 Define measurable metrics for autonomy evaluation:
 
 - **Adaptation speed**: Time in milliseconds between uncertainty injection and the first attributable rover reaction
+- **Autonomy reaction status**: Boolean indicating whether the rover performed a genuine non-nominal autonomy reaction during the run, regardless of whether it was attributable to the injected uncertainty
 - **Reaction attribution status**: Boolean indicating whether the credited reaction can be distinguished from nominal behavior, baseline hazards, or unrelated monitor-triggered behavior
 - **Control rationale at reaction**: The logged rationale attached to the credited control response, such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 - **Safety preservation**: Key-value pairs with safety constraints from monitors and boolean preservation state
@@ -73,13 +75,20 @@ Define measurable metrics for autonomy evaluation:
 - **Attribution scope**: Short string such as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - **Additional mission-specific metrics**: Any extra metrics requested by the user or needed for the scenario, each with an explicit unit or boolean status and a short description
 
-Fault or reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
+Fault or injected-reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
 
-Motion reactions must not be credited from `cmd_vel` deviation alone. A credited rover reaction must be supported by a logged control rationale and by scenario state that distinguishes injected-fault response from nominal goal alignment, baseline hazards, monitor enforcement, or unrelated runtime behavior.
+Motion reactions must not be credited from `cmd_vel` deviation alone. A credited rover reaction must be supported by a logged control rationale and by scenario state.
+
+Use this distinction in the contract and report:
+
+- a **real autonomy reaction** is a genuine non-nominal rover behavior such as obstacle avoidance, replanning, or monitor-enforced recovery
+- an **injected-attributed reaction** is a real autonomy reaction that additionally satisfies the scenario's `fault_attribution_rule`
+
+This means a baseline-obstacle avoidance event can and should count as a valid rover reaction when supported by control rationale and scenario state, even if it does not satisfy the injected-fault attribution rule.
 
 If baseline uncertainty clearly exercised autonomy but the rover never encountered the injected uncertainty, report the baseline outcome and mark the injected outcome as `UNTESTED`.
 
-If attribution is ambiguous, report the relevant detection or reaction metric as `AMBIGUOUS` or `NOT ATTRIBUTABLE` instead of presenting a numeric value as though it were confidently caused by the injected uncertainty.
+If attribution is ambiguous, keep the autonomy reaction credited when the behavior itself is real, but report the attribution-specific detection or reaction metric as `AMBIGUOUS` or `NOT ATTRIBUTABLE` instead of presenting it as confidently caused by the injected uncertainty.
 
 Before execution, validate the contract against the launch design:
 

@@ -19,6 +19,8 @@ Write scenario outputs to the bind-mounted host `log/` folder using the followin
 ## Attribution Rules
 
 - Do not claim that the injected uncertainty was detected or that the rover reacted to it unless the report includes explicit evidence that separates the injected fault from baseline hazards, pre-existing obstacles, or unrelated monitor-triggered behavior.
+- Distinguish a real rover autonomy reaction from an injected-attributed reaction.
+- A real rover autonomy reaction may be credited when the rover clearly performs obstacle avoidance, replanning, or another non-nominal control response supported by logged rationale and scenario state, even if that response is caused by a baseline obstacle rather than the injected fault.
 - If the first significant post-injection control change is labeled `goal_alignment`, `unknown`, or another non-attributable rationale, do not credit it as adaptation to the injected fault.
 - A credited reaction should be supported by both event timing and logged control rationale.
 - A credited detection should be supported by both event timing and scenario-specific attribution checks.
@@ -39,6 +41,7 @@ Keep scenario logic observable:
 - log the scenario state used to classify each `cmd_vel` rationale, such as obstacle flags, monitor status, planner state, or BT state when available
 - log whether each credited detection passed the scenario's `fault_attribution_rule`
 - log whether each credited reaction passed the scenario's `fault_attribution_rule`
+- log the `reaction_scope` for each credited reaction, such as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - log whether any baseline obstacle, monitor violation, or other confounding condition was active when a detection or reaction candidate was evaluated
 - if a detection or reaction candidate is rejected, log the rejection reason
 
@@ -52,7 +55,8 @@ Prefer attribution-aware event names when scenario outputs include a runtime tim
 - `fault_detection_rejected`
 - `reaction_candidate`
 - `reaction_attributed`
-- `reaction_rejected_due_to_baseline_hazard`
+- `reaction_not_attributed`
+- `baseline_reaction_observed`
 - `baseline_monitor_violation_active`
 - `cmd_vel_changed`
 - `control_rationale_classified`
