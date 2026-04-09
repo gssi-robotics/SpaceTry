@@ -59,14 +59,23 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Validate incrementally, starting with the launch and adjusting launch configuration and parameters if needed. Then move into the full scenario uninterrupted execution.
 - During incremental launch validation, confirm that contract/config file paths arrive as ordinary string ROS parameters and that the node does not receive those YAML files via `--params-file`.
 - Before claiming injected-autonomy results, confirm from runtime artifacts that the rover actually encountered the injected uncertainty according to the scenario contract's `encounter_rule`.
+- Before classifying injected-autonomy failure, confirm from runtime artifacts that the run also satisfied the scenario contract's `meaningful_evaluation_rule` and that the report includes `evaluation_window_after_encounter_s`.
 - Before classifying autonomy outcome, separate:
   - whether a real autonomy reaction occurred
+  - what `observed_control_rationale` best describes that maneuver
+  - what `reaction_scope` best describes the active baseline-plus-injected context
   - whether that reaction is attributable to injected uncertainty, baseline uncertainty, or both
+- Keep encounter and fair evaluability separate:
+  - if the rover never encountered the injected uncertainty, classify the injected outcome as `UNTESTED`
+  - if the rover encountered the injected uncertainty but too little time remained after encounter to expect detection, reaction, or recovery evidence, classify the injected outcome as `INCONCLUSIVE` or `UNTESTED` per the contract
+  - classify the injected outcome as `FAIL` only when encounter occurred and the post-encounter observation window was long enough for a fair evaluation
 - If runtime artifacts show that only baseline uncertainties were exercised, report that explicitly and classify the injected-autonomy portion as `UNTESTED`.
+- If a baseline obstacle or monitor clearly explains the observed maneuver, still report the maneuver classification in `observed_control_rationale`; do not force it to `unknown` merely because the injected uncertainty was not the cause.
 - Store the generated report in the bind-mounted host `log/` folder with the name `spacetry_scenario_{scenario_name}_report.md`, ideally inside `log/spacetry_scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
 - If necessary, mount the `log/` folder as a volume in Docker, for example `-v $(pwd)/log:/ws/log`, to ensure that rosbags, metrics files, runtime logs, and the final report are saved to the host machine.
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario.
 - The created or updated scenario driver package should be copied into the running Docker container before it is built or executed.
+- The scenario runtime budget must not be shorter than the baseline BT evaluation horizon. If the baseline mission or BT configuration expects a longer run to express its nominal autonomy behavior, the scenario timeout must be at least that long.
 
 ### Interrupted Runs
 

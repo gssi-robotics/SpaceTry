@@ -48,9 +48,11 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
    - identify which goals, landmarks, obstacles, and hazards already exist in the baseline world
    - identify baseline uncertainties already present in the source system, including BT obstacle-avoidance behavior, monitor-triggering battery or speed constraints, known hazards, perception limits, and launch-time defaults that can affect the mission before any new injection occurs
    - estimate whether the launch point, route length, and mission deadline are mutually realistic in the existing map
+   - ensure the scenario runtime and timeout budget are not shorter than the baseline BT evaluation horizon or mission window needed to express the autonomy under test
    - require a practical reachability assessment before finalizing the injection pose or trigger:
      - estimate whether the rover is likely to physically reach the intended injection zone under realistic baseline behavior, not only under ideal mission geometry
      - account for likely baseline hazard avoidance, monitor-driven slowdowns, launch-time settling, and other non-nominal effects that may prevent the injected uncertainty from ever being encountered
+     - reserve enough post-encounter observation time to evaluate detection, reaction, or recovery fairly instead of injecting so late that the run becomes non-diagnostic
    - if the prompt goal already matches an existing waypoint or world entity, treat that baseline target as the goal under evaluation instead of inventing a new one
    - separate which uncertainties are already exercised by the baseline source code and environment from which uncertainties will be newly injected by the scenario
 7. Verify artifact provenance per `references/Scenario_Driver_Policies.md` before reusing any existing scenario artifact.
@@ -77,6 +79,7 @@ Follow the implementation, code-style, and observability guidance in this file a
    - use inline launch dict parameters for the scenario driver node
    - pass paths like `scenario_config_file` and `scenario_contract_file` as string parameters
    - treat scenario YAML files as driver-parsed artifacts, not ROS params files
+   - when including baseline bringup, do not override BT-runner-related launch arguments or parameters from the scenario launch; evaluate the developer-configured BT runner settings as-is unless the user explicitly approves a baseline bug fix
 6. Preserve the policy gate during implementation:
    - do not open, grep, or copy from `log/` or `logs/` to scaffold code
    - if you need examples, use only canonical artifacts under `src/`, `skills/`, or `docs/`
@@ -100,7 +103,8 @@ Execute the scenario driver to generate the report with metrics and logging sign
 3. Generate and write the final report with metrics, logged signals, and separate baseline-vs-injected outcomes per `references/Validation_and_Execution.md`.
 4. Report important confounders explicitly when they affect interpretation, such as baseline hazard avoidance, monitor dominance, launch-time settling delays, or other baseline conditions that plausibly explain the observed behavior.
 5. Treat `UNTESTED` as a valid early iteration outcome during scenario tuning when the rover never meaningfully encounters the injected uncertainty. This is part of refining scenario reachability and attribution, not automatically a scenario-driver defect.
-6. Only after implementation is complete may `log/` or `logs/` be inspected, and then only for current-run result reporting.
+6. Treat `encountered` and `meaningfully evaluable` as separate outcome gates. If the injected uncertainty is encountered too close to timeout to support fair interpretation, use `INCONCLUSIVE` or `UNTESTED` per the scenario contract rather than automatically reporting `FAIL`.
+7. Only after implementation is complete may `log/` or `logs/` be inspected, and then only for current-run result reporting.
 
 ## Execution Orchestration
 
@@ -161,6 +165,15 @@ Evaluate rover response in two dimensions throughout reporting:
 1. whether a real autonomy reaction occurred at all, such as obstacle avoidance, replanning, monitor-driven recovery, or another non-nominal navigation response
 2. whether that reaction is attributable to baseline uncertainty, injected uncertainty, or both
 
+Classify maneuver and attribution separately:
+
+1. `observed_control_rationale` describes what the rover appeared to do
+2. `reaction_scope` describes whether baseline conditions, injected conditions, both, or indeterminate context explain that maneuver
+3. `reaction_attribution_status` describes whether the injected uncertainty receives causal credit
+4. `active_context_at_reaction` captures the relevant simulation properties active when the maneuver occurred
+
+Do not use `unknown` when the rover clearly performed a classifiable maneuver such as baseline obstacle avoidance. Use `unknown` only when the maneuver itself cannot be classified from available evidence.
+
 If the rover performs a genuine autonomy reaction to baseline uncertainty but never reaches the injected uncertainty, report that reaction as exercised baseline autonomy and mark the injected-autonomy outcome as `UNTESTED` rather than claiming the injected challenge failed.
 
 The same traceability discipline applies to ROS parameter consumption:
@@ -177,7 +190,8 @@ Prefer the least invasive path:
 2. Only changes on the mission and world packages are allowed within the remaining `src/` sub-folders.
 3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline bringup unchanged launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
 4. When including baseline bringup or depending on its launch arguments, follow `src/spacetry_bringup/AGENTS.md` for launch-integration, `use_sim_time`, BT runner, parameter-wiring, and topic QoS compatibility rules.
-5. Before any Dockerized build or launch of the scenario package, copy it into the running container:
+5. The scenario launch must not override BT-runner-related bringup inputs such as `tree_file`, BT parameter files, tick rate, or equivalent runner configuration. Those values belong to the baseline autonomy owned by the developers and must remain unchanged during evaluation unless the user explicitly approves a baseline bug fix.
+6. Before any Dockerized build or launch of the scenario package, copy it into the running container:
 
 ```bash
 docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/
@@ -191,8 +205,12 @@ Before choosing a trigger, injected obstacle pose, timeout, or derived goal logi
 - Require a practical reachability assessment before finalizing the injection pose or trigger. The selected trigger zone should be one the rover is likely to reach under realistic baseline behavior, not only under ideal mission geometry.
 - Scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal.
 - Define how the scenario will decide whether a given behavior change was caused by baseline uncertainty, injected uncertainty, or both.
+- Record maneuver classification separately from causal attribution so baseline obstacle avoidance can still be reported as `observed_control_rationale=obstacle_avoidance` with `reaction_scope=baseline_only`.
 - If the scenario depends on the rover reaching a later route segment before injection, add an explicit reachability check and a fallback classification path for `UNTESTED` injected uncertainty.
 - Prefer at least one trigger condition tied to observed rover behavior or mission phase, not only map geometry. Examples include entering a baseline hazard interaction zone, clearing an obstacle field, sustained forward progress, or another observable mission-phase signal.
+- Define a minimum post-encounter observation window in the contract and report `evaluation_window_after_encounter_s` so late encounters are classified fairly.
+- Log trigger-decision diagnostics whenever injection occurs, including why injection was allowed, remaining mission time, progress ratio, and whether baseline monitors were already active.
+- Report `observed_control_rationale`, `reaction_scope`, `reaction_attribution_status`, and `active_context_at_reaction` as separate fields in metrics and final reports.
 - Define launch consumption rules up front so the scenario package does not need a separate ROS params YAML just to pass file paths or runtime settings into the driver node.
 
 
