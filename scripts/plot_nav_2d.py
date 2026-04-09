@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import re
+import shlex
+import subprocess
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-# To run this script:
-# python3 -m pip install --user rosbags matplotlib
-
-# python3 /home/keila/robotics/marti/scripts/plot_nav_2d.py \
-#  /home/keila/robotics/marti/logs/icra_isrs_26/trace1/scenario_obstacle_intelligence_dynamic_rock_gradual/rosbags/scenario_obstacle_intelligence_dynamic_rock_gradual \
-#  --output /home/keila/robotics/marti/logs/icra_isrs_26/trace1/scenario_obstacle_intelligence_dynamic_rock_gradual/rosbags/scenario_obstacle_intelligence_dynamic_rock_gradual/navigation_2d.png \
-#  --title "Scenario Rover Path" \
-#  --injection-x 59.0 \
-#  --injection-y -35.0
+# Host usage:
+# python3 scripts/plot_nav_2d.py logs/icra_isrs_26/trace0
+#
+# Internal container usage:
+# python3 scripts/plot_nav_2d.py \
+#   /ws/logs/icra_isrs_26/trace0/records/<scenario>/rosbags/<bag_dir> \
+#   --internal \
+#   --output /ws/logs/icra_isrs_26/trace0/records/<scenario>/rosbags/<bag_dir>/navigation_2d.png
 
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
@@ -24,6 +26,7 @@ import matplotlib.pyplot as plt
 
 
 ODOM_TOPIC = "/mobile_base_controller/odom"
+TIMESTAMP_SUFFIX = re.compile(r"_(\d{8}T\d{6}Z)$")
 
 
 def read_odom_points(bag_path: Path, topic_name: str) -> List[Tuple[float, float]]:
@@ -152,11 +155,140 @@ def plot_path(
     plt.close()
 
 
+def is_bag_directory(path: Path) -> bool:
+    return path.is_dir() and (
+        (path / "metadata.yaml").exists() or any(path.glob("*.mcap"))
+    )
+
+
+def candidate_bag_directories(trace_path: Path) -> List[Path]:
+    if is_bag_directory(trace_path):
+        return [trace_path]
+
+    records_dir = trace_path / "records"
+    search_root = records_dir if records_dir.is_dir() else trace_path
+
+    candidates = [path for path in search_root.rglob("*") if is_bag_directory(path)]
+    return sorted(set(candidates))
+
+
+def bag_sort_key(path: Path) -> Tuple[int, str]:
+    match = TIMESTAMP_SUFFIX.search(path.name)
+    if match:
+        return (1, match.group(1))
+    try:
+        return (0, f"{path.stat().st_mtime_ns:020d}")
+    except FileNotFoundError:
+        return (0, "0")
+
+
+def choose_latest_bag(trace_path: Path) -> Path:
+    candidates = candidate_bag_directories(trace_path)
+    if not candidates:
+        raise RuntimeError(
+            f"No rosbag directory found under '{trace_path}'. "
+            "Expected a bag directory or a trace folder containing records/*/rosbags/*."
+        )
+    return sorted(candidates, key=bag_sort_key)[-1]
+
+
+def find_repo_root() -> Path:
+    return Path(__file__).resolve().parent.parent
+
+
+def to_container_path(path: Path, repo_root: Path) -> Path:
+    resolved = path.resolve()
+    try:
+        relative = resolved.relative_to(repo_root)
+    except ValueError as exc:
+        raise RuntimeError(
+            f"Path '{resolved}' must be inside the repository root '{repo_root}'."
+        ) from exc
+    return Path("/ws") / relative
+
+
+def run_in_docker(
+    trace_path: Path,
+    output_path: Optional[Path],
+    title: str,
+    start_label: str,
+    end_label: str,
+    injection_point: Optional[Tuple[float, float]],
+    topic: str,
+) -> None:
+    repo_root = find_repo_root()
+    bag_path = choose_latest_bag(trace_path)
+    resolved_output = output_path or (bag_path / "navigation_2d.png")
+
+    bag_path_in_container = to_container_path(bag_path, repo_root)
+    output_path_in_container = to_container_path(resolved_output, repo_root)
+    script_in_container = Path("/ws/scripts/plot_nav_2d.py")
+
+    inner_command = [
+        "python3",
+        shlex.quote(str(script_in_container)),
+        shlex.quote(str(bag_path_in_container)),
+        "--internal",
+        "--topic",
+        shlex.quote(topic),
+        "--output",
+        shlex.quote(str(output_path_in_container)),
+        "--title",
+        shlex.quote(title),
+        "--start-label",
+        shlex.quote(start_label),
+        "--end-label",
+        shlex.quote(end_label),
+    ]
+    if injection_point is not None:
+        inner_command.extend(
+            [
+                "--injection-x",
+                str(injection_point[0]),
+                "--injection-y",
+                str(injection_point[1]),
+            ]
+        )
+
+    docker_command = [
+        "docker",
+        "run",
+        "--rm",
+        "--platform",
+        "linux/amd64",
+        "-v",
+        f"{repo_root}:/ws",
+        "-w",
+        "/ws",
+        "spacetry:dev",
+        "bash",
+        "-lc",
+        (
+            "source /opt/ros/spaceros/setup.bash && "
+            "source /etc/profile && "
+            + " ".join(inner_command)
+        ),
+    ]
+
+    print(f"Using rosbag: {bag_path}")
+    subprocess.run(docker_command, check=True)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Plot the 2D rover trajectory from a SpaceTry rosbag."
+        description=(
+            "Generate a 2D rover trajectory plot from a SpaceTry trace folder. "
+            "The plotting step runs inside the Docker image."
+        )
     )
-    parser.add_argument("bag_path", type=Path, help="Path to the rosbag directory")
+    parser.add_argument(
+        "input_path",
+        type=Path,
+        help=(
+            "Path to a trace/log folder such as logs/icra_isrs_26/trace0. "
+            "In internal mode this may also be a direct rosbag directory."
+        ),
+    )
     parser.add_argument(
         "--topic",
         default=ODOM_TOPIC,
@@ -177,17 +309,34 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--end-label", default="End")
     parser.add_argument("--injection-x", type=float, default=None)
     parser.add_argument("--injection-y", type=float, default=None)
+    parser.add_argument(
+        "--internal",
+        action="store_true",
+        help=argparse.SUPPRESS,
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    bag_path = args.bag_path
-    output_path = args.output or (bag_path / "navigation_2d.png")
     injection_point = None
     if args.injection_x is not None and args.injection_y is not None:
         injection_point = (args.injection_x, args.injection_y)
 
+    if not args.internal:
+        run_in_docker(
+            trace_path=args.input_path,
+            output_path=args.output,
+            title=args.title,
+            start_label=args.start_label,
+            end_label=args.end_label,
+            injection_point=injection_point,
+            topic=args.topic,
+        )
+        return
+
+    bag_path = args.input_path
+    output_path = args.output or (bag_path / "navigation_2d.png")
     points = read_odom_points(bag_path, args.topic)
     if not points:
         raise RuntimeError(
