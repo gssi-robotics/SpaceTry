@@ -6,6 +6,15 @@ Use Docker for all build, validation, and execution steps.
 
 Rebuild the scenario driver related packages if scenario components have changed or new ones were added.
 
+During iterative tuning, when only files inside the scenario package changed, agents may use a lighter validation loop:
+
+- copy the updated scenario package into the running container
+- rebuild only the scenario package instead of the full workspace
+- rerun the scenario launch or targeted validation needed to check the modified scenario-package behavior
+- do not repeat earlier world verification or unrelated package validation unless those artifacts also changed
+
+This lighter loop is allowed only when the edits are confined to the scenario package and do not change baseline autonomy packages, world files, or cross-package interfaces.
+
 Before Docker execution, validate the scenario's ROS-consumption design:
 
 - scenario contract/config YAML files are passed to the driver by file path only
@@ -65,6 +74,13 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
   - the scenario report Markdown file
   - the metrics JSON file
   - the runtime timeline or equivalent event log
+- Use an in-container interruption method for this validation:
+  - launch the scenario inside the running `spacetry` container
+  - identify the scenario driver PID or the scenario launch PID inside the container
+  - send `SIGINT` to that in-container process
+  - then verify that the report, metrics, and timeline files were written under the bind-mounted host `log/` folder
+- Do not treat termination of the outer host-side wrapper command alone, such as killing `docker compose exec` from the host, as the canonical interrupted-run validation method. That mainly tests host-side process plumbing and may not deliver the intended signal to the driver.
+- Temporary helper scripts or shell wrappers created only for execution orchestration are allowed for validation when they make PID capture, signal delivery, log polling, or cleanup more reliable. Keep them short-lived, execution-only, and separate from scenario implementation artifacts.
 - If an interrupted run does not produce the required artifacts, treat that as a scenario-driver defect and fix it before considering the scenario complete.
 
 ## Final Reporting

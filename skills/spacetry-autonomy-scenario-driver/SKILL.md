@@ -1,11 +1,12 @@
 ---
 name: spacetry-autonomy-scenario-driver
-description: Create or update SpaceTry autonomy test scenarios and report results for the execution of scenario driver implementations that evaluate both baseline SpaceTry uncertainties and additional injected uncertainties in simulation. Use when the LLM agent needs to turn SpaceTry behavior trees, missions, monitors, world files, fault-model notes, or scenario prompt templates into a scenario plan, uncertainty traceability, scenario-specific launch or config changes, execution guidance, or validation steps for autonomy evaluation in this repo.
+description: Create or update SpaceTry autonomy test scenarios and report results for the execution of scenario driver implementations that evaluate both baseline SpaceTry uncertainties and additional injected uncertainties in simulation. Use when the LLM agent needs to turn SpaceTry behavior trees, missions, monitors, or world files into a scenario plan, uncertainty traceability, scenario-specific launch or config changes, execution guidance, or validation steps for autonomy evaluation in this repo.
 ---
 
 # SpaceTry Scenario Driver
 
-Use this skill to design, implement, or execute autonomy-evaluation scenarios for the SpaceTry rover.
+Use this skill to design, implement, or execute autonomy-evaluation scenarios for the SpaceTry rover. The driver should challenge the rover's autonomy by injecting uncertainties at critical moments and measuring the rover's response in terms of safety, adaptation, and mission success.
+
 After the implementation, validate and execute the scenario driver in a Dockerized environment, and generate a report with the defined metrics and logged signals.
 
 Use `SKILL.md` as the primary workflow document.
@@ -47,6 +48,9 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
    - identify which goals, landmarks, obstacles, and hazards already exist in the baseline world
    - identify baseline uncertainties already present in the source system, including BT obstacle-avoidance behavior, monitor-triggering battery or speed constraints, known hazards, perception limits, and launch-time defaults that can affect the mission before any new injection occurs
    - estimate whether the launch point, route length, and mission deadline are mutually realistic in the existing map
+   - require a practical reachability assessment before finalizing the injection pose or trigger:
+     - estimate whether the rover is likely to physically reach the intended injection zone under realistic baseline behavior, not only under ideal mission geometry
+     - account for likely baseline hazard avoidance, monitor-driven slowdowns, launch-time settling, and other non-nominal effects that may prevent the injected uncertainty from ever being encountered
    - if the prompt goal already matches an existing waypoint or world entity, treat that baseline target as the goal under evaluation instead of inventing a new one
    - separate which uncertainties are already exercised by the baseline source code and environment from which uncertainties will be newly injected by the scenario
 7. Verify artifact provenance per `references/Scenario_Driver_Policies.md` before reusing any existing scenario artifact.
@@ -84,7 +88,8 @@ Validate the implementation before execution by loading `skills/spacetry-autonom
 1. Sync the scenario package from the host repository into `/ws/src` inside the running container before rebuilding.
 2. Rebuild scenario packages with Docker using the validation reference.
 3. If changes were made to `src/spacetry_world`, run world verification using the validation reference.
-4. Run an intentionally interrupted validation run and confirm that the required report artifacts are written.
+4. Run an intentionally interrupted validation run using an in-container PID-targeted `SIGINT` method, and confirm that the required report artifacts are written.
+5. During iterative tuning, if only the scenario package changed, use the lighter scenario-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
 
 ### 4. Scenario Execution and Reporting
 
@@ -93,7 +98,17 @@ Execute the scenario driver to generate the report with metrics and logging sign
 1. Follow `references/Validation_and_Execution.md` to verify Docker setup and build the project.
 2. Launch the scenario driver and ensure logging signals are captured per `references/Observability_and_Attribution.md`.
 3. Generate and write the final report with metrics, logged signals, and separate baseline-vs-injected outcomes per `references/Validation_and_Execution.md`.
-4. Only after implementation is complete may `log/` or `logs/` be inspected, and then only for current-run result reporting.
+4. Report important confounders explicitly when they affect interpretation, such as baseline hazard avoidance, monitor dominance, launch-time settling delays, or other baseline conditions that plausibly explain the observed behavior.
+5. Treat `UNTESTED` as a valid early iteration outcome during scenario tuning when the rover never meaningfully encounters the injected uncertainty. This is part of refining scenario reachability and attribution, not automatically a scenario-driver defect.
+6. Only after implementation is complete may `log/` or `logs/` be inspected, and then only for current-run result reporting.
+
+## Execution Orchestration
+
+When the validation or execution workflow needs reliable PID tracking, signal delivery, or log polling, temporary helper scripts or shell wrappers are allowed as execution-only tooling.
+
+- Use them only to orchestrate launch, interruption, cleanup, or artifact verification.
+- Do not treat them as scenario implementation artifacts.
+- Keep them short-lived and avoid storing them as maintained repository source unless the user explicitly asks for that.
 
 ## Code Style and Guidelines
 
@@ -173,9 +188,11 @@ Before choosing a trigger, injected obstacle pose, timeout, or derived goal logi
 - Reuse prompt-specified goals when they already correspond to baseline world entities or mission waypoints.
 - Avoid injecting a new obstacle that duplicates or trivially overlaps an existing hazard unless the scenario explicitly intends to intensify that known obstacle field.
 - Place runtime uncertainty relative to the nominal route that actually exists in the baseline map, not an assumed straight-line route through empty terrain.
+- Require a practical reachability assessment before finalizing the injection pose or trigger. The selected trigger zone should be one the rover is likely to reach under realistic baseline behavior, not only under ideal mission geometry.
 - Scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal.
 - Define how the scenario will decide whether a given behavior change was caused by baseline uncertainty, injected uncertainty, or both.
 - If the scenario depends on the rover reaching a later route segment before injection, add an explicit reachability check and a fallback classification path for `UNTESTED` injected uncertainty.
+- Prefer at least one trigger condition tied to observed rover behavior or mission phase, not only map geometry. Examples include entering a baseline hazard interaction zone, clearing an obstacle field, sustained forward progress, or another observable mission-phase signal.
 - Define launch consumption rules up front so the scenario package does not need a separate ROS params YAML just to pass file paths or runtime settings into the driver node.
 
 
@@ -188,6 +205,7 @@ Specify what the driver component should perform:
 - **Measure** adaptation success (goal completion, safety violations, contingency activations)
 - **Adapt injection intensity** based on observed autonomy performance (gradually increase challenge)
 - **Log behavior** for post-execution analysis (decision timestamps, fallback activations, constraint violations)
+- During tuning, a small set of temporary diagnostic runtime events is recommended, for example trigger-state snapshots, reachability-state flags, or simplified phase markers. Once the scenario is stable, those events may be removed or reduced to the minimum needed for routine validation and reporting.
 
 ### Behavior Configuration
 
