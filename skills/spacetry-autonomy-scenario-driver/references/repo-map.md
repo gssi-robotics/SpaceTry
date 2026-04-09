@@ -4,6 +4,13 @@ Load this file when you need a quick map of where scenario-relevant information 
 
 ## Core inputs
 
+Policy gate before exploration:
+
+- Treat `log/` and `logs/` as output-only and excluded from implementation searches.
+- Start repository exploration from `src/`, `skills/`, `docs/`, and instruction files only.
+- Use commands that enforce this by construction, for example `rg --files src skills docs` or `rg --glob '!log/**' --glob '!logs/**' <pattern>`.
+- If a broad search result points into `log/` or `logs/`, do not open it for implementation input.
+
 - `AGENTS.md`
   Project-wide rules, Docker-only execution, autonomy-evaluation workflow.
 - `skills/spacetry-autonomy-scenario-driver/references/Scenario_Driver_Policies.md`

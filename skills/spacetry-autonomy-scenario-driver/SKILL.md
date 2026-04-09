@@ -1,6 +1,6 @@
 ---
 name: spacetry-autonomy-scenario-driver
-description: Create or update SpaceTry autonomy test scenarios and report results for the execution of scenario driver implementations that inject uncertainty and evaluate the rover's autonomy in simulation. Use when Codex needs to turn SpaceTry behavior trees, missions, monitors, world files, fault-model notes, or scenario prompt templates into a scenario plan, fault-to-object traceability, scenario-specific launch or config changes, execution guidance, or validation steps for autonomy evaluation in this repo.
+description: Create or update SpaceTry autonomy test scenarios and report results for the execution of scenario driver implementations that evaluate both baseline SpaceTry uncertainties and additional injected uncertainties in simulation. Use when the LLM agent needs to turn SpaceTry behavior trees, missions, monitors, world files, fault-model notes, or scenario prompt templates into a scenario plan, uncertainty traceability, scenario-specific launch or config changes, execution guidance, or validation steps for autonomy evaluation in this repo.
 ---
 
 # SpaceTry Scenario Driver
@@ -29,7 +29,12 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
 1. Read `AGENTS.md` first and then load `skills/spacetry-autonomy-scenario-driver/references/Scenario_Driver_Policies.md`.
 2. Follow the rule hierarchy from project and package-specific `AGENTS.md` or `.instructions.md` files for every package you may modify.
 3. Load `skills/spacetry-autonomy-scenario-driver/references/repo-map.md` for the usual files and decision points.
-4. Inspect the source files and dependencies needed for the scenario:
+4. Apply a policy gate before any repository-wide search:
+   - treat `log/` and `logs/` as forbidden implementation inputs
+   - limit early searches to canonical roots such as `src/`, `skills/`, `docs/`, and package instruction files
+   - use safe-by-construction commands such as `rg --files src skills docs` or `rg --glob '!log/**' --glob '!logs/**' <pattern>`
+   - if a search accidentally touches `log/` or `logs/`, discard that result as implementation context and restart from canonical sources
+5. Inspect the source files and dependencies needed for the scenario:
    - behavior tree
    - battery resources and perception sensors
    - bringup launch files and ROS 2 package-specific launch instructions when the scenario will include baseline bringup
@@ -37,14 +42,19 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
    - monitor definitions
    - world SDF files and related models files
    - project documentation at `docs/`
-5. Build a baseline world-and-mission map before designing uncertainty injection:
+6. Build a baseline world-and-mission map before designing uncertainty injection:
    - compare the prompt or reference scenario goals against the existing mission waypoints and the active world SDF
    - identify which goals, landmarks, obstacles, and hazards already exist in the baseline world
+   - identify baseline uncertainties already present in the source system, including BT obstacle-avoidance behavior, monitor-triggering battery or speed constraints, known hazards, perception limits, and launch-time defaults that can affect the mission before any new injection occurs
    - estimate whether the launch point, route length, and mission deadline are mutually realistic in the existing map
    - if the prompt goal already matches an existing waypoint or world entity, treat that baseline target as the goal under evaluation instead of inventing a new one
-6. Verify artifact provenance per `references/Scenario_Driver_Policies.md` before reusing any existing scenario artifact.
-7. Load `skills/spacetry-autonomy-scenario-driver/references/Scenario_Contract.md` and define the scenario contract before editing code.
-8. Load `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md` when mapping the fault subject, uncertainty location, manifestation, or trigger to implementation details.
+   - separate which uncertainties are already exercised by the baseline source code and environment from which uncertainties will be newly injected by the scenario
+7. Verify artifact provenance per `references/Scenario_Driver_Policies.md` before reusing any existing scenario artifact.
+8. Load `skills/spacetry-autonomy-scenario-driver/references/Scenario_Contract.md` and define the scenario contract before editing code.
+9. Load `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md` when mapping the fault subject, uncertainty location, manifestation, or trigger to implementation details.
+10. Define at design time how each scenario artifact is consumed by ROS:
+   - keep scenario contract and scenario config YAML as plain files
+   - pass file paths and runtime toggles to the scenario node only through inline launch dict ROS parameters
 
 ### 2. Scenario Driver Implementation
 
@@ -54,6 +64,13 @@ Follow the implementation, code-style, and observability guidance in this file a
 2. Create the scenario package, launch file, and configuration following the implementation guidance in this file.
 3. Load `skills/spacetry-autonomy-scenario-driver/references/Observability_and_Attribution.md` before implementing metrics, runtime timelines, rosbag capture, or report generation.
 4. When the scenario depends on Gazebo entities, spawning, or world behavior, load `skills/spacetry-autonomy-scenario-driver/references/Gazebo.md`.
+5. Keep the launch-to-node interface unambiguous:
+   - use inline launch dict parameters for the scenario driver node
+   - pass paths like `scenario_config_file` and `scenario_contract_file` as string parameters
+   - treat scenario YAML files as driver-parsed artifacts, not ROS params files
+6. Preserve the policy gate during implementation:
+   - do not open, grep, or copy from `log/` or `logs/` to scaffold code
+   - if you need examples, use only canonical artifacts under `src/`, `skills/`, or `docs/`
 
 ### 3. Scenario Driver Validation
 
@@ -70,7 +87,8 @@ Execute the scenario driver to generate the report with metrics and logging sign
 
 1. Follow `references/Validation_and_Execution.md` to verify Docker setup and build the project.
 2. Launch the scenario driver and ensure logging signals are captured per `references/Observability_and_Attribution.md`.
-3. Generate and write the final report with metrics, logged signals, and outcomes per `references/Validation_and_Execution.md`.
+3. Generate and write the final report with metrics, logged signals, and separate baseline-vs-injected outcomes per `references/Validation_and_Execution.md`.
+4. Only after implementation is complete may `log/` or `logs/` be inspected, and then only for current-run result reporting.
 
 ## Code Style and Guidelines
 
@@ -95,6 +113,11 @@ spacetry_scenario_{autonomy_aspect}_{uncertainty_type}_{intensity}
 
 Use `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md` to map the uncertainty and associated fault to implementation details for the scenario driver.
 
+Treat uncertainty as two layers throughout planning and reporting:
+
+1. **Baseline uncertainties** already present in SpaceTry source code, launch defaults, monitors, mission configuration, perception, and world hazards.
+2. **Injected uncertainties** introduced by the scenario driver during execution.
+
 For each fault, the scenario driver maintains traceability:
 
 1. Between fault subjects/attributes and their corresponding ROS 2 nodes and Gazebo objects
@@ -105,6 +128,14 @@ For each fault, the scenario driver maintains traceability:
 6. Monitor or metric that detects the rover response
 
 If traceability is incomplete, call that out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
+
+If the rover only responds to baseline uncertainty and never reaches the injected uncertainty, report the baseline autonomy exercised and mark the injected-autonomy outcome as `UNTESTED` rather than claiming the injected challenge failed.
+
+The same traceability discipline applies to ROS parameter consumption:
+
+1. Identify which contract/config artifacts are plain files parsed by the scenario driver
+2. Identify which values are passed as inline ROS parameters from launch
+3. Ensure the contract states this mapping before implementation so launch wiring is not guessed later
 
 ## Implementation Guidelines
 
@@ -126,6 +157,9 @@ Before choosing a trigger, injected obstacle pose, timeout, or derived goal logi
 - Avoid injecting a new obstacle that duplicates or trivially overlaps an existing hazard unless the scenario explicitly intends to intensify that known obstacle field.
 - Place runtime uncertainty relative to the nominal route that actually exists in the baseline map, not an assumed straight-line route through empty terrain.
 - Scale mission deadlines and success windows to the baseline route length from the launch point to the evaluated goal.
+- Define how the scenario will decide whether a given behavior change was caused by baseline uncertainty, injected uncertainty, or both.
+- If the scenario depends on the rover reaching a later route segment before injection, add an explicit reachability check and a fallback classification path for `UNTESTED` injected uncertainty.
+- Define launch consumption rules up front so the scenario package does not need a separate ROS params YAML just to pass file paths or runtime settings into the driver node.
 
 
 ### Component Specification
