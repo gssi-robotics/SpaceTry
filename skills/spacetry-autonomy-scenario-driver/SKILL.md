@@ -135,7 +135,7 @@ Prefer the least invasive path:
 1. The scenario driver should not make changes on the autonomy behavior being evaluated. New packages needed for implementing the scenario driver can be added inside `src/` and should be named `spacetry_scenario_<scenario_name>`. 
 2. Only changes on the mission and world packages are allowed within the remaining `src/` sub-folders.
 3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline bringup unchanged launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
-4. When including baseline bringup or depending on its launch arguments, follow `src/spacetry_bringup/AGENTS.md` for launch-integration, `use_sim_time`, BT runner, and parameter-wiring rules.
+4. When including baseline bringup or depending on its launch arguments, follow `src/spacetry_bringup/AGENTS.md` for launch-integration, `use_sim_time`, BT runner, parameter-wiring, and topic QoS compatibility rules.
 5. Before any Dockerized build or launch of the scenario package, copy it into the running container:
 
 ```bash
@@ -185,6 +185,7 @@ For each autonomy and safety requirement being evaluated, specify injection stra
 - The logging signals and events related to the scenario should be stored in a rosbag under the bind-mounted host `log/` folder and included in the final report with the metric values and scenario outcomes.
 - Use ROS 2 logging and rosbag existing solutions when possible, and avoid adding new logging topics or custom solutions that are not already part of the rover's ROS 2 packages.
 - If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks. 
+- Before depending on an existing SpaceTry topic for scenario triggers, derived mission state, or report metrics, confirm that the scenario node subscription QoS matches the publisher QoS used in the stack. In case of doubt, use an explicitly compatible QoS profile instead of the default subscription QoS. If there is a mismatch, treat that as an observability/integration issue to fix before evaluating the autonomy behavior.
 
 Write scenario outputs to the bind-mounted host `log/` folder using a per-scenario subdirectory, for example:
 

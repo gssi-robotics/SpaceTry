@@ -15,6 +15,9 @@ These rules supplement the project-wide `AGENTS.md` and are the canonical place 
 
 - Treat launch-time parameter wiring as part of scenario integration rather than assuming every bringup default is safe in every runtime environment.
 - Do not redeclare `use_sim_time` inside a Python scenario node if it is already injected by launch or declared via node options. Read it if needed, but avoid redeclaration because it can raise `ParameterAlreadyDeclaredException` at runtime.
+- Verify QoS compatibility for every existing SpaceTry topic that a ROS 2 node depends on for triggers, metrics, derived status signals, or integration behavior. Do not assume default ROS 2 subscription QoS will match existing publishers in this stack.
+- In case of doubt, use an explicitly compatible subscriber QoS profile rather than the default reliable subscription when attaching a node to existing SpaceTry topics.
+- `/mobile_base_controller/odom` is a concrete example of this rule: its publisher QoS may be best-effort in this stack, so nodes that subscribe to it for position tracking, goal checks, or injection timing should use an explicitly matched QoS profile.
 - If baseline bringup starts the BT runner, verify that the `tree_file` launch argument resolves to a non-empty absolute path in the execution environment.
 - If there is any doubt about `tree_file` resolution, pass the path explicitly from the scenario launch only to ensure the evaluated baseline BT is the one that actually loads at runtime.
 - The BT file used for launch must remain the autonomy behavior under evaluation. Do not swap in a scenario-specific BT or an edited BT variant unless the user explicitly approves a bug fix to the baseline autonomy logic.
@@ -23,6 +26,7 @@ These rules supplement the project-wide `AGENTS.md` and are the canonical place 
 ## Scenario-Facing Bringup Checks
 
 - When including baseline bringup from a scenario launch, inspect bringup-side defaults before relying on launch overrides for mission-specific values such as battery SOC, odom topics, spawn targets, waypoint files, and scenario-specific thresholds.
+- When a node depends on existing SpaceTry topics, inspect both the topic names and their effective QoS settings before finalizing subscriptions. If the node depends on odometry, obstacle, battery, monitor, or similar streams for injection timing, control adaptation, or report metrics, confirm the subscriber QoS matches the publisher QoS used by the stack.
 - Prefer explicit scenario launch arguments over hidden assumptions when a scenario depends on bringup behavior that is sensitive to path resolution or parameter injection order.
 - Keep the baseline bringup composition unchanged unless the user explicitly approves a bringup bug fix.
 
