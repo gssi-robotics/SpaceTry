@@ -55,6 +55,11 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
 10. Define at design time how each scenario artifact is consumed by ROS:
    - keep scenario contract and scenario config YAML as plain files
    - pass file paths and runtime toggles to the scenario node only through inline launch dict ROS parameters
+11. When the prompt includes one or more injected uncertainties, identify:
+   - the primary evaluation target
+   - any secondary injected uncertainties
+   - whether the scenario is single-uncertainty or multi-uncertainty
+   - whether any stated interaction hypothesis is intentional or omitted
 
 ### 2. Scenario Driver Implementation
 
@@ -117,6 +122,13 @@ Treat uncertainty as two layers throughout planning and reporting:
 
 1. **Baseline uncertainties** already present in SpaceTry source code, launch defaults, monitors, mission configuration, perception, and world hazards.
 2. **Injected uncertainties** introduced by the scenario driver during execution.
+
+Within injected uncertainties, distinguish:
+
+1. the **primary evaluation target** that the scenario is mainly intended to assess
+2. any **secondary injected uncertainties** that are also introduced in the same run
+
+Secondary injected uncertainties may be related or unrelated to the primary evaluation target.
 
 For each fault, the scenario driver maintains traceability:
 

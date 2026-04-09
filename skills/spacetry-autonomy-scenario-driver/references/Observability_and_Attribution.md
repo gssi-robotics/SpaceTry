@@ -24,6 +24,7 @@ Write scenario outputs to the bind-mounted host `log/` folder using the followin
 - If the first significant post-injection control change is labeled `goal_alignment`, `unknown`, or another non-attributable rationale, do not credit it as adaptation to the injected fault.
 - A credited reaction should be supported by both event timing and logged control rationale.
 - A credited detection should be supported by both event timing and scenario-specific attribution checks.
+- In multi-uncertainty scenarios, log which injected uncertainty a credited event is associated with when that is knowable, and do not imply an interaction hypothesis unless the scenario explicitly states one.
 
 ## Required Logging Content
 
@@ -42,6 +43,7 @@ Keep scenario logic observable:
 - log whether each credited detection passed the scenario's `fault_attribution_rule`
 - log whether each credited reaction passed the scenario's `fault_attribution_rule`
 - log the `reaction_scope` for each credited reaction, such as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
+- log the associated injected uncertainty source for each credited detection or reaction when the scenario contains more than one injected uncertainty and the source is knowable
 - log whether any baseline obstacle, monitor violation, or other confounding condition was active when a detection or reaction candidate was evaluated
 - if a detection or reaction candidate is rejected, log the rejection reason
 

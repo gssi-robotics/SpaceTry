@@ -39,26 +39,32 @@ iv) **Mission Goals Description**:
 
 Design, implement, and execute a **Autonomy Test Scenario Driver Software Component** that:
 
-1. **Injects Uncertainty**:
-   - Uncertainty locations: {ENVIRONMENT_SENSING_MANAGED_SYSTEM_RESOURCES_GOALS}
-   - Uncertainty emerging time: {RUNTIME_OR_DESIGN-TIME}
-   - Fault subjects: {SPECIFY_FROM_UNCERTAINTY_LOCATIONS}
-   - Fault Manifestation: {FIXED-VALUE_OR_NOISY_OR_DEGRADING_OR_ANY}
-   - Fault Trigger Timming: {TRANSIENT_OR_PERMANENT_OR INTERMITTENT_OR_ANY}
+1. **Defines the Evaluation Target**:
+   - Primary evaluation target: {PRIMARY_UNCERTAINTY_FAMILY_OR_AUTONOMY_CONCERN}
+   - Secondary injected uncertainties: {ZERO_OR_MORE_SECONDARY_UNCERTAINTIES}
+   - Note: secondary injected uncertainties may be related or unrelated to the primary evaluation target
+   - [Optional] Interaction hypothesis: {WHY_THE_PRIMARY_AND_SECONDARY_UNCERTAINTIES_INTERACT}
 
-2. **Tests Autonomous Adaptation**:
+2. **Injects Uncertainty**:
+   - Uncertainty locations: {PRIMARY_AND_OPTIONAL_SECONDARY_LOCATIONS}
+   - Uncertainty emerging time: {RUNTIME_OR_DESIGN-TIME}
+   - Fault subjects: {PRIMARY_AND_OPTIONAL_SECONDARY_FAULT_SUBJECTS}
+   - Fault Manifestation: {FIXED-VALUE_OR_NOISY_OR_DEGRADING_OR_ANY}
+   - Fault Trigger Timming: {TRANSIENT_OR_PERMANENT_OR_INTERMITTENT_OR_ANY}
+
+3. **Tests Autonomous Adaptation**:
    - {ADAPTATION_TEST_1}
    - {ADAPTATION_TEST_2}
    - {ADAPTATION_TEST_3}
 
-3. **Challenges Safety and Goal Viability**:
+4. **Challenges Safety and Goal Viability**:
    - {SAFETY_CHALLENGE_1}
    - {SAFETY_CHALLENGE_2}
    - {GOAL_VIABILITY_CHALLENGE_1}
 
 ## [Optional] Uncertainty Injection Plan 
 
-Choose the closest pattern and fill in the blanks:
+Choose one or more patterns that match the primary target and any secondary injected uncertainties:
 - Sensor degradation: `Inject {SENSOR} confidence loss from {START}% to {END}% over {DURATION}`
 - Dynamic obstacles: `Spawn {OBSTACLE_TYPE} at {LOCATION} when rover is {DISTANCE_OR_STATE} from {REFERENCE_POINT}`
 - Power constraints: `Accelerate battery drain from {BASELINE_RATE} to {NEW_RATE} during {ACTIVITY}`

@@ -13,6 +13,9 @@ Write the scenario in terms of these fields:
 - `core_metrics`: details below under **Core Metrics**
 - `additional_metrics`: mission-specific metrics requested by the user or needed for the scenario
 - `baseline_uncertainties`: a short inventory of uncertainties already present in the baseline SpaceTry source code, mission, world, monitors, and launch defaults that can affect the mission without any new scenario injection
+- `primary_evaluation_target`: the main autonomy concern or injected uncertainty the scenario is primarily intended to evaluate
+- `secondary_injected_uncertainties`: zero or more additional injected uncertainties introduced in the same run
+- `interaction_hypothesis`: optional statement of why multiple injected uncertainties may interact; omit when no interaction is claimed
 - `injected_uncertainties`: the uncertainties introduced by the scenario driver
 - `outcome_assessment`: PASS, DEGRADED, FAIL, or UNTESTED for the injected-autonomy portion when the rover never reaches the injected challenge
 - `baseline_outcome_assessment`: PASS, DEGRADED, FAIL, or NOT_EVALUATED for autonomy exercised by baseline uncertainties
@@ -56,6 +59,12 @@ The `runtime_parameter_interface` must at minimum include:
 
 where `transport` should be `inline_launch_dict` for scenario-driver ROS parameters in this skill.
 
+When multiple injected uncertainties are present:
+
+- the contract should still identify one `primary_evaluation_target`
+- `secondary_injected_uncertainties` may be related or unrelated to that primary target
+- `interaction_hypothesis` is optional, not required
+
 ## Core Metrics
 
 Define measurable metrics for autonomy evaluation:
@@ -73,6 +82,7 @@ Define measurable metrics for autonomy evaluation:
 - **Injected-uncertainty encounter status**: Boolean indicating whether the rover reached the spatial, temporal, or state conditions needed for the injected uncertainty to meaningfully affect behavior
 - **Baseline-uncertainty exercised status**: Boolean indicating whether one or more baseline uncertainties materially influenced rover behavior during the run
 - **Attribution scope**: Short string such as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
+- **Injected uncertainty source**: Short string or list indicating which injected uncertainty or uncertainties a credited event is associated with when that is knowable
 - **Additional mission-specific metrics**: Any extra metrics requested by the user or needed for the scenario, each with an explicit unit or boolean status and a short description
 
 Fault or injected-reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
