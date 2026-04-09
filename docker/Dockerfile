@@ -80,7 +80,7 @@ fi
 EOF
 
 # prepare workspace dirs explicitly
-RUN mkdir -p /ws/src /ws/log
+RUN mkdir -p /ws/src
 
 WORKDIR /ws
 
