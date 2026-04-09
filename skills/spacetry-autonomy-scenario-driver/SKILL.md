@@ -19,24 +19,17 @@ Define the scenario before implementing it. Follow the **[Non-Negotiables](#non-
 3. Load `skills/spacetry-autonomy-scenario-driver/references/repo-map.md` for the usual files and decision points.
 4. Inspect the source files and dependencies needed for the scenario:
    - behavior tree
+   - battery resources and perception sensors
+   - bringup launch files and ROS 2 package-specific launch instructions when the scenario will include baseline bringup
    - mission config or mission docs
    - monitor definitions
-   - world/model files
+   - world SDF files and related models files
    - project documentation at `docs/`
 5. Run a provenance check before reusing any existing scenario artifact:
    - allowed implementation inputs: `src/`, `docs/`, `skills/spacetry-autonomy-scenario-driver/assets/`, `skills/spacetry-autonomy-scenario-driver/references/`
    - forbidden implementation inputs: `log/`, `logs/`
    - if provenance is unclear, do not reuse the artifact
 6. Define the scenario contract before editing code (see **[Scenario Contract](#scenario-contract)** section for all required fields).
-
-### Provenance Check
-
-Before reusing any existing artifact, confirm all of the following:
-
-- the artifact path is under `src/` or another canonical source directory listed above
-- the artifact path is not under `log/` or `logs/`
-- the artifact is a maintained source artifact, not a generated execution output
-- if any of the above is unclear, do not reuse it
 
 ### 2. Scenario Driver Parametrization (Implementation)
 
@@ -67,6 +60,11 @@ Execute the scenario driver to generate the report with metrics and logging sign
 Policies that must be followed during scenario driver generation, implementation, validation, and execution:
 
 - Treat both `log/` and `logs/` as output-only directories.
+- Before reusing any existing artifact, confirm all of the following:
+   - the artifact path is under `src/` or another canonical source directory listed above
+   - the artifact path is not under `log/` or `logs/`
+   - the artifact is a maintained source artifact, not a generated execution output
+   - if any of the above is unclear, do not reuse it.
 - Never read scenario code, launch files, configs, reports, generated packages, or package templates from `log/` or `logs/` in order to design, scaffold, restore, or implement a scenario driver.
 - Files under `log/` or `logs/` may be inspected only to report execution results from the current run, not to recover prior implementations or bootstrap new ones.
 - If a similarly named scenario exists only under `log/` or `logs/`, ignore it as implementation input and recreate the scenario from canonical repository sources unless the user explicitly asks to restore or migrate it.
@@ -137,7 +135,7 @@ Prefer the least invasive path:
 1. The scenario driver should not make changes on the autonomy behavior being evaluated. New packages needed for implementing the scenario driver can be added inside `src/` and should be named `spacetry_scenario_<scenario_name>`. 
 2. Only changes on the mission and world packages are allowed within the remaining `src/` sub-folders.
 3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline bringup unchanged launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
-4. When including baseline bringup, inspect the target node’s YAML defaults before relying on launch overrides for mission-specific values such as battery SOC, odom topics, spawn targets, waypoint files, or scenario-specific thresholds.
+4. When including baseline bringup or depending on its launch arguments, follow `src/spacetry_bringup/AGENTS.md` for launch-integration, `use_sim_time`, BT runner, and parameter-wiring rules.
 5. Before any Dockerized build or launch of the scenario package, copy it into the running container:
 
 ```bash
@@ -204,9 +202,9 @@ Keep scenario logic observable:
 
 ## Validation
 
-Rebuild packages if scenario components have changed or new ones were added:
+Rebuild the scenario driver related packages if scenario components have changed or new ones were added:
 
-If the scenario package is new or has changed on the host, copy it into the running container first:
+If the scenario related packages are new or has changed on the host, copy it into the running container first:
 
 ```bash
 docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/

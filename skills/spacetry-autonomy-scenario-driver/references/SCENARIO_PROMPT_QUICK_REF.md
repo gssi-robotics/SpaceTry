@@ -27,7 +27,7 @@ ii) **Implementation Source Code**:
     Description: source code with the ROS 2 packages that implement the behavior tree logic and handle real-time decision-making:
     - Perception: spacetry_perception
     - Behavior execution: spacetry_bt
-    - Mission planning: spacetry_mission
+    - Mission planning: spacetry_mission/MISSION.md
     - Battery manager: spacetry_battery
     - Dependency packages: ../deps/spacetry.repos
 
