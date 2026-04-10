@@ -25,6 +25,7 @@ Write scenario outputs to the bind-mounted host `log/` folder using the followin
 - If the first significant post-injection control change is labeled `goal_alignment`, `unknown`, or another non-attributable rationale, do not credit it as adaptation to the injected fault.
 - A credited reaction should be supported by both event timing and logged control rationale.
 - A credited detection should be supported by both event timing and scenario-specific attribution checks.
+- When the autonomy logic consumes interpreted perception outputs such as BT-facing obstacle topics, detection metrics should be keyed to the first attributable autonomy-facing obstacle signal rather than delayed until a raw sensor fallback changes state.
 - In multi-uncertainty scenarios, log which injected uncertainty a credited event is associated with when that is knowable, and do not imply an interaction hypothesis unless the scenario explicitly states one.
 
 ## Required Logging Content
@@ -43,6 +44,7 @@ Keep scenario logic observable:
 - log rover pose at every credited detection and credited reaction event
 - log rover-to-fault distance when detection or reaction is credited
 - log which sensor, topic, or monitor signal produced each detection or reaction candidate
+- log whether the credited detection came from a raw sensor path or from an autonomy-facing interpreted perception interface
 - log each significant `cmd_vel` change with its command values and an explicit `observed_control_rationale` such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 - log the scenario state used to classify each `observed_control_rationale`, such as obstacle flags, monitor status, planner state, or BT state when available
 - log `reaction_scope` for each reaction candidate as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
@@ -65,6 +67,7 @@ Prefer attribution-aware event names when scenario outputs include a runtime tim
 - `fault_detection_candidate`
 - `fault_detection_attributed`
 - `fault_detection_rejected`
+- `raw_scan_detection_attributed`
 - `fault_encountered`
 - `meaningful_evaluation_window_satisfied`
 - `meaningful_evaluation_window_not_satisfied`

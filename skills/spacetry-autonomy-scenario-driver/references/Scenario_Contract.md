@@ -72,7 +72,9 @@ When multiple injected uncertainties are present:
 Define measurable metrics for autonomy evaluation:
 
 - **Adaptation speed**: Time in milliseconds between uncertainty injection and the first attributable rover reaction
+- **Obstacle detection latency**: Time in milliseconds between uncertainty injection and the first attributable obstacle evidence made available on the autonomy-facing perception interface actually consumed by the behavior under test. When the scenario injects or degrades interpreted obstacle topics, use that consumer-facing interface rather than raw sensor fallback
 - **Autonomy reaction status**: Boolean indicating whether the rover performed a genuine non-nominal autonomy reaction during the run, regardless of whether it was attributable to the injected uncertainty
+- **Detection signal source**: Topic, sensor, or interface that produced the credited detection, for example `/obstacle/state`, `/obstacle/front`, or `/scan`
 - **Observed control rationale**: The best classification of the observed rover maneuver at the reaction point, such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 - **Reaction scope**: Short string classifying whether the observed reaction is `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - **Reaction attribution status**: Boolean indicating whether the injected uncertainty receives causal credit for the observed reaction, separate from whether the maneuver itself is classifiable
@@ -81,6 +83,7 @@ Define measurable metrics for autonomy evaluation:
 - **Safety preservation**: Key-value pairs with safety constraints from monitors and boolean preservation state
 - **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
 - **Recovery rate**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
+- **Route deviation**: Maximum or average lateral deviation between the full executed route and the nominal route over the whole run. If the scenario also needs disturbance-scoped deviation, report it separately as an additional metric such as `post_injection_route_deviation_m`
 - **Detection attribution status**: Boolean indicating whether the credited detection can be distinguished from baseline hazards, unrelated obstacle signals, or other confounding runtime events
 - **Minimum fault distance at detection**: Rover-to-injected-fault distance in meters when detection is credited
 - **Baseline-confound status**: Boolean or short string indicating whether a baseline obstacle, monitor violation, or unrelated runtime condition could explain the credited detection or reaction
@@ -92,6 +95,10 @@ Define measurable metrics for autonomy evaluation:
 - **Additional mission-specific metrics**: Any extra metrics requested by the user or needed for the scenario, each with an explicit unit or boolean status and a short description
 
 Fault or injected-reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
+
+If the autonomy stack consumes interpreted obstacle topics or other processed perception signals, a credited obstacle detection may come from those autonomy-facing signals even when a raw sensor fallback such as `/scan` still appears `CLEAR`. Do not force `obstacle_detection_latency_ms` to depend on raw-sensor evidence unless raw sensing is itself the autonomy interface under evaluation.
+
+If raw-sensor timing is also analytically useful, report it as a separate additional metric such as `raw_scan_detection_latency_ms` instead of overloading the core obstacle-detection metric.
 
 Motion reactions must not be credited from `cmd_vel` deviation alone. A credited rover reaction must be supported by a logged observed control rationale and by scenario state.
 

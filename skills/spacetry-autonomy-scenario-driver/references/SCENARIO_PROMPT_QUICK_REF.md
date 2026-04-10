@@ -75,10 +75,10 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 
 - Safety preservation (boolean per constraint): Boolean status for each relevant monitor or safety condition, for example `MR_009=true`, `MR_011=true`, `collision_with_dynamic_obstacle=false`
 - Goal viability (boolean per goal): Boolean status for each mission objective, for example `science_rock_01_reached=true`, `mission_deadline_met=true`
-- Recovery rate (ms): Time from replanning activation to stable progress on a collision-free route
-- Obstacle detection latency (ms): Time from obstacle injection to the first confirmed obstacle detection by the autonomy stack
+- Recovery rate (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
+- Obstacle detection latency (ms): Time from obstacle injection to the first attributable obstacle evidence on the autonomy-facing perception interface used by the autonomy stack
 - Detour distance (m): Extra path length traveled relative to the nominal route after replanning around the obstacle
-- Route deviation (m): Maximum or average lateral distance between the executed path and the nominal planned path
+- Route deviation (m): Maximum or average lateral distance between the full executed path and the nominal planned path; if needed, add a separate post-injection route-deviation metric
 ```
 
 ### Example 2: Battery / Resource
@@ -144,6 +144,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 - Battery reserve margin (%): Lowest remaining state of charge reached during recovery or return behavior
 - Time to safe-return decision (ms): Time from injected resource stress to a stable decision to continue or return
 - Mission truncation point (m): Distance traveled toward the goal before the autonomy stack abandons or defers the objective
+- Route deviation (m): Maximum or average lateral distance between the full executed path and the nominal planned path; if needed, add a separate post-injection route-deviation metric
 ```
 
 ### Example 3: Sensor / Perception
@@ -209,6 +210,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 - False obstacle rate (count or %): Rate at which degraded perception produces obstacle classifications unsupported by world state
 - Missed-detection rate (count or %): Rate at which relevant hazards are not detected during the degradation window
 - Recovery time (ms): Time from restoration of perception quality to stable forward progress on the mission route
+- Route deviation (m): Maximum or average lateral distance between the full executed path and the nominal planned path; if needed, add a separate post-injection route-deviation metric
 ```
 
 ### Example 4: Composite / Obstacle + Sensing Degradation
@@ -275,10 +277,9 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 
 - Safety preservation (boolean per constraint): Boolean status for each relevant monitor or safety condition, for example `MR_009=true`, `MR_011=true`, `collision_with_obstacle=false`
 - Goal viability (boolean per goal): Boolean status for each mission objective, for example `science_rock_01_reached=true`, `mission_deadline_met=true`
-- Obstacle detection latency (ms): Time from obstacle injection to first confirmed obstacle-related response under degraded sensing
+- Obstacle detection latency (ms): Time from obstacle injection to the first attributable obstacle evidence available to the autonomy stack under degraded sensing
 - False obstacle rate (count or %): Rate of unsupported obstacle classifications during the sensing degradation window
-- Recovery rate (ms): Time from the first stable avoidance maneuver to resumed collision-free progress
-- Route deviation (m): Maximum or average lateral deviation after the multi-uncertainty disturbance begins
+- Recovery rate (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
 ```
 
 ### Example 5: Composite / Terrain Change + Battery Drain
@@ -367,6 +368,7 @@ Before using a scenario prompt to generate or implement a driver:
 - [ ] Metrics logging doesn't impact real-time performance
 - [ ] Scenario can run in docker compose environment
 - [ ] Autonomy aspect being tested is clearly documented
+- [ ] Detection-latency metrics are defined on the autonomy-consumed perception interface, with any raw-sensor latency tracked separately if needed
 
 ---
 

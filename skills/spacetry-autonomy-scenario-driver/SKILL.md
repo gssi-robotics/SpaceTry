@@ -66,6 +66,11 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
    - any secondary injected uncertainties
    - whether the scenario is single-uncertainty or multi-uncertainty
    - whether any stated interaction hypothesis is intentional or omitted
+12. When the scenario measures obstacle or perception detection latency:
+   - define detection on the perception interface actually consumed by the autonomy logic under test
+   - if the scenario injects, overrides, or degrades BT-facing obstacle topics or other interpreted perception outputs, treat the first attributable autonomy-facing obstacle signal as the primary detection event
+   - do not force `obstacle_detection_latency_ms` to wait for a raw sensor fallback such as `/scan` when the autonomy stack is already reacting to fresher obstacle-state topics
+   - if raw-sensor latency is also important, record it as a separate source-specific metric rather than overloading the core detection metric
 
 ### 2. Scenario Driver Implementation
 
