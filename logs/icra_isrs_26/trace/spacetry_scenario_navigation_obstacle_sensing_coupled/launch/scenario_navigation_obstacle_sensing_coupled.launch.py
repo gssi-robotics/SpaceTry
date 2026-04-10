@@ -24,7 +24,7 @@ def generate_launch_description():
     pkg_share = get_package_share_directory(scenario_name)
     bringup_share = get_package_share_directory("spacetry_bringup")
     bt_share = get_package_share_directory("spacetry_bt")
-    scenario_config_file = os.path.join(pkg_share, "config", "scenario_config.yaml")
+    default_scenario_config_file = os.path.join(pkg_share, "config", "scenario_config.yaml")
     scenario_contract_file = os.path.join(pkg_share, "config", "scenario_contract.yaml")
     baseline_tree_file = os.path.join(bt_share, "trees", "base_bt.xml")
 
@@ -36,6 +36,7 @@ def generate_launch_description():
     headless = LaunchConfiguration("headless")
     battery = LaunchConfiguration("battery")
     enable_rosbag = LaunchConfiguration("enable_rosbag")
+    scenario_config_file = LaunchConfiguration("scenario_config_file")
 
     baseline_bringup = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -107,6 +108,11 @@ def generate_launch_description():
                 "enable_rosbag",
                 default_value="true",
                 description="Record scenario rosbag topics under /ws/log.",
+            ),
+            DeclareLaunchArgument(
+                "scenario_config_file",
+                default_value=default_scenario_config_file,
+                description="Scenario configuration file consumed by the scenario driver.",
             ),
             baseline_bringup,
             scenario_driver,

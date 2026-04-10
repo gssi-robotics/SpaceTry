@@ -69,7 +69,7 @@ attribution:
   collision_distance_m: 2.5
 
 evaluation:
-  scenario_timeout_s: 500.0
+  scenario_timeout_s: 1300.0
   minimum_post_encounter_observation_window_s: 40.0
 
 rosbag:

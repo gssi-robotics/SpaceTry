@@ -212,6 +212,7 @@ class ScenarioDriver(Node):
         self.progress_history: Deque[Tuple[float, float]] = deque(maxlen=300)
         self.distance_to_goal_history: Deque[Tuple[float, float]] = deque(maxlen=300)
         self.route_deviation_max_m = 0.0
+        self.post_injection_route_deviation_max_m = 0.0
         self.minimum_injected_fault_distance_m = float("inf")
         self.minimum_fault_distance_at_detection_m = None
         self.baseline_uncertainty_exercised = False
@@ -219,6 +220,7 @@ class ScenarioDriver(Node):
         self.first_post_injection_reaction: Optional[Dict[str, Any]] = None
         self.attributed_reaction: Optional[Dict[str, Any]] = None
         self.attributed_detection: Optional[Dict[str, Any]] = None
+        self.raw_scan_attributed_detection: Optional[Dict[str, Any]] = None
         self.encounter_time_s: Optional[float] = None
         self.recovery_time_s: Optional[float] = None
         self.injection_time_s: Optional[float] = None
@@ -323,9 +325,13 @@ class ScenarioDriver(Node):
         distance_to_goal = self._distance_to_goal()
         self.progress_history.append((sim_time, progress_ratio))
         self.distance_to_goal_history.append((sim_time, distance_to_goal))
+        self.route_deviation_max_m = max(
+            self.route_deviation_max_m,
+            self._distance_to_route_line(self.pose.x, self.pose.y),
+        )
         if self.injection_time_s is not None:
-            self.route_deviation_max_m = max(
-                self.route_deviation_max_m,
+            self.post_injection_route_deviation_max_m = max(
+                self.post_injection_route_deviation_max_m,
                 self._distance_to_route_line(self.pose.x, self.pose.y),
             )
             distance_to_fault, _ = self._injected_fault_geometry()
@@ -749,48 +755,116 @@ class ScenarioDriver(Node):
         max_angle = math.radians(float(self.attribution_config["encounter_heading_half_angle_deg"]))
         return distance <= max_distance and abs(relative_angle) <= max_angle
 
+    def _pose_snapshot(self) -> Optional[Dict[str, float]]:
+        if self.pose is None:
+            return None
+        return {
+            "x": self.pose.x,
+            "y": self.pose.y,
+            "z": self.pose.z,
+            "yaw": self.pose.yaw,
+        }
+
+    def _baseline_hazard_confound(self, distance_to_fault: float) -> Tuple[bool, Optional[float]]:
+        hazard_distance = self._distance_to_baseline_hazard()
+        margin = float(self.attribution_config["fault_distance_margin_from_baseline_hazard_m"])
+        return (
+            hazard_distance is not None and hazard_distance + margin < distance_to_fault,
+            hazard_distance,
+        )
+
+    def _maybe_record_autonomy_stack_detection(self, actual_state: str, degraded_state: str) -> None:
+        if self.attributed_detection is not None or self.injection_time_s is None:
+            return
+        if actual_state == "CLEAR" or degraded_state == "CLEAR":
+            return
+        distance, relative_angle = self._injected_fault_geometry()
+        if distance is None or relative_angle is None:
+            return
+        baseline_confound, hazard_distance = self._baseline_hazard_confound(distance)
+        if baseline_confound:
+            self._log_event(
+                "fault_detection_rejected",
+                rejection_reason="baseline hazard closer than injected obstacle",
+                sensor_signal="/obstacle/state",
+                actual_state=actual_state,
+                published_obstacle_state=degraded_state,
+                injected_fault_distance_m=distance,
+                baseline_hazard_distance_m=hazard_distance,
+                raw_scan=self.raw_scan,
+                pose=self._pose_snapshot(),
+            )
+            return
+        self.minimum_fault_distance_at_detection_m = distance
+        self.attributed_detection = {
+            "time_s": self._sim_time_s(),
+            "distance_m": distance,
+            "relative_angle_rad": relative_angle,
+            "signal_source": "/obstacle/state",
+            "actual_state": actual_state,
+            "published_obstacle_state": degraded_state,
+            "pose": self._pose_snapshot(),
+        }
+        self._log_event(
+            "fault_detection_attributed",
+            injected_uncertainty_source=self._active_injected_sources(),
+            rover_to_fault_distance_m=distance,
+            sensor_signal="/obstacle/state",
+            actual_state=actual_state,
+            published_obstacle_state=degraded_state,
+            raw_scan=self.raw_scan,
+            pose=self._pose_snapshot(),
+        )
+
     def _maybe_record_detection(self) -> None:
         distance, relative_angle = self._injected_fault_geometry()
-        if distance is None or relative_angle is None or self.injection_time_s is None:
+        if (
+            distance is None
+            or relative_angle is None
+            or self.injection_time_s is None
+            or self.raw_scan_attributed_detection is not None
+        ):
             return
         candidate = self.raw_scan["state"] != "CLEAR"
         if not candidate:
             return
         if self._encounter_rule_satisfied():
-            hazard_distance = self._distance_to_baseline_hazard()
-            margin = float(self.attribution_config["fault_distance_margin_from_baseline_hazard_m"])
-            baseline_confound = (
-                hazard_distance is not None and hazard_distance + margin < distance
-            )
+            baseline_confound, hazard_distance = self._baseline_hazard_confound(distance)
             if baseline_confound:
                 self._log_event(
                     "fault_detection_rejected",
                     rejection_reason="baseline hazard closer than injected obstacle",
+                    sensor_signal="/scan",
                     raw_scan=self.raw_scan,
                     injected_fault_distance_m=distance,
                     baseline_hazard_distance_m=hazard_distance,
+                    pose=self._pose_snapshot(),
                 )
                 return
-            self.minimum_fault_distance_at_detection_m = distance
-            self.attributed_detection = {
+            self.raw_scan_attributed_detection = {
                 "time_s": self._sim_time_s(),
                 "distance_m": distance,
                 "relative_angle_rad": relative_angle,
                 "raw_scan_state": self.raw_scan["state"],
+                "signal_source": "/scan",
+                "pose": self._pose_snapshot(),
             }
             self._log_event(
-                "fault_detection_attributed",
+                "raw_scan_detection_attributed",
                 injected_uncertainty_source=self._active_injected_sources(),
                 rover_to_fault_distance_m=distance,
                 sensor_signal="scan_sector_min",
                 raw_scan=self.raw_scan,
+                pose=self._pose_snapshot(),
             )
         else:
             self._log_event(
                 "fault_detection_candidate",
                 rover_to_fault_distance_m=distance,
                 relative_angle_rad=relative_angle,
+                sensor_signal="/scan",
                 raw_scan=self.raw_scan,
+                pose=self._pose_snapshot(),
             )
 
     def _current_actual_obstacle_state(self) -> str:
@@ -858,6 +932,7 @@ class ScenarioDriver(Node):
         actual_state = self._current_actual_obstacle_state()
         degraded_state = self._degraded_state(actual_state)
         self._publish_state(degraded_state)
+        self._maybe_record_autonomy_stack_detection(actual_state, degraded_state)
         self.degradation_publications += 1
         if degraded_state != actual_state:
             self.unsupported_classification_publications += 1
@@ -1029,6 +1104,12 @@ class ScenarioDriver(Node):
         if self.attributed_detection is not None and self.injection_time_s is not None:
             detection_latency_ms = (self.attributed_detection["time_s"] - self.injection_time_s) * 1000.0
 
+        raw_scan_detection_latency_ms = None
+        if self.raw_scan_attributed_detection is not None and self.injection_time_s is not None:
+            raw_scan_detection_latency_ms = (
+                self.raw_scan_attributed_detection["time_s"] - self.injection_time_s
+            ) * 1000.0
+
         adaptation_speed_ms = None
         if self.attributed_reaction is not None and self.injection_time_s is not None:
             adaptation_speed_ms = (self.attributed_reaction["time_s"] - self.injection_time_s) * 1000.0
@@ -1095,6 +1176,11 @@ class ScenarioDriver(Node):
             "adaptation_speed_ms": adaptation_speed_ms,
             "detection_attribution_status": bool(self.attributed_detection),
             "minimum_fault_distance_at_detection_m": self.minimum_fault_distance_at_detection_m,
+            "detection_signal_source": (
+                self.attributed_detection.get("signal_source")
+                if self.attributed_detection is not None
+                else None
+            ),
             "baseline_confound_status": baseline_confound_status,
             "injected_uncertainty_encounter_status": self.encounter_time_s is not None,
             "evaluation_window_after_encounter_s": evaluation_window_after_encounter_s,
@@ -1103,9 +1189,15 @@ class ScenarioDriver(Node):
             "attribution_scope": first_reaction.get("reaction_scope", "indeterminate"),
             "injected_uncertainty_source": self._active_injected_sources(),
             "obstacle_detection_latency_ms": detection_latency_ms,
+            "raw_scan_detection_latency_ms": raw_scan_detection_latency_ms,
             "false_obstacle_rate": false_obstacle_rate,
             "recovery_rate_ms": recovery_rate_ms,
             "route_deviation_m": self.route_deviation_max_m,
+            "post_injection_route_deviation_m": (
+                self.post_injection_route_deviation_max_m
+                if self.injection_time_s is not None
+                else None
+            ),
             "safety_preservation": safety_preservation,
             "goal_viability": {
                 "science_rock_01_reached": goal_reached,
@@ -1149,9 +1241,12 @@ class ScenarioDriver(Node):
             "",
             f"- Adaptation speed (ms): {metrics['adaptation_speed_ms']}",
             f"- Obstacle detection latency (ms): {metrics['obstacle_detection_latency_ms']}",
+            f"- Detection signal source: {metrics['detection_signal_source']}",
+            f"- Raw scan detection latency (ms): {metrics['raw_scan_detection_latency_ms']}",
             f"- Recovery rate (ms): {metrics['recovery_rate_ms']}",
             f"- False obstacle rate: {metrics['false_obstacle_rate']}",
             f"- Route deviation (m): {metrics['route_deviation_m']}",
+            f"- Post-injection route deviation (m): {metrics['post_injection_route_deviation_m']}",
             f"- Evaluation window after encounter (s): {metrics['evaluation_window_after_encounter_s']}",
             f"- Meaningful evaluation satisfied: {metrics['meaningful_evaluation_rule_satisfied']}",
             f"- Observed control rationale: {metrics['observed_control_rationale']}",

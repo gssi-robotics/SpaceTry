@@ -1,0 +1,67 @@
+{
+  "active_context_at_reaction": {
+    "degradation_active": true,
+    "distance_to_baseline_hazard_m": 32.5989,
+    "distance_to_goal_m": 78.1289,
+    "distance_to_injected_fault_m": 8.7168,
+    "injection_active": true,
+    "monitor_mr009_active": false,
+    "monitor_mr011_active": false,
+    "progress_ratio": 0.1834,
+    "raw_scan_front_min_m": null,
+    "raw_scan_state": "CLEAR",
+    "relative_angle_to_injected_fault_rad": -0.2702
+  },
+  "adaptation_speed_ms": 644.0,
+  "attribution_scope": "injected_only",
+  "autonomy_assessment": "FAIL",
+  "autonomy_reaction_status": true,
+  "baseline_confound_status": false,
+  "baseline_outcome_assessment": "NOT_EVALUATED",
+  "baseline_uncertainty_exercised_status": false,
+  "detection_attribution_status": false,
+  "end_wall_time": "2026-04-10T16:03:51.727807+00:00",
+  "evaluation_window_after_encounter_s": 200.9,
+  "false_obstacle_rate": 0.2941,
+  "goal_status": "PASS",
+  "goal_viability": {
+    "mission_deadline_met": true,
+    "science_rock_01_reached": true
+  },
+  "injected_outcome_assessment": "FAIL",
+  "injected_uncertainty_encounter_status": true,
+  "injected_uncertainty_source": [
+    "runtime_blocking_rock",
+    "degraded_obstacle_interpretation"
+  ],
+  "injection_entity_name": "injected_blocking_rock_20260410t155023z",
+  "injection_failure_reason": null,
+  "injection_pose": {
+    "x": 23.392,
+    "y": -15.9318,
+    "yaw": -1.1758,
+    "z": -1.2
+  },
+  "meaningful_evaluation_rule_satisfied": true,
+  "minimum_fault_distance_at_detection_m": null,
+  "monitor_events": [],
+  "observed_control_rationale": "obstacle_avoidance",
+  "obstacle_detection_latency_ms": null,
+  "outcome_assessment": "FAIL",
+  "reaction_attribution_status": true,
+  "reaction_scope": "injected_only",
+  "recovery_rate_ms": null,
+  "rosbag_output_dir": "/ws/log/spacetry_scenario_navigation_obstacle_sensing_coupled/rosbags/20260410T155023Z",
+  "route_deviation_m": 14.5256,
+  "run_id": "20260410T155023Z",
+  "safety_preservation": {
+    "MR_009": true,
+    "MR_011": true,
+    "collision_with_obstacle": false
+  },
+  "safety_status": "FAIL",
+  "scenario_elapsed_s": 296.0,
+  "scenario_name": "spacetry_scenario_navigation_obstacle_sensing_coupled",
+  "start_wall_time": "2026-04-10T15:50:25.343812+00:00",
+  "termination_reason": "goal_reached"
+}
