@@ -280,6 +280,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 - Obstacle detection latency (ms): Time from obstacle injection to the first attributable obstacle evidence available to the autonomy stack under degraded sensing
 - False obstacle rate (count or %): Rate of unsupported obstacle classifications during the sensing degradation window
 - Recovery rate (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
+- Route deviation (m): Maximum or average lateral distance between the full executed path and the nominal planned path; if needed, add a separate post-injection route-deviation metric
 ```
 
 ### Example 5: Composite / Terrain Change + Battery Drain
