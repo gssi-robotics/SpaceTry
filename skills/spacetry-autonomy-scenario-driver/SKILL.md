@@ -48,7 +48,7 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
    - identify which goals, landmarks, obstacles, and hazards already exist in the baseline world
    - identify baseline uncertainties already present in the source system, including BT obstacle-avoidance behavior, monitor-triggering battery or speed constraints, known hazards, perception limits, and launch-time defaults that can affect the mission before any new injection occurs
    - estimate whether the launch point, route length, and mission deadline are mutually realistic in the existing map
-   - ensure the scenario runtime and timeout budget are not shorter than the baseline BT evaluation horizon or mission window needed to express the autonomy under test
+   - ensure the scenario runtime and timeout budget are not shorter than the baseline BT evaluation horizon
    - require a practical reachability assessment before finalizing the injection pose or trigger:
      - estimate whether the rover is likely to physically reach the intended injection zone under realistic baseline behavior, not only under ideal mission geometry
      - account for likely baseline hazard avoidance, monitor-driven slowdowns, launch-time settling, and other non-nominal effects that may prevent the injected uncertainty from ever being encountered
