@@ -2,6 +2,7 @@
 import argparse
 import struct
 import json
+import math
 import os
 import re
 import shlex
@@ -25,6 +26,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 from matplotlib.patches import Circle, Ellipse, Polygon
 
 
@@ -119,6 +121,21 @@ def normalize_samples(
     ]
 
 
+def message_header_stamp_ns(msg: object) -> Optional[int]:
+    header = getattr(msg, "header", None)
+    if header is None:
+        return None
+    stamp = getattr(header, "stamp", None)
+    if stamp is None:
+        return None
+
+    sec = getattr(stamp, "sec", getattr(stamp, "secs", None))
+    nanosec = getattr(stamp, "nanosec", getattr(stamp, "nsec", None))
+    if sec is None or nanosec is None:
+        return None
+    return int(sec) * 1_000_000_000 + int(nanosec)
+
+
 def read_odom_samples_rosbag2_py(
     bag_path: Path, topic_name: str
 ) -> List[Tuple[float, float, float]]:
@@ -152,7 +169,10 @@ def read_odom_samples_rosbag2_py(
         if not isinstance(msg, Odometry):
             continue
         position = msg.pose.pose.position
-        points.append((int(stamp_ns), float(position.x), float(position.y)))
+        sample_stamp_ns = message_header_stamp_ns(msg)
+        if sample_stamp_ns is None:
+            sample_stamp_ns = int(stamp_ns)
+        points.append((sample_stamp_ns, float(position.x), float(position.y)))
     if not points:
         return []
     return normalize_samples(points)
@@ -174,7 +194,10 @@ def read_odom_samples_rosbags(
         for connection, stamp_ns, rawdata in reader.messages(connections=connections):
             msg = reader.deserialize(rawdata, connection.msgtype)
             position = msg.pose.pose.position
-            points.append((int(stamp_ns), float(position.x), float(position.y)))
+            sample_stamp_ns = message_header_stamp_ns(msg)
+            if sample_stamp_ns is None:
+                sample_stamp_ns = int(stamp_ns)
+            points.append((sample_stamp_ns, float(position.x), float(position.y)))
     if not points:
         return []
     return normalize_samples(points)
@@ -404,6 +427,90 @@ def compute_block_island_footprint(repo_root: Path) -> Optional[Dict[str, object
     }
 
 
+def compute_runtime_rock_footprint(
+    repo_root: Path,
+    injection_pose: Dict[str, float],
+) -> Optional[Dict[str, object]]:
+    model_path = repo_root / "src" / "spacetry_models" / "models" / "rock_5" / "model.sdf"
+    if not model_path.exists():
+        return None
+
+    model_sdf = model_path.read_text(encoding="utf-8")
+    collider_uri_match = re.search(
+        r"<collision[^>]*>.*?<mesh>\s*<uri>([^<]+)</uri>.*?</mesh>.*?</collision>",
+        model_sdf,
+        re.DOTALL,
+    )
+    if not collider_uri_match:
+        return None
+
+    collider_rel_uri = collider_uri_match.group(1).strip()
+    if collider_rel_uri.startswith("meshes/"):
+        collider_path = model_path.parent / collider_rel_uri
+    else:
+        collider_path = model_path.parent / collider_rel_uri.replace("model://rock_5/", "")
+    if not collider_path.exists():
+        return None
+
+    scale_match = re.search(
+        r"<collision[^>]*>.*?<mesh>\s*<uri>[^<]+</uri>\s*<scale>\s*([^\s]+)\s+([^\s]+)\s+([^\s]+)\s*</scale>",
+        model_sdf,
+        re.DOTALL,
+    )
+    scale_x = scale_y = 1.0
+    if scale_match:
+        scale_x = float(scale_match.group(1))
+        scale_y = float(scale_match.group(2))
+
+    collider_text = collider_path.read_text(encoding="utf-8")
+    unit_match = re.search(r"<unit[^>]*meter=\"([^\"]+)\"", collider_text)
+    unit_meter = float(unit_match.group(1)) if unit_match else 1.0
+
+    matrix_match = re.search(r"<matrix[^>]*>([^<]+)</matrix>", collider_text)
+    matrix_scale_x = matrix_scale_y = 1.0
+    if matrix_match:
+        matrix_values = [float(value) for value in matrix_match.group(1).split()]
+        if len(matrix_values) == 16:
+            matrix_scale_x = abs(matrix_values[0])
+            matrix_scale_y = abs(matrix_values[5])
+
+    positions_match = re.search(
+        r"<float_array[^>]+id=\"[^\"]*positions[^\"]*\"[^>]*>([^<]+)</float_array>",
+        collider_text,
+        re.DOTALL,
+    )
+    if not positions_match:
+        return None
+
+    position_values = [float(value) for value in positions_match.group(1).split()]
+    if len(position_values) < 6:
+        return None
+
+    total_scale_x = unit_meter * matrix_scale_x * scale_x
+    total_scale_y = unit_meter * matrix_scale_y * scale_y
+    xs = [value * total_scale_x for value in position_values[0::3]]
+    ys = [value * total_scale_y for value in position_values[1::3]]
+    min_x = min(xs)
+    max_x = max(xs)
+    min_y = min(ys)
+    max_y = max(ys)
+    local_center_x = (min_x + max_x) / 2.0
+    local_center_y = (min_y + max_y) / 2.0
+
+    yaw = float(injection_pose.get("yaw", 0.0))
+    cos_yaw = math.cos(yaw)
+    sin_yaw = math.sin(yaw)
+    world_center_x = float(injection_pose["x"]) + local_center_x * cos_yaw - local_center_y * sin_yaw
+    world_center_y = float(injection_pose["y"]) + local_center_x * sin_yaw + local_center_y * cos_yaw
+
+    return {
+        "center": (world_center_x, world_center_y),
+        "width": max_x - min_x,
+        "height": max_y - min_y,
+        "yaw_deg": math.degrees(yaw),
+    }
+
+
 def scenario_root_for_bag(bag_path: Path) -> Optional[Path]:
     if bag_path.parent.name != "rosbags":
         if bag_path.parent.parent.name == "rosbags":
@@ -449,11 +556,29 @@ def scenario_record_files(scenario_root: Path, run_id: Optional[str]) -> Dict[st
         metrics_path = metrics_dir / f"{scenario_name}_metrics.json"
         timeline_json_path = runtime_dir / f"{scenario_name}_timeline.json"
         timeline_jsonl_path = runtime_dir / f"{scenario_name}_timeline.jsonl"
+    report_path = scenario_root / f"{scenario_name}_report.md"
+
+    if not metrics_path.exists():
+        metric_candidates = sorted(metrics_dir.glob("*_metrics.json"))
+        if len(metric_candidates) == 1:
+            metrics_path = metric_candidates[0]
+    if not timeline_json_path.exists() and not timeline_jsonl_path.exists():
+        timeline_json_candidates = sorted(runtime_dir.glob("*_timeline.json"))
+        timeline_jsonl_candidates = sorted(runtime_dir.glob("*_timeline.jsonl"))
+        if len(timeline_json_candidates) == 1:
+            timeline_json_path = timeline_json_candidates[0]
+        if len(timeline_jsonl_candidates) == 1:
+            timeline_jsonl_path = timeline_jsonl_candidates[0]
+    if not report_path.exists():
+        report_candidates = sorted(scenario_root.glob("*_report.md"))
+        if len(report_candidates) == 1:
+            report_path = report_candidates[0]
+
     return {
         "metrics": metrics_path,
         "timeline_json": timeline_json_path,
         "timeline_jsonl": timeline_jsonl_path,
-        "report": scenario_root / f"{scenario_name}_report.md",
+        "report": report_path,
     }
 
 
@@ -475,6 +600,108 @@ def load_scenario_metrics_and_timeline(
     else:
         timeline = load_jsonl_file(record_files["timeline_jsonl"])
     return metrics, timeline
+
+
+def event_payload_candidates(event: Dict[str, object]) -> List[Dict[str, object]]:
+    candidates: List[Dict[str, object]] = []
+
+    def append_candidate(candidate: object) -> None:
+        if isinstance(candidate, dict):
+            candidates.append(candidate)
+
+    for key in ("details", "payload", "data"):
+        append_candidate(event.get(key))
+    for key in ("injected_fault_pose", "fault_pose", "active_context_at_reaction", "context"):
+        append_candidate(event.get(key))
+    for candidate in list(candidates):
+        for nested_key in ("pose", "fault_pose", "injected_fault_pose", "active_context_at_reaction", "context"):
+            append_candidate(candidate.get(nested_key))
+
+    return candidates
+
+
+def event_primary_payload(event: Dict[str, object]) -> Dict[str, object]:
+    for key in ("details", "payload", "data"):
+        candidate = event.get(key)
+        if isinstance(candidate, dict):
+            return candidate
+    return {}
+
+
+def event_style(event: Dict[str, object]) -> Optional[Tuple[str, str, str, Optional[str]]]:
+    event_name = event.get("event")
+    primary = event_primary_payload(event)
+    source = (
+        primary.get("source")
+        or primary.get("detection_signal_source")
+        or primary.get("candidate_source")
+    )
+    if not isinstance(source, str):
+        source = ""
+
+    if event_name == "fault_injected":
+        return ("Rock injected", "#ff7f0e", "^", "runtime rock")
+    if event_name in {"fault_injection_verified", "fault_spawn_verification"}:
+        return None
+    if event_name == "fault_encountered":
+        return ("Runtime rock detected", "#bcbd22", "v", None)
+    if event_name == "fault_detection_candidate":
+        if "obstacle_override" in source or "obstacle" in source:
+            return ("Obstacle proxy candidate", "#17becf", "s", None)
+        if "/scenario/obstacle" in source:
+            return ("Obstacle proxy candidate", "#17becf", "s", None)
+        if "/scan" in source:
+            return ("Raw scan candidate", "#17becf", "s", None)
+        return ("Detection candidate", "#17becf", "s", None)
+    if event_name == "fault_detection_attributed":
+        if "/scan" in source:
+            return ("Raw scan detection", "#17becf", "D", None)
+        if (
+            "/scenario/obstacle" in source
+            or "/obstacle/" in source
+            or "obstacle/front" in source
+            or "obstacle/left" in source
+            or "obstacle/right" in source
+        ):
+            return ("Obstacle detected", "#2ca02c", "s", None)
+        return ("Detection attributed", "#2ca02c", "s", None)
+    if event_name == "raw_scan_detection_attributed":
+        return ("Raw scan detection", "#17becf", "D", None)
+    if event_name == "reaction_attributed":
+        rationale = primary.get("observed_control_rationale") or primary.get("rationale")
+        if rationale == "obstacle_avoidance":
+            return ("Attributed avoidance", "#2ca02c", "P", None)
+        return ("Attributed reaction", "#2ca02c", "P", None)
+    if event_name == "fault_degradation_recovered":
+        return ("Degradation recovered", "#7f7f7f", "h", None)
+    if event_name == "goal_reached":
+        return ("Goal reached", "#1f77b4", "X", None)
+    return None
+
+
+def runtime_rock_pose(
+    metrics: Dict[str, object],
+    timeline: List[dict],
+) -> Optional[Dict[str, float]]:
+    injection_pose = metrics.get("injection_pose")
+    if isinstance(injection_pose, dict) and {"x", "y"} <= set(injection_pose):
+        return {
+            "x": float(injection_pose["x"]),
+            "y": float(injection_pose["y"]),
+            "yaw": float(injection_pose.get("yaw", 0.0)),
+        }
+
+    for event in timeline:
+        if not isinstance(event, dict) or event.get("event") != "fault_injected":
+            continue
+        for candidate in event_payload_candidates(event):
+            if {"x", "y"} <= set(candidate):
+                return {
+                    "x": float(candidate["x"]),
+                    "y": float(candidate["y"]),
+                    "yaw": float(candidate.get("yaw", 0.0)),
+                }
+    return None
 
 
 def build_scenario_markers(
@@ -512,6 +739,30 @@ def build_scenario_markers(
 
     mission = scenario_config.get("mission") if isinstance(scenario_config, dict) else None
     if isinstance(mission, dict):
+        start_pose = mission.get("start")
+        if isinstance(start_pose, dict) and {"x", "y"} <= set(start_pose):
+            append_marker(
+                {
+                    "x": float(start_pose["x"]),
+                    "y": float(start_pose["y"]),
+                    "label": "Dock Pad",
+                    "color": "#2ca02c",
+                    "marker": "o",
+                    "annotation": str(start_pose.get("name", "dock_pad_01")),
+                }
+            )
+        goal_pose = mission.get("goal")
+        if isinstance(goal_pose, dict) and {"x", "y"} <= set(goal_pose):
+            append_marker(
+                {
+                    "x": float(goal_pose["x"]),
+                    "y": float(goal_pose["y"]),
+                    "label": "Science Target",
+                    "color": "#9467bd",
+                    "marker": "*",
+                    "annotation": str(goal_pose.get("name", "science_rock_01")),
+                }
+            )
         start_waypoint = mission.get("start_waypoint")
         if isinstance(start_waypoint, dict) and {"x", "y"} <= set(start_waypoint):
             append_marker(
@@ -591,37 +842,14 @@ def build_scenario_markers(
             }
         )
 
-    event_styles = {
-        "fault_injected": ("Fault injected", "#ff7f0e", "^", "runtime rock"),
-        "fault_injection_verified": ("Injection verified", "#ff7f0e", "^", None),
-        "fault_encountered": ("Fault encountered", "#bcbd22", "v", None),
-        "fault_detection_candidate": ("Obstacle detection", "#17becf", "s", None),
-        "fault_detection_attributed": ("Detection attributed", "#2ca02c", "s", None),
-        "goal_reached": ("Goal reached", "#1f77b4", "X", "goal"),
-    }
     for event in timeline:
         if not isinstance(event, dict):
             continue
-        event_name = event.get("event")
-        if event_name not in event_styles:
+        style = event_style(event)
+        if style is None:
             continue
         xy = None
-        details_candidates = []
-        details = event.get("details")
-        if isinstance(details, dict):
-            details_candidates.append(details)
-        payload = event.get("payload")
-        if isinstance(payload, dict):
-            details_candidates.append(payload)
-        injected_fault_pose = event.get("injected_fault_pose")
-        if isinstance(injected_fault_pose, dict):
-            details_candidates.append(injected_fault_pose)
-        active_context = event.get("active_context_at_reaction")
-        if isinstance(active_context, dict):
-            details_candidates.append(active_context)
-
-        for details_candidate in details_candidates:
-            details = details_candidate
+        for details in event_payload_candidates(event):
             pose = details.get("pose")
             if isinstance(pose, dict) and {"x", "y"} <= set(pose):
                 xy = (float(pose["x"]), float(pose["y"]))
@@ -629,7 +857,10 @@ def build_scenario_markers(
             if {"x", "y"} <= set(details):
                 xy = (float(details["x"]), float(details["y"]))
                 break
-            if "distance_to_fault_m" in details and event_name == "fault_encountered":
+            if (
+                ("distance_to_fault_m" in details or "distance_to_injected_m" in details)
+                and event.get("event") == "fault_encountered"
+            ):
                 injected_marker = next(
                     (
                         marker
@@ -650,7 +881,7 @@ def build_scenario_markers(
             xy = nearest_sample_at_time(samples, float(time_s))
         if xy is None:
             continue
-        label, color, marker, annotation = event_styles[event_name]
+        label, color, marker, annotation = style
         append_marker(
             {
                 "x": xy[0],
@@ -658,13 +889,16 @@ def build_scenario_markers(
                 "label": label,
                 "color": color,
                 "marker": marker,
-                "annotation": annotation if event_name != "fault_injected" else "runtime rock",
+                "annotation": annotation,
             }
         )
     return markers
 
 
-def draw_world_context(repo_root: Path) -> None:
+def draw_world_context(
+    repo_root: Path,
+    runtime_rock_footprint: Optional[Dict[str, object]] = None,
+) -> None:
     footprint = compute_block_island_footprint(repo_root)
     if footprint is not None:
         polygon = Polygon(
@@ -698,6 +932,22 @@ def draw_world_context(repo_root: Path) -> None:
         elif name == "science_rock_01":
             patch = Ellipse((x, y), width=2.6, height=2.0, angle=0.0, facecolor="#9467bd", alpha=0.12, edgecolor="#9467bd", linewidth=1.2, zorder=1)
             plt.gca().add_patch(patch)
+
+    if runtime_rock_footprint is not None:
+        center_x, center_y = runtime_rock_footprint["center"]
+        patch = Ellipse(
+            (float(center_x), float(center_y)),
+            width=float(runtime_rock_footprint["width"]),
+            height=float(runtime_rock_footprint["height"]),
+            angle=float(runtime_rock_footprint["yaw_deg"]),
+            facecolor="#ffbb78",
+            alpha=0.25,
+            edgecolor="#ff7f0e",
+            linewidth=1.4,
+            zorder=1,
+            label="_nolegend_",
+        )
+        plt.gca().add_patch(patch)
 
 
 def scenario_summary_lines(
@@ -744,9 +994,31 @@ def scenario_summary_lines(
         )
 
     return lines
-def plot_path(
+
+
+def route_deviation_value(bag_path: Path) -> Optional[float]:
+    scenario_root = scenario_root_for_bag(bag_path)
+    if scenario_root is None:
+        return None
+    metrics, _timeline = load_scenario_metrics_and_timeline(scenario_root, bag_path)
+    if not metrics:
+        return None
+    route_deviation = metrics.get("route_deviation_m")
+    if not isinstance(route_deviation, (int, float)):
+        return None
+    return float(route_deviation)
+
+
+def route_deviation_text(bag_path: Path) -> Optional[str]:
+    route_deviation = route_deviation_value(bag_path)
+    if route_deviation is None:
+        return None
+    return f"Route deviation: {route_deviation:.4f} m"
+
+
+def plot_path_on_axis(
+    ax,
     points: List[Tuple[float, float]],
-    output_path: Path,
     title: str,
     start_label: str,
     end_label: str,
@@ -758,10 +1030,18 @@ def plot_path(
     xs = [point[0] for point in points]
     ys = [point[1] for point in points]
     resolved_markers = scenario_markers or []
+    scenario_root = scenario_root_for_bag(bag_path)
+    metrics: Dict[str, object] = {}
+    timeline: List[dict] = []
+    runtime_rock_footprint = None
+    if scenario_root is not None:
+        metrics, timeline = load_scenario_metrics_and_timeline(scenario_root, bag_path)
+        injection_pose = runtime_rock_pose(metrics, timeline)
+        if injection_pose is not None:
+            runtime_rock_footprint = compute_runtime_rock_footprint(repo_root, injection_pose)
 
-    fig, ax = plt.subplots(figsize=(10, 7.2))
     plt.sca(ax)
-    draw_world_context(repo_root)
+    draw_world_context(repo_root, runtime_rock_footprint=runtime_rock_footprint)
     ax.plot(xs, ys, linewidth=2.0, color="#1f77b4", label="Rover path")
     if not has_nearby_marker(resolved_markers, xs[0], ys[0]):
         add_marker(xs[0], ys[0], start_label, "#2ca02c", "o")
@@ -815,7 +1095,7 @@ def plot_path(
     ax.set_title(title, fontsize=TITLE_FONT_SIZE)
     current_right = ax.get_xlim()[1]
     current_bottom, current_top = ax.get_ylim()
-    ax.set_xlim(left=-2.0, right=max(70.0, current_right))
+    ax.set_xlim(left=-2.0, right=max(78.0, current_right))
     ax.set_ylim(bottom=current_bottom, top=current_top)
     ax.set_aspect("equal", adjustable="box")
     ax.grid(True, alpha=0.3)
@@ -836,7 +1116,7 @@ def plot_path(
             {
                 "loc": "center",
                 "bbox_to_anchor": (
-                    ((outpost_xy[0] + science_xy[0]) / 2.0) - 3.0,
+                    outpost_xy[0] + 8.0,
                     (outpost_xy[1] + science_xy[1]) / 2.0,
                 ),
                 "bbox_transform": ax.transData,
@@ -846,6 +1126,313 @@ def plot_path(
         legend_kwargs["loc"] = "upper left"
     ax.legend(**legend_kwargs)
 
+    route_deviation = route_deviation_text(bag_path)
+    if route_deviation is not None:
+        ax.text(
+            0.02,
+            0.03,
+            route_deviation,
+            transform=ax.transAxes,
+            fontsize=ANNOTATION_FONT_SIZE,
+            ha="left",
+            va="bottom",
+            bbox={
+                "boxstyle": "round,pad=0.25",
+                "facecolor": "white",
+                "edgecolor": "#bbbbbb",
+                "alpha": 0.9,
+            },
+        )
+
+
+def plot_path(
+    points: List[Tuple[float, float]],
+    output_path: Path,
+    title: str,
+    start_label: str,
+    end_label: str,
+    injection_point: Optional[Tuple[float, float]],
+    repo_root: Path,
+    bag_path: Path,
+    scenario_markers: Optional[List[Dict[str, object]]] = None,
+) -> None:
+    fig, ax = plt.subplots(figsize=(10, 7.2))
+    plot_path_on_axis(
+        ax=ax,
+        points=points,
+        title=title,
+        start_label=start_label,
+        end_label=end_label,
+        injection_point=injection_point,
+        repo_root=repo_root,
+        bag_path=bag_path,
+        scenario_markers=scenario_markers,
+    )
+
+    fig.tight_layout()
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=180)
+    plt.close(fig)
+
+
+def comparison_panel_title(bag_path: Path) -> str:
+    scenario_root = scenario_root_for_bag(bag_path)
+    name = scenario_root.name if scenario_root is not None else bag_path.name
+    match = re.search(r"(\d{8})_(\d{6})$", name)
+    if not match:
+        return name
+    date_part, time_part = match.groups()
+    return (
+        f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]}\n"
+        f"{time_part[:2]}:{time_part[2:4]}:{time_part[4:6]}"
+    )
+
+
+def unique_legend_entries(axes: List[object]) -> Tuple[List[object], List[str]]:
+    handles: List[object] = []
+    labels: List[str] = []
+    seen: set[str] = set()
+    for ax in axes:
+        axis_handles, axis_labels = ax.get_legend_handles_labels()
+        for handle, label in zip(axis_handles, axis_labels):
+            if not label or label == "_nolegend_" or label in seen:
+                continue
+            seen.add(label)
+            handles.append(handle)
+            labels.append(label)
+    return handles, labels
+
+
+def plot_comparison_pdf(
+    bag_paths: List[Path],
+    output_path: Path,
+    figure_title: str,
+    repo_root: Path,
+    start_label: str = "Start",
+    end_label: str = "Final Pose",
+    topic: str = ODOM_TOPIC,
+) -> None:
+    if not bag_paths:
+        raise RuntimeError("No bag paths provided for comparison plot.")
+
+    fig, axes = plt.subplots(
+        1,
+        len(bag_paths),
+        figsize=(6.8 * len(bag_paths) + 2.8, 6.8),
+        sharex=True,
+        sharey=True,
+    )
+    axes_list = [axes] if len(bag_paths) == 1 else list(axes)
+
+    for ax, bag_path in zip(axes_list, bag_paths):
+        samples = read_odom_samples(bag_path, topic)
+        points = [(x, y) for _, x, y in samples]
+        if not points:
+            raise RuntimeError(f"No odometry samples found in '{bag_path}'.")
+        scenario_markers = build_scenario_markers(repo_root, bag_path, samples)
+        plot_path_on_axis(
+            ax=ax,
+            points=points,
+            title=comparison_panel_title(bag_path),
+            start_label=start_label,
+            end_label=end_label,
+            injection_point=None,
+            repo_root=repo_root,
+            bag_path=bag_path,
+            scenario_markers=scenario_markers,
+        )
+        legend = ax.get_legend()
+        if legend is not None:
+            legend.remove()
+
+    handles, labels = unique_legend_entries(axes_list)
+    fig.suptitle(figure_title, fontsize=TITLE_FONT_SIZE + 1)
+    fig.legend(
+        handles,
+        labels,
+        loc="center left",
+        bbox_to_anchor=(0.985, 0.5),
+        fontsize=LEGEND_FONT_SIZE,
+        framealpha=0.95,
+        borderpad=0.8,
+        labelspacing=0.6,
+        handlelength=1.8,
+    )
+    fig.tight_layout(rect=[0.0, 0.0, 0.86, 0.93])
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output_path, dpi=180)
+    plt.close(fig)
+
+
+def comparison_run_label(bag_path: Path) -> str:
+    scenario_root = scenario_root_for_bag(bag_path)
+    name = scenario_root.name if scenario_root is not None else bag_path.name
+    match = re.search(r"(\d{8})_(\d{6})$", name)
+    if not match:
+        return name
+    date_part, time_part = match.groups()
+    return (
+        f"{date_part[:4]}-{date_part[4:6]}-{date_part[6:8]} "
+        f"{time_part[:2]}:{time_part[2:4]}:{time_part[4:6]}"
+    )
+
+
+def plot_overlay_comparison(
+    bag_paths: List[Path],
+    output_path: Path,
+    figure_title: str,
+    repo_root: Path,
+    start_label: str = "Start",
+    end_label: str = "Final Pose",
+    topic: str = ODOM_TOPIC,
+) -> None:
+    if not bag_paths:
+        raise RuntimeError("No bag paths provided for overlay comparison plot.")
+
+    colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+    fig, ax = plt.subplots(figsize=(12.2, 8.0))
+    plt.sca(ax)
+    draw_world_context(repo_root)
+    route_deviation_lines = ["Route deviation [m]"]
+
+    world_landmarks = load_world_landmarks(repo_root)
+    if "outpost_habitat_01" in world_landmarks:
+        x, y = world_landmarks["outpost_habitat_01"]
+        add_marker(x, y, "Outpost", "#8c564b", "P")
+        add_annotation(x, y, "outpost_habitat_01", "#8c564b", xytext=(-8, 4), ha="right")
+    if "science_rock_01" in world_landmarks:
+        x, y = world_landmarks["science_rock_01"]
+        add_marker(x, y, "Science Rock", "#9467bd", "*")
+        add_annotation(x, y, "science_rock_01", "#9467bd", xytext=(-8, 4), ha="right")
+
+    common_start: Optional[Tuple[float, float]] = None
+    for index, bag_path in enumerate(bag_paths):
+        color = colors[index % len(colors)]
+        samples = read_odom_samples(bag_path, topic)
+        points = [(x, y) for _, x, y in samples]
+        if not points:
+            raise RuntimeError(f"No odometry samples found in '{bag_path}'.")
+
+        xs = [point[0] for point in points]
+        ys = [point[1] for point in points]
+        ax.plot(xs, ys, linewidth=2.3, color=color, label=f"run{index + 1}")
+        ax.scatter([xs[-1]], [ys[-1]], color=color, marker="X", s=90, zorder=3, label="_nolegend_")
+        route_deviation = route_deviation_value(bag_path)
+        if route_deviation is not None:
+            route_deviation_lines.append(f"run{index + 1}: {route_deviation:.3f}")
+
+        if common_start is None:
+            common_start = (xs[0], ys[0])
+
+        scenario_markers = build_scenario_markers(repo_root, bag_path, samples)
+        for marker_info in scenario_markers:
+            label = str(marker_info["label"])
+            if label not in {"Rock injected", "Obstacle detected", "Runtime rock injected"}:
+                continue
+            ax.scatter(
+                [float(marker_info["x"])],
+                [float(marker_info["y"])],
+                color=color,
+                marker=str(marker_info["marker"]),
+                s=95,
+                zorder=4,
+                label="_nolegend_",
+            )
+
+        scenario_root = scenario_root_for_bag(bag_path)
+        if scenario_root is not None:
+            metrics, timeline = load_scenario_metrics_and_timeline(scenario_root, bag_path)
+            injection_pose = runtime_rock_pose(metrics, timeline)
+            if injection_pose is not None:
+                footprint = compute_runtime_rock_footprint(repo_root, injection_pose)
+                if footprint is not None:
+                    center_x, center_y = footprint["center"]
+                    ax.add_patch(
+                        Ellipse(
+                            (float(center_x), float(center_y)),
+                            width=float(footprint["width"]),
+                            height=float(footprint["height"]),
+                            angle=float(footprint["yaw_deg"]),
+                            facecolor=color,
+                            alpha=0.08,
+                            edgecolor=color,
+                            linewidth=1.2,
+                            zorder=2,
+                            label="_nolegend_",
+                        )
+                    )
+
+    if common_start is not None:
+        add_marker(common_start[0], common_start[1], start_label, "#2ca02c", "o")
+        add_annotation(common_start[0], common_start[1], "rover", "#2ca02c")
+
+    ax.set_xlabel("X [m]", fontsize=AXIS_LABEL_FONT_SIZE)
+    ax.set_ylabel("Y [m]", fontsize=AXIS_LABEL_FONT_SIZE)
+    ax.set_title(figure_title, fontsize=TITLE_FONT_SIZE)
+    current_right = ax.get_xlim()[1]
+    current_bottom, current_top = ax.get_ylim()
+    ax.set_xlim(left=-2.0, right=max(78.0, current_right))
+    ax.set_ylim(bottom=current_bottom, top=current_top)
+    ax.set_aspect("equal", adjustable="box")
+    ax.grid(True, alpha=0.3)
+    ax.tick_params(axis="both", labelsize=TICK_LABEL_FONT_SIZE)
+    y_range = max(current_top - current_bottom, 1.0)
+    legend_y_anchor = min(0.9, 0.42 + (15.0 / y_range))
+    if len(route_deviation_lines) > 1:
+        ax.text(
+            0.98,
+            0.68,
+            "\n".join(route_deviation_lines),
+            transform=ax.transAxes,
+            fontsize=ANNOTATION_FONT_SIZE,
+            ha="right",
+            va="center",
+            bbox={
+                "boxstyle": "round,pad=0.3",
+                "facecolor": "white",
+                "edgecolor": "#bbbbbb",
+                "alpha": 0.92,
+            },
+        )
+    legend_handles, legend_labels = ax.get_legend_handles_labels()
+    legend_handles.extend(
+        [
+            Line2D(
+                [0],
+                [0],
+                marker="^",
+                linestyle="None",
+                color="#444444",
+                markerfacecolor="#444444",
+                markeredgecolor="#444444",
+                markersize=8,
+                label="Rock injected",
+            ),
+            Line2D(
+                [0],
+                [0],
+                marker="s",
+                linestyle="None",
+                color="#444444",
+                markerfacecolor="#444444",
+                markeredgecolor="#444444",
+                markersize=8,
+                label="Obstacle detected",
+            ),
+        ]
+    )
+    legend_labels.extend(["Rock injected", "Obstacle detected"])
+    ax.legend(
+        legend_handles,
+        legend_labels,
+        loc="upper right",
+        bbox_to_anchor=(0.98, legend_y_anchor),
+        fontsize=LEGEND_FONT_SIZE,
+        framealpha=0.95,
+        borderpad=0.8,
+        labelspacing=0.6,
+        handlelength=1.8,
+    )
     fig.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output_path, dpi=180)

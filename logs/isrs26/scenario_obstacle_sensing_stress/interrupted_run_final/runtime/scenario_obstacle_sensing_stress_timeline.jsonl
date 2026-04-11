@@ -1,0 +1,4 @@
+{"details": {"config_file": "/ws/install/share/spacetry_scenario_obstacle_sensing_stress/config/scenario_config.yaml", "contract_file": "/ws/install/share/spacetry_scenario_obstacle_sensing_stress/config/scenario_contract.yaml", "goal": {"name": "science_rock_01", "x": 50.1, "y": -80.0}, "output_root": "/ws/log/scenario_obstacle_sensing_stress/interrupted_run_final"}, "event": "scenario_started", "sim_time_s": 0.0, "wall_time_utc": "2026-04-10T21:20:55.574609+00:00"}
+{"details": {"sim_time_s": 0.1}, "event": "sim_time_started", "sim_time_s": 0.1, "wall_time_utc": "2026-04-10T21:21:03.069872+00:00"}
+{"details": {"reason": "sigterm"}, "event": "shutdown_requested", "sim_time_s": 11.108, "wall_time_utc": "2026-04-10T21:21:26.712530+00:00"}
+{"details": {"termination_reason": "sigterm"}, "event": "scenario_finalized", "sim_time_s": 11.108, "wall_time_utc": "2026-04-10T21:21:26.713820+00:00"}

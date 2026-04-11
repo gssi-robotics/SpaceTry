@@ -1,1 +1,0 @@
-"""SpaceTry scenario driver package."""
