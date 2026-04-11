@@ -2,7 +2,7 @@ spacetry_bt_runner:
   ros__parameters:
     # Runner settings
     tick_hz: 10.0
-    max_runtime_s: 500.0
+    max_runtime_s: 1200.0
 
     # Waypoints (SetGoal expects: waypoints.<name> = [x, y, yaw])
     waypoints.science_rock: [50.10, -80.0, 3.07]

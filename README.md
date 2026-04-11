@@ -1,27 +1,42 @@
 <h1>SpaceTry 🥐 — <u>Space</u> <u>T</u>raining <u>R</u>over Autonom<u>Y</u></h1>
 
-SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees. 
+SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees + Autonomy Evaluation Scenario Generation Skill for LLM Agents. 
 
-Contents:
-- [Project Layout](#project-layout)
-- [Dependencies & Requirements](#dependencies--requirements)
-- [Quickstart](#quickstart-docker-only)
-- [Step-by-Step: Run SpaceTry 🥐](#step-by-step-run-spacetry--with-the-curiosity-rover)
-- [Mission configuration](#spacetry--mission-configuration)
+**Contents:**
+- [Project Layout](#project-layout) — Repository structure and ROS2 packages
+- [Dependencies & Integrations](#dependencies--integrations) — Integration with Space-ROS, Curiosity Rover, and BehaviorTree.CPP
+- [Quickstart](#quickstart-docker-only) — Quick validation: build Docker image and run smoke tests
+- [Step-by-Step: Run SpaceTry 🥐](#step-by-step-run-spacetry--with-the-curiosity-rover) — Complete walkthrough from container startup to rover control
+- [Mission configuration](#spacetry--mission-configuration) — Mission objectives, waypoints, and validation
+- [Test Scenarios](#test-scenarios-for-autonomy-evaluation) — Framework for autonomy evaluation and self-adaptation testing
 
 ## Project layout
-* `docker/` — Dockerfile + compose + entrypoint
-* `scripts/` — build / run / smoke test / validator
-* `deps/` — pinned external repos (`spacetry.repos`)
-* `src/` — ROS 2 packages & Gazebo assets:
 
-   * `spacetry_world` — Extension of the space-ros Curiosity Mars rover world and launch files ([description](src/spacetry_world/README.md))
-   * `spacetry_models` — Gazebo models ( [description](src/spacetry_models/README.md))
-   * `spacetry_bringup` — integration launch files (rover + world + bridges)
-   * `spacetry_bt` — BehaviorTree.CPP-based mission runner
-   * `spacetry_mission` — mission YAML configs and tooling
-   * `spacetry_battery` — battery manager node
-   * `spacetry_perception` — perception helpers (LiDAR obstacle direction)
+```
+spacetry/
+├── AGENTS.md                        - LLM agents instructions and rules
+├── README.md                        - project overview and usage
+├── REF_SCENARIO.md                  - autonomy behavior description for the reference scenario
+├── deps/                            - repository configuration for dependency management
+├── docker/
+├── scripts/                        - helper scripts to build, execution, and validation
+├── skills/
+│   └── spacetry-autonomy-scenario-driver/  - autonomy testing scenario LLM agent skill
+├── src/                            - ROS 2 packages & Gazebo assets
+│   ├── spacetry_battery/           - Battery manager node
+│   ├── spacetry_bringup/           - Rover launch configurations
+│   ├── spacetry_bt/                - Behavior tree runner node (C++)
+│   ├── spacetry_mission/           - Mission description and configuration files
+│   ├── spacetry_models/            - Gazebo models (target rocks, obstacles, outpost)
+│   ├── spacetry_monitors/          - Safety properties monitoring node
+│   ├── spacetry_perception/        - Perception nodes
+│   └── spacetry_world/             - Gazebo world configurations
+├── docs/                           - Project structure and implementation details
+└── logs/                           - Scenario execution and test run logs
+```
+
+The full project implementation and structure details can be found in [IMPLEMENTATION.md](docs/IMPLEMENTATION.md).
+
 
 ## Dependencies & Integrations
 
@@ -164,57 +179,101 @@ You should see:
 </details>
 
 <details>
-<summary> 4. Launch SpaceTry 🥐 with the Curiosity Mars Rover </summary>
+<summary> 4. Launch SpaceTry Rover in Simulation with Autonomous Mission 🥐 </summary>
 
-   SpaceTry 🥐 includes a bringup that launches the `mars_outpost` world, the Curiosity rover (spawned near `dock_pad_01`), and ROS↔Gazebo bridges.
+   SpaceTry 🥐 bringup launches the `mars_outpost` world, spawns the Curiosity rover (with proper simulation clock synchronization), starts ROS↔Gazebo bridges, loads the ros2_control controller chain, and **automatically** starts the behavior tree mission runner.
 
-   In the same terminal:
+   **Option A: Run from inside the running container**
 
+   From inside the container (see step 2.), simply launch the rover:
    ```bash
    source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py
    ```
 
-   **Optional** -- If you want to launch from a new terminal:
+   The launch will:
+   1. Start Gazebo with mars_outpost world
+   2. Publish ROS↔Gazebo bridges (including `/clock` for simulation time)
+   3. Spawn Curiosity rover (with 2-second delay to ensure clock is available)
+   4. Load ros2_control controller chain
+   5. Automatically start the behavior tree runner to execute the mission
 
+   To use a different BT tree file:
    ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py'
+   source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml
    ```
 
-   You should see Gazebo open with the outpost scene and rover spawned nearby. Use launch argument `battery:=0.5` to set initial battery state-of-charge (example: 50%).
+   **Option B: Run from a new terminal window**
 
-   **Optional - Headless mode (no Gazebo GUI):**
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75'
+   ```
+
+   To specify a custom BT tree:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75 tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml'
+   ```
+
+   **Option C: Run in Headless Mode (no Gazebo GUI)**
+
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1'
    ```
 
-   **Verify rover is running:**
+   To specify a custom BT tree:
    ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep curiosity'
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1 tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml'
    ```
 
-</details>
+   **Option D: Launch without the Behavior Tree**
 
-<details>
-<summary> 5. Run the Behavior Tree (BT) or drive manually </summary>
+   To launch the rover without the BT runner (for manual testing or debugging):
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py enable_bt_runner:=false'
+   ```
 
-   **Option A: Drive the rover manually in Gazebo GUI**
-   - Open the Entity Tree and select `curiosity_mars_rover`
-   - Open Component Inspector and adjust velocity commands
+   This starts the full simulation stack without the autonomous mission runner. Useful for:
+   - Manual rover control via command-line or external controllers
+   - Testing individual components (perception, battery manager, etc.)
+   - Debugging without BT execution overhead
 
-   **Option B: Run the Behavior Tree autonomously**
+   **Option E: Run the Behavior Tree separately on a new terminal**
 
-   In another terminal:
+   First, launch the rover without the BT runner:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py enable_bt_runner:=false'
+   ```
 
+   Then in another terminal, run the behavior tree runner:
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 run spacetry_bt spacetry_bt_runner --ros-args -p tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/base_bt.xml --params-file /ws/src/spacetry_bt/bt_params.yaml'
    ```
 
-   The BT runner will execute the mission defined in `/ws/src/spacetry_bt/trees/base_bt.xml`.
+   This allows you to start the BT independently, giving you fine-grained control over when the mission execution begins.
+
+   **Option F: Verify the rover and BT are running**
+
+   Check if Curiosity nodes are active:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep curiosity'
+   ```
+
+   Verify the behavior tree runner is executing:
+   ```bash
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep spacetry_bt_runner'
+   ```
+
+   You should see:
+   - Gazebo window with mars_outpost scene and rover spawned near `dock_pad_01`
+   - Console output from rover nodes and BT runner showing mission execution (if BT enabled)
+   - Use `battery:=0.5` to set initial battery state (example: 50%)
+   - Use `enable_bt_runner:=false` to launch without the behavior tree
+   - Use `tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml` to specify a custom BT tree
+   - The BT executes the mission from [base_bt.xml](src/spacetry_bt/trees/base_bt.xml) automatically (when enabled)
 
 </details>
 
 <details>
-<summary> 6. Stop SpaceTry 🥐 </summary>
+<summary> 5. Stop SpaceTry 🥐 </summary>
 
 After closing Gazebo GUI, exit all the containers bash with:
 
@@ -233,9 +292,8 @@ docker compose -f docker/docker-compose.yaml down
 ## SpaceTry 🥐 Mission Configuration
 
    Mission configuration files live in:
-   * ```src/spacetry_mission/config/waypoints.yaml``` — named navigation waypoints (frame: world)
    * ```src/spacetry_mission/config/objects.yaml``` — mission objects (IDs must match model instance names in the world)
-   * ```src/spacetry_mission/config/mission_01.yaml``` — example objective list (optional)
+   * ```src/spacetry_mission/config/waypoints.yaml``` — named navigation waypoints (frame: world)
 
    ### Validate mission config against the world
    The validator checks that IDs in objects.yaml exist in the installed world SDF.
@@ -252,3 +310,34 @@ docker compose -f docker/docker-compose.yaml down
    '
    ```
 > More details on the mission goals, configurations, and launch can be found in [MISSION.md](src/spacetry_mission/MISSION.md).
+
+## Test Scenarios for Autonomy Evaluation
+
+SpaceTry 🥐 includes an LLM-Agent [Skill](skills) for generating and running test scenarios that evaluate the rover's autonomous capabilities and self-adaptation to faults or  changing/unforeseen conditions.
+
+### Overview
+
+Test scenarios inject uncertainty into the rover's mission execution to evaluate:
+- **Perceptual Adaptation** — Can the rover adapt when sensors degrade or fail?
+- **Behavioral Flexibility** — Does the behavior tree transition to contingencies appropriately?
+- **Resource-Aware Autonomy** — Can the rover adapt goals to energy constraints?
+- **Obstacle Intelligence** — Can the rover discover and avoid dynamic obstacles?
+- **Mission Resilience** — Can the rover recover from failures or replanning challenges?
+- **Safety Under Autonomy** — Does self-adaptation maintain safety constraints?
+
+
+### Autonomy Test Scenario Workflow
+
+For a deeper understanding of the test scenario process and how to create custom scenarios, see the [AGENTS.md](AGENTS.md) section on [Autonomy Test Scenario Generation and Evaluation Workflow](AGENTS.md#autonomy-test-scenario-generation-and-evaluation-workflow) and the [Scenario Generation Prompt Template](skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md).
+
+The workflow consists of:
+
+| Step | Task | Description | Workflow |
+|------|------|-------------|----------|
+| 1 | **Scenario Prompt Template** | Specify the autonomy under text and mission context and objectives using the prompt template. | User Input |
+| 2 | **Scenario Driver Generation** | Use the LLM agent custom Skill to generate and parametrize the evaluation scenario from the prompt. | Automated |
+| 3 | **Scenario Driver Parametrization** | Configure and fine-tune scenario parameters before execution. | Automated |
+| 4 | **Scenario Driver Execution** | Execute the generated scenario in the simulation environment. | Automated |
+| 5 | **Autonomy Evaluation Report** | Analyze the output report from the agent to assess the rover's self-adaptation capabilities in the uncertainty test scenario. | User Input |
+
+A quick reference guide with examples is available at [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md).

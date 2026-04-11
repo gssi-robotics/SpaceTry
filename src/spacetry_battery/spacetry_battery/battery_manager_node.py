@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Tuple
 
 import rclpy
 from rclpy.node import Node
+from rclpy.qos import HistoryPolicy, QoSProfile, ReliabilityPolicy
 from rclpy.time import Time
 
 from geometry_msgs.msg import Twist
@@ -83,10 +84,15 @@ class BatteryManager(Node):
         cmd_vel_topic = str(self.get_parameter("cmd_vel_topic").value)
         joint_states_topic = str(self.get_parameter("joint_states_topic").value)
         odom_topic = str(self.get_parameter("odom_topic").value)
+        odom_qos = QoSProfile(
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10,
+            reliability=ReliabilityPolicy.BEST_EFFORT,
+        )
 
         self.create_subscription(Twist, cmd_vel_topic, self.on_twist, 10)
         self.create_subscription(JointState, joint_states_topic, self.on_joint, 10)
-        self.create_subscription(Odometry, odom_topic, self.on_odom, 10)
+        self.create_subscription(Odometry, odom_topic, self.on_odom, odom_qos)
 
         self.pub_battery = self.create_publisher(
             BatteryState, str(self.get_parameter("battery_state_topic").value), 10

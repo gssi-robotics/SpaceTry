@@ -48,15 +48,15 @@ class ObstacleDirectionNode(Node):
 
         self.declare_parameter('scan_topic', '/scan')
         self.declare_parameter('base_frame', 'base_link')
-        self.declare_parameter('threshold_m', 3.0)
+        self.declare_parameter('threshold_m', 9.0)
 
         # sector bounds in radians (in base_frame)
-        self.declare_parameter('front_min_rad', -0.35)
-        self.declare_parameter('front_max_rad',  0.35)
-        self.declare_parameter('left_min_rad',   1.05)
-        self.declare_parameter('left_max_rad',   2.09)
-        self.declare_parameter('right_min_rad', -2.09)
-        self.declare_parameter('right_max_rad', -1.05)
+        self.declare_parameter('front_min_rad', math.radians(-20.0))
+        self.declare_parameter('front_max_rad', math.radians(20.0))
+        self.declare_parameter('left_min_rad', math.radians(20.0))
+        self.declare_parameter('left_max_rad', math.radians(75.0))
+        self.declare_parameter('right_min_rad', math.radians(-75.0))
+        self.declare_parameter('right_max_rad', math.radians(-20.0))
 
         self.declare_parameter('publish_state_string', True)
         self.declare_parameter('log_period_s', 0.5)
@@ -133,32 +133,52 @@ class ObstacleDirectionNode(Node):
                 min_right = min(min_right, r)
 
         front = (min_front < self.threshold)
-        left  = (min_left  < self.threshold)
-        right = (min_right < self.threshold)
+        left = False
+        right = False
+        state = "CLEAR"
+
+        if front:
+            # Front gets priority so the BT reacts to hazards ahead.
+            # We still expose only one lateral side as blocked so the tree
+            # has a clear opposite direction to choose for circumvention.
+            side_ranges = {
+                "LEFT": min_left,
+                "RIGHT": min_right,
+            }
+            side_state, side_range = min(side_ranges.items(), key=lambda item: item[1])
+            if side_range < self.threshold:
+                left = (side_state == "LEFT")
+                right = (side_state == "RIGHT")
+                state = f"FRONT_{side_state}"
+            else:
+                state = "FRONT"
+        else:
+            side_ranges = {
+                "LEFT": min_left,
+                "RIGHT": min_right,
+            }
+            side_state, side_range = min(side_ranges.items(), key=lambda item: item[1])
+            if side_range < self.threshold:
+                left = (side_state == "LEFT")
+                right = (side_state == "RIGHT")
+                state = side_state
 
         self.pub_front.publish(Bool(data=front))
         self.pub_left.publish(Bool(data=left))
         self.pub_right.publish(Bool(data=right))
 
         if self.pub_state is not None:
-            if front:
-                state = "FRONT"
-            elif left:
-                state = "LEFT"
-            elif right:
-                state = "RIGHT"
-            else:
-                state = "CLEAR"
             self.pub_state.publish(String(data=state))
 
         now = self.get_clock().now()
         if (now - self._last_log_time).nanoseconds * 1e-9 >= self.log_period_s:
             self._last_log_time = now
-            # self.get_logger().info(
-            #     f"scan_frame={scan_frame} valid={valid}/{len(msg.ranges)} "
-            #     f"range=[{msg.range_min:.2f},{msg.range_max:.2f}] "
-            #     f"min_any={min_any:.2f} front={min_front:.2f} left={min_left:.2f} right={min_right:.2f}"
-            # )
+            self.get_logger().info(
+                f"state={state if self.pub_state is not None else 'N/A'} "
+                f"scan_frame={scan_frame} valid={valid}/{len(msg.ranges)} "
+                f"range=[{msg.range_min:.2f},{msg.range_max:.2f}] thr={self.threshold:.2f} "
+                f"min_any={min_any:.2f} front={min_front:.2f} left={min_left:.2f} right={min_right:.2f}"
+            )
 
 def main(args=None):
     rclpy.init(args=args)

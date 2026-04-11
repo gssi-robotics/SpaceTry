@@ -1,0 +1,196 @@
+# Package-Specific Agent Instructions Template
+
+Use this template to create a package-specific `AGENTS.md` or `.instructions.md` file in your package directory (`src/<package>/AGENTS.md`).
+
+This file allows you to specify rules, conventions, and constraints specific to your package that override or supplement the project-wide `AGENTS.md`.
+
+## Example Structure
+
+```markdown
+# <Package Name> - Agent Instructions
+
+This package implements [brief description].
+
+## Package-Specific Rules
+
+### Rule 1: [Topic/Guideline]
+Description of the rule and why it matters for this package.
+
+### Rule 2: [Topic/Guideline]
+Description of the rule and rationale.
+
+## Dependencies
+
+This package depends on:
+- [Package/Library Name] - [reason]
+- [Package/Library Name] - [reason]
+
+Agents should be aware of these dependencies when making changes.
+
+## Docker Interaction
+
+All commands for this package MUST be executed in the Docker container:
+
+**Build this package:**
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry colcon build --packages-select <package-name>
+```
+
+**Run this package:**
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 run <package-name> <executable>"
+```
+
+**Debug/Test this package:**
+```bash
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/jazzy/setup.bash && <your-test-command>"
+```
+
+**Do NOT:**
+- ❌ Run ROS2 commands on the host machine
+- ❌ Compile code outside Docker
+- ❌ Install packages directly on the host
+- ❌ Assume host system has any dependencies
+
+### Key Requirements
+
+- The `docker-compose.yaml` file is at `/ws/docker/docker-compose.yaml` inside the container
+- All ROS2 commands need to source `/opt/ros/jazzy/setup.bash` first
+- Use `bash -lc` to ensure login shell sources are available
+- The spacetry container has all dependencies pre-installed in the Docker image
+
+
+## Critical Files
+
+- `src/main.py` / `src/main.cpp` - Main entry point
+- `config/default.yaml` - Configuration schema
+- `launch/package.launch.py` - Primary launch configuration
+
+**Changing these requires understanding**: [impact/dependencies]
+
+## Testing This Package
+
+All testing MUST be done in Docker:
+
+```bash
+# Build in Docker
+docker compose -f docker/docker-compose.yaml exec spacetry colcon build --packages-select <package-name>
+
+# Test the package
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "ros2 launch <package-name> <launch-file> [args]"
+
+# Run unit tests (if applicable)
+docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "colcon test --packages-select <package-name>"
+```
+
+**Never** test code on the host system. Always use Docker.
+
+## Impact on Test Scenarios
+
+**This package affects rover autonomous capabilities and self-adaptation in the following ways:**
+
+(Describe how this package impacts autonomy:)
+- **Perceptual Autonomy** - Sensor quality and degradation handling (if spacetry_perception)
+- **Behavioral Autonomy** - Decision-making under uncertainty (if spacetry_bt)
+- **Resource Autonomy** - Energy-aware goal adaptation (if spacetry_battery)
+- **Environmental Adaptation** - Response to dynamic obstacles and conditions (if spacetry_world or spacetry_perception)
+- **Mission Resilience** - Recovery and replanning capabilities (if spacetry_mission)
+- **Safety-Aware Autonomy** - Constraint preservation during self-adaptation (if spacetry_monitors or spacetry_bt)
+
+**When modifying this package, validate:**
+- Does the rover's autonomous capability improve or degrade?
+- Can it adapt to unforeseen conditions?
+- Does self-adaptation maintain safety constraints?
+- Are contingency behaviors triggered appropriately?
+- Does graceful degradation work under resource constraints?
+- Can it recover from failures autonomously?
+
+**Autonomy Test Scenario Locations:**
+- Mission configs with autonomy parameters: `src/spacetry_mission/config/`
+- World configs with dynamic elements: `src/spacetry_world/worlds/`
+- Behavior tree autonomy logic: `src/spacetry_bt/trees/`
+- Launch parameters for autonomy tuning: `src/spacetry_bringup/launch/`
+
+
+## Known Constraints
+
+(List any known issues, workarounds, or design decisions)
+
+**Autonomy & Self-Adaptation Constraints:**
+(List constraints that affect autonomous behavior and self-adaptation)
+- Constraint: [Name] - [How it affects autonomy]
+- Constraint: [Name] - [How it degrades gracefully]
+
+**Test Scenarios Affected:**
+(List autonomy test scenarios that are sensitive to changes in this package)
+- Scenario: [Name] - [Autonomy aspect tested, impact of changes]
+- Scenario: [Name] - [Autonomy aspect tested, impact of changes]
+
+
+## Contribution Notes
+
+Before submitting changes to this package:
+
+1. **Autonomy Impact Analysis** - Determine how changes affect autonomous adaptation:
+   - Will the rover adapt better or worse to unforeseen conditions?
+   - Do changes improve perception, behavior flexibility, or resource awareness?
+   - Could changes degrade graceful degradation or contingency fallbacks?
+
+2. **Self-Adaptation Validation** - Test changes in contexts where autonomy is critical:
+   - Run autonomy test scenarios (sensor degradation, dynamic obstacles, power constraints)
+   - Verify contingency behaviors still trigger appropriately
+   - Check that safety constraints are never violated during autonomous operation
+
+3. **Dependency Review** - Reference hierarchical rules:
+   - Check project-wide `/AGENTS.md` for Docker requirements and test workflows
+   - Ensure changes follow the development workflow (docker compose, build in container, test in container)
+   - Verify autonomy impact aligns with test scenario evaluation criteria
+
+4. **Documentation** - Update this AGENTS.md file:
+   - Document any new autonomy-affecting code changes
+   - Add to "Impact on Test Scenarios" if autonomy evaluation changes
+   - Note any new constraints affecting self-adaptation in "Known Constraints"
+
+(Any additional guidance specific to this package)
+```
+
+## Guidelines for Package Maintainers
+
+Create a package-specific `AGENTS.md` if your package:
+
+1. Has **specific conventions** that differ from project defaults
+2. Has **critical dependencies** other packages rely on
+3. Has **complex initialization** or **setup requirements**
+4. Is **sensitive to timing** or has **performance constraints**
+5. Has **known limitations** agents should be aware of
+
+## When to Use Package-Level Rules
+
+✅ **Create package rules for:**
+- Behavioral packages (spacetry_bt)
+- Configuration-heavy packages (spacetry_mission)
+- Middleware packages (spacetry_monitors)
+- Sensor packages (spacetry_perception)
+
+❌ **Don't need package rules for:**
+- Simple launch wrapper packages
+- Model/asset packages
+- Minimal utility packages
+
+## Docker Interaction as a Package Rule
+
+**Important:** Always include the "Docker Interaction" section (from the project-wide AGENTS.md) in your package-specific rules so agents know:
+- All commands must run in Docker
+- Exact commands to build/test/run this package
+- Which environment variables are important
+- What dependencies must be present
+
+This prevents agents from attempting to run ROS2 or compilation commands on the host system.
+
+---
+
+Projects should check for package-specific files in this order:
+1. `<package>/AGENTS.md`
+2. `<package>/.instructions.md`
+
+If neither exists, the project-wide `AGENTS.md` applies.

@@ -1,15 +1,10 @@
 battery_manager:
   ros__parameters:
     capacity_wh: 120.0
-    initial_soc: 0.23
     update_rate_hz: 10.0
 
     cmd_vel_topic: /cmd_vel
     joint_states_topic: /joint_states
-    odom_topic: /model/curiosity_mars_rover/odometry
-
-    outpost_x: 0.0
-    outpost_y: 0.0
     outpost_radius_m: 2.0
 
     arm_joint_patterns: ["*arm*"]

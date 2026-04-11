@@ -21,6 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-${ROS_DISTRO}-controller-manager \
     ros-${ROS_DISTRO}-control-msgs \
     ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-rosbag2 \
     lsb-release wget gnupg \
  && rm -rf /var/lib/apt/lists/*
 
@@ -89,6 +90,7 @@ COPY --chown=${USERNAME}:${USERNAME} . /ws
 # Remove any stale colcon artifacts that slipped past .dockerignore
 # (prevents broken package.dsv files from a previous host build)
 RUN rm -rf /ws/build /ws/install /ws/log
+RUN mkdir -p /ws/log
 
 # Add GitHub host key to known_hosts to avoid interactive prompt
 RUN mkdir -p -m 0700 /root/.ssh && \

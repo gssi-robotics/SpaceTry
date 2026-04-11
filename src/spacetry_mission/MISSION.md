@@ -1,26 +1,18 @@
-# Space Robotics Use Case Description
+# Space Robotics Missions
+
+This document describes the rover's functionalities that can be used to implement self-adaptive behavior. Additional simulation environment configurations relevant to mission goals specification are also described.
+
+
+## Goals
+The main goal of the deployed rovers is to conduct scientific exploration and sampling of Mars. Depending on the rover payload configuration, different types of samples  or payload data can be collected. 
+
+The goal of the rover mission will be to explore the surrounding environment starting from the dock_pad location. An important aspect in the design to consider are the <u>terrain obstacles</u> and <u>battery energy levels</u>.
 
 The idea is that you design a mission that explores an unknown environment surrounding the rover to find sampling locations when a payload is being triggered by a science instrument. In this case, the camera and the lidar. Figure 1 below depicts the overall idea of the mission, where the exploration goal is to find areas that align with the robot’s sampling and sensing capabilities.
 ![Intersection between the unknown and the known environments during robot's operation.](robotics_ops.png)
 <p style="text-align: center;"> Fig. 1: Robotics mission goals.</p>
 
-### Goals
-The main goal of the deployed rovers is to conduct scientific exploration and sampling of Mars. Depending on the rover payload configuration, different types of samples  or payload data can be collected. 
-
-The goal of the rover mission will be to explore the surrounding environment starting from the dock_pad location. An important aspect in the design to consider are the <u>terrain obstacles</u> and <u>battery energy levels</u>.
-
-### Higher-Level Rover Tasks
-1. **Explore** - NavigateWithAvoidance Maneuver (BT Action Node)
-    - Navigate safely towards a goal waypoint (previously defined).
-    
-2. **Sample** - AlignToGoal + StopAndObserve Maneuver (BT Action Node)
-    - Circumvent area around the goal waypoint
-
-### Safety constraints
-1. **Battery**
-    - Battery levels should be considered to determine the next task and shall always be above 20% (topic /battery/soc 0.2). Otherwise, the rover shall return to the outpost.
-2. **Wheel**
-    - On good battery conditions (full), the rover speed should be above a certain threshold to avoid the wheel to get stuck.
+## Rover Capabilities
 
 ### Rover Actions
 
@@ -48,43 +40,25 @@ The demo nodes from `curiosity_rover_demo` (`mars_rover.launch.py`) expose ROS 2
 | Joint states | `/joint_states` | `sensor_msgs/JointState` | Published by `joint_state_broadcaster` |
 | Clock | `/clock` | `rosgraph_msgs/Clock` | Simulation time; all nodes use `use_sim_time: true` |
 
-## Mars Outpost World
-
-The Gazebo world (`mars_outpost.sdf`) defines a Martian environment with reduced gravity (3.711 m/s²) and the following scene entities:
-
-| Instance name | Model | Role |
-|---|---|---|
-| `outpost_habitat_01` | `station` | Outpost base station |
-| `science_rock_01` | `rock_5` | Science sampling target |
-| `block_island` | `block_island` | Terrain hazard obstacle |
-| `curiosity_path` | `curiosity_path` | Ground terrain (from `curiosity_gazebo`) |
-
-Physics is tuned for performance: 4 ms step size at 250 Hz update rate (ODE solver, `quick` type), with shadows disabled.
-
 ## SpaceTry packages and their role on the mission
 
 ### `spacetry_bt` — Behavior Tree mission runner
 
-The BT runner (`spacetry_bt_runner`) loads a BehaviorTree.CPP XML file and ticks it at a configurable rate (default 10 Hz). It provides 6 custom BT nodes:
+The BT runner (`spacetry_bt_runner`) loads a BehaviorTree.CPP XML file and ticks it at a configurable rate (default 10 Hz). It provides 10 custom BT nodes:
 
 | BT Node | Type | Description |
 |---|---|---|
-| `CallEmptyService` | SyncAction | Calls any `std_srvs/Empty` service (e.g., `/mast_open`, `/open_arm`) |
-| `SleepRos` | StatefulAction | Non-blocking timed pause |
-| `TimedMotion` | StatefulAction | Calls a start service, waits a duration, then calls a stop service |
-| `ObstacleTooClose` | Condition | Returns SUCCESS when minimum LiDAR range < threshold |
-| `PickRandomTurn` | SyncAction | Outputs `"left"` or `"right"` randomly |
-| `RandomSuccess` | Condition | Returns SUCCESS with configurable probability |
-
-An example tree (`base_bt.xml`) demonstrates the primary mission workflow:
-```
-MissionSequence (Sequence)
-├── SetGoal — Set target waypoint to "science_rock"
-├── NavigateWithAvoidance — Navigate to goal with LiDAR obstacle avoidance
-├── AlignToGoal — Align rover to final goal orientation
-├── StopAndObserve — Pause for 3 seconds at the goal location
-└── LogMessage — Log "Science rock reached"
-```
+| `SetGoal` | SyncAction | Load waypoint coordinates from parameters (e.g., `waypoints.science_rock`) and output as `Goal2D` blackboard entry |
+| `NavigateWithAvoidance` | StatefulAction | Navigate to goal with integrated LiDAR obstacle avoidance (reverse, turn, arc phases); publishes `/cmd_vel` commands |
+| `GoalReached` | Condition | Returns SUCCESS if rover is within distance tolerance of goal (checks odometry) |
+| `ObstacleInDirection` | Condition | Returns SUCCESS if obstacle detected in specified direction (front/left/right) from perception or scan data |
+| `SelectAvoidanceDirection` | SyncAction | Analyze obstacle state and select optimal avoidance direction (left/right); outputs `turn_direction` and `reverse_first` |
+| `DriveTowardGoal` | StatefulAction | Simple goal-seeking without obstacle avoidance (proportional heading control); publishes `/cmd_vel` |
+| `AvoidObstacle` | StatefulAction | Execute avoidance maneuver in selected direction from `SelectAvoidanceDirection` (reverse, turn, arc phases) |
+| `AlignToGoal` | StatefulAction | Rotate rover in place to align with goal heading; publishes `/cmd_vel` angular commands |
+| `StopAndObserve` | StatefulAction | Stop all motion and wait for specified duration (default 3 seconds) |
+| `LogMessage` | SyncAction | Log a string message to ROS logger (for debugging/mission milestones) |
+| `KeepRunning` | StatefulAction | Utility node that keeps a parent or external logic in RUNNING state |
 
 ### `spacetry_battery` — Battery manager node
 
@@ -119,10 +93,16 @@ YAML-based mission configuration consisting of three files:
 
 - **`objects.yaml`** — World objects with semantic types (validated against the SDF by `validate_mission_config.py`)
 
-- **`mission_01.yaml`** — Ordered objective list:
-  1. Navigate to `ridge`
-  2. Inspect `science_rock_01`
-  4. Return to `outpost_habitat_01`
+## Mars Outpost World
 
+The Gazebo world (`mars_outpost.sdf`) defines a Martian environment with reduced gravity (3.711 m/s²) and the following scene entities:
 
+| Instance name | Model | Role |
+|---|---|---|
+| `outpost_habitat_01` | `station` | Outpost base station |
+| `science_rock_01` | `rock_5` | Science sampling target |
+| `block_island` | `block_island` | Terrain hazard obstacle |
+| `curiosity_path` | `curiosity_path` | Ground terrain (defined in `curiosity_gazebo` from Space ROS Demos) |
+
+Physics is tuned for performance: 4 ms step size at 250 Hz update rate (ODE solver, `quick` type), with shadows disabled.
 

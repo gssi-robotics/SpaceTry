@@ -5,7 +5,7 @@ SpaceTry 🥐 bringup: Curiosity rover in the SpaceTry 🥐 mars_outpost world.
 - Launch mars_outpost
 - Spawn Curiosity via ros_gz_sim create (-param robot_description)
 - Start bridges + controllers
-- Include the demo nodes (mars_rover.launch.py)
+- Optionally include the upstream demo nodes (disabled by default for BT control)
 """
 
 import os
@@ -22,6 +22,7 @@ from launch.actions import (
     IncludeLaunchDescription,
     RegisterEventHandler,
     SetEnvironmentVariable,
+    TimerAction,
 )
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -30,7 +31,6 @@ from launch.conditions import IfCondition
 
 from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
-from launch_ros.parameter_descriptions import ParameterValue
 
 def _load_waypoint_pose(waypoints_yaml: str, waypoint_name: str):
     """
@@ -60,6 +60,9 @@ def generate_launch_description():
     spawn_y_offset = LaunchConfiguration("spawn_y_offset")
     spawn_yaw_offset = LaunchConfiguration("spawn_yaw_offset")
     battery = LaunchConfiguration("battery")
+    enable_demo_nodes = LaunchConfiguration("enable_demo_nodes")
+    enable_bt_runner = LaunchConfiguration("enable_bt_runner")
+    tree_file = LaunchConfiguration("tree_file")
 
     # --- paths
     spacetry_world_share = get_package_share_directory("spacetry_world")
@@ -163,6 +166,18 @@ def generate_launch_description():
         output="screen",
     )
 
+    odom_relay = Node(
+        package="spacetry_perception",
+        executable="odom_relay_node",
+        name="odom_relay",
+        output="screen",
+        parameters=[{
+            "use_sim_time": True,
+            "input_topic": "/model/curiosity_mars_rover/odometry",
+            "output_topic": "/mobile_base_controller/odom",
+        }],
+    )
+
     image_bridge = Node(
         package="ros_gz_image",
         executable="image_bridge",
@@ -184,7 +199,8 @@ def generate_launch_description():
             {
                 "outpost_x": base_x,
                 "outpost_y": base_y,
-                "initial_soc": ParameterValue(battery, value_type=float),
+                "initial_soc": battery,
+                "odom_topic": "/mobile_base_controller/odom",
                 "use_sim_time": True,
             },
         ],
@@ -233,11 +249,47 @@ def generate_launch_description():
         output="screen",
     )
 
-    # --- include demo nodes (arm/mast/wheel/run_demo)
+    # --- BT navigation uses /cmd_vel, but Curiosity expects wheel / steer controller commands.
+    # Keep the upstream wheel adapter active, but leave the demo action publisher disabled
+    # unless explicitly requested.
+    move_wheel_adapter = Node(
+        package="curiosity_rover_demo",
+        executable="move_wheel",
+        name="move_wheel_adapter",
+        output="screen",
+        parameters=[{"use_sim_time": True}],
+    )
+
     mars_rover_demo_nodes = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory("curiosity_rover_demo"), "launch", "mars_rover.launch.py")
-        )
+        ),
+        condition=IfCondition(enable_demo_nodes),
+    )
+
+    # --- BT Runner (behavior tree mission executor)
+    # Started after controller chain is loaded to ensure rover is fully ready
+    bt_params = PathJoinSubstitution(
+        [FindPackageShare("spacetry_bt"), "bt_params.yaml"]
+    )
+    bt_tree_file_default = PathJoinSubstitution(
+        [FindPackageShare("spacetry_bt"), "trees", "base_bt.xml"]
+    )
+    
+    spacetry_bt_runner = Node(
+        package="spacetry_bt",
+        executable="spacetry_bt_runner",
+        name="spacetry_bt_runner",
+        output="screen",
+        condition=IfCondition(enable_bt_runner),
+        parameters=[
+            bt_params,
+            {
+                "tree_file": tree_file,
+                "use_sim_time": True,
+                "tick_hz": 10,
+            },
+        ],
     )
 
 
@@ -251,7 +303,14 @@ def generate_launch_description():
             "use_sim_time": True,
             "scan_topic": "/scan",
             "base_frame": "base_link",
-            "threshold_m": 10.0,
+            "threshold_m": 9.0,
+            "front_min_rad": -0.3490658503988659,
+            "front_max_rad": 0.3490658503988659,
+            "left_min_rad": 0.3490658503988659,
+            "left_max_rad": 1.3089969389957472,
+            "right_min_rad": -1.3089969389957472,
+            "right_max_rad": -0.3490658503988659,
+            "log_period_s": 0.5,
         }],
     )
 
@@ -300,21 +359,40 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "battery",
-                default_value="0.2",
+                default_value="1.0",
                 description="Initial battery SOC fraction (0.0..1.0). Example: battery:=0.2 starts at 20%.",
+            ),
+            DeclareLaunchArgument(
+                "enable_demo_nodes",
+                default_value="false",
+                description="Launch upstream curiosity_rover_demo helper nodes. Keep false for BT-driven navigation.",
+            ),
+            DeclareLaunchArgument(
+                "enable_bt_runner",
+                default_value="true",
+                description="Launch the behavior tree runner for autonomous mission execution. Set to false to control rover manually.",
+            ),
+            DeclareLaunchArgument(
+                "tree_file",
+                default_value=str(bt_tree_file_default),
+                description="Path to BehaviorTree XML file. Defaults to base_bt.xml. Example: tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml",
             ),
             env_gz_plugin,
             env_gz_resource,
             SetParameter(name="use_sim_time", value=True),
             mars_outpost_launch,
             robot_state_publisher,
-            spawn,
-            odom_node,
+            # Start bridges early so /clock is available before robot spawns
             ros_gz_bridge,
             image_bridge,
+            # Small delay lets the clock bridge publish before spawn
+            TimerAction(period=2.0, actions=[spawn]),
+            odom_node,
+            odom_relay,
             battery_manager,
             obstacle_direction,
             copilot_monitor,
+            move_wheel_adapter,
             # Controller chain
             RegisterEventHandler(OnProcessExit(target_action=spawn, on_exit=[set_hardware_interface_active])),
             RegisterEventHandler(OnProcessExit(target_action=set_hardware_interface_active, on_exit=[load_joint_state_broadcaster])),
@@ -328,6 +406,13 @@ def generate_launch_description():
                         load_steer_joint_traj_controller,
                         load_suspension_joint_traj_controller,
                     ],
+                )
+            ),
+            # Start BT runner after suspension controller is loaded (last in chain)
+            RegisterEventHandler(
+                OnProcessExit(
+                    target_action=load_suspension_joint_traj_controller,
+                    on_exit=[spacetry_bt_runner],
                 )
             ),
             mars_rover_demo_nodes,

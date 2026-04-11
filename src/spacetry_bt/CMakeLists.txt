@@ -40,4 +40,8 @@ install(DIRECTORY trees
   DESTINATION share/${PROJECT_NAME}
 )
 
+install(FILES bt_params.yaml
+  DESTINATION share/${PROJECT_NAME}
+)
+
 ament_package()
