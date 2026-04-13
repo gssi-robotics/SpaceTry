@@ -1,0 +1,76 @@
+{
+  "active_context_at_reaction": {
+    "bearing_to_fault_deg": 1.283,
+    "block_island_near": false,
+    "degradation_mode": "noise",
+    "distance_to_fault_m": 9.413,
+    "monitor_mr009_active": false,
+    "monitor_mr011_active": false,
+    "obstacle_state": "FRONT_LEFT",
+    "progress_ratio": 0.6423,
+    "scan_front_min_m": null
+  },
+  "adaptation_speed_ms": 6364.0,
+  "attribution_scope": "injected_only",
+  "autonomy_reaction_status": true,
+  "baseline_confound_status": "clear",
+  "baseline_outcome_assessment": "PASS",
+  "baseline_uncertainty_exercised_status": true,
+  "collision_with_obstacle_observed": false,
+  "detection_attribution_status": true,
+  "detection_signal_source": "obstacle/front|left|right",
+  "evaluation_window_after_encounter_s": 97.796,
+  "false_obstacle_classification_count": 146,
+  "false_obstacle_rate_pct": 43.45,
+  "fault_model_name": "injected_rock_5_173000",
+  "fault_pose": {
+    "x": 41.501,
+    "y": -56.466,
+    "yaw": -1.22,
+    "z": 0.0
+  },
+  "goal_viability": {
+    "mission_deadline_met": true,
+    "science_rock_01_reached": true
+  },
+  "injected_outcome_assessment": "PASS",
+  "injected_uncertainty_encounter_status": true,
+  "injected_uncertainty_source": [
+    "injected_route_blocker",
+    "obstacle_topic_degradation"
+  ],
+  "injection_gate_diagnostics": {
+    "baseline_monitors_active": {
+      "MR_009": false,
+      "MR_011": false
+    },
+    "clear_window_s": 33.696,
+    "distance_to_block_island_m": 18.006,
+    "distance_to_goal_m": 37.055,
+    "obstacle_state": "CLEAR",
+    "progress_delta": 0.0246,
+    "progress_ratio": 0.616,
+    "remaining_time_s": 1027.1
+  },
+  "meaningful_evaluation_rule_satisfied": true,
+  "minimum_fault_distance_at_detection_m": 8.997523446079878,
+  "mission_deadline_met": true,
+  "observed_control_rationale": "obstacle_avoidance",
+  "obstacle_detection_latency_ms": 8000.0,
+  "outcome_assessment": "PASS",
+  "post_injection_route_deviation_m": 7.643,
+  "raw_scan_detection_latency_ms": null,
+  "reaction_attribution_status": true,
+  "reaction_scope": "injected_only",
+  "recovery_rate_ms": 3044.0,
+  "report": "/ws/log/scenario_obstacle_sensing_stress/full_run_bt_runtime_20260410_232826/spacetry_scenario_obstacle_sensing_stress_report.md",
+  "route_deviation_m": 10.039,
+  "safety_preservation": {
+    "MR_009": true,
+    "MR_011": true,
+    "collision_free": true
+  },
+  "scenario_name": "obstacle_sensing_stress",
+  "science_rock_01_reached": true,
+  "termination_reason": "goal_reached"
+}

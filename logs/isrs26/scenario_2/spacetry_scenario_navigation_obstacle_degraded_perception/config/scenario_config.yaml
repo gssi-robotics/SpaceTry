@@ -1,0 +1,101 @@
+scenario_name: navigation_obstacle_degraded_perception
+world_name: mars_outpost
+timeout_s: 1200.0
+nominal_linear_speed_mps: 1.6
+goal_tolerance_m: 1.5
+initial_battery_soc: 0.79
+publish_at_science_rock: true
+
+start_pose:
+  x: 0.0
+  y: 0.0
+  yaw: 0.0
+
+goal_pose:
+  name: science_rock_01
+  x: 50.10
+  y: -80.0
+  yaw: 3.07
+
+baseline_hazard:
+  name: block_island
+  x: 20.0
+  y: -40.5
+  radius_m: 12.0
+
+injection:
+  entity_name: scenario_blocking_rock_01
+  model_package: spacetry_models
+  model_relative_path: models/rock_5/model.sdf
+  reference_pose:
+    x: 31.3
+    y: -50.0
+    z: -14.2
+    yaw: 0.0
+  dynamic_pose_from_goal_bearing: true
+  spawn_distance_ahead_m: 10.0
+  detection_range_m: 9.0
+  encounter_radius_m: 9.0
+  attribution_distance_m: 12.0
+  collision_distance_m: 2.8
+  verification_delay_s: 2.0
+
+trigger:
+  min_progress_ratio: 0.075
+  trigger_radius_m: 60.0
+  recent_progress_window_s: 6.0
+  min_recent_progress_m: 0.25
+  min_remaining_time_s: 120.0
+  obstacle_clear_hold_s: 2.0
+  require_baseline_reaction_observed: true
+
+degradation:
+  duration_s: 18.0
+  publish_rate_hz: 10.0
+  base_false_duty_cycle: 0.35
+  max_false_duty_cycle: 0.80
+  base_segment_s: 0.45
+
+recovery:
+  hold_s: 3.0
+  resumed_linear_speed_mps: 0.6
+  resumed_progress_delta_m: 2.0
+  stall_timeout_s: 60.0
+  stall_progress_window_s: 45.0
+  stall_min_progress_m: 1.0
+
+geometry_checks:
+  front_bearing_deg: 25.0
+  misclassification_front_bearing_deg: 15.0
+  misclassification_distance_m: 10.0
+
+topics:
+  odom: /mobile_base_controller/odom
+  scan: /scan
+  cmd_vel: /cmd_vel
+  obstacle_front: /obstacle/front
+  obstacle_left: /obstacle/left
+  obstacle_right: /obstacle/right
+  obstacle_state: /obstacle/state
+  battery_soc: /battery/soc
+  battery_near_outpost: /battery/near_outpost
+  monitor_events: /monitor/events
+  monitor_mr009: /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+  monitor_mr011: /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
+  at_science_rock: /at_science_rock
+
+rosbag_topics:
+  - /clock
+  - /mobile_base_controller/odom
+  - /scan
+  - /cmd_vel
+  - /obstacle/front
+  - /obstacle/left
+  - /obstacle/right
+  - /obstacle/state
+  - /battery/soc
+  - /battery/near_outpost
+  - /monitor/events
+  - /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+  - /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
+  - /at_science_rock

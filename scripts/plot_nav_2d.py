@@ -562,6 +562,10 @@ def scenario_record_files(scenario_root: Path, run_id: Optional[str]) -> Dict[st
         metric_candidates = sorted(metrics_dir.glob("*_metrics.json"))
         if len(metric_candidates) == 1:
             metrics_path = metric_candidates[0]
+        else:
+            plain_metrics_path = metrics_dir / "scenario_metrics.json"
+            if plain_metrics_path.exists():
+                metrics_path = plain_metrics_path
     if not timeline_json_path.exists() and not timeline_jsonl_path.exists():
         timeline_json_candidates = sorted(runtime_dir.glob("*_timeline.json"))
         timeline_jsonl_candidates = sorted(runtime_dir.glob("*_timeline.jsonl"))
@@ -569,6 +573,14 @@ def scenario_record_files(scenario_root: Path, run_id: Optional[str]) -> Dict[st
             timeline_json_path = timeline_json_candidates[0]
         if len(timeline_jsonl_candidates) == 1:
             timeline_jsonl_path = timeline_jsonl_candidates[0]
+        if not timeline_json_path.exists():
+            plain_timeline_json_path = runtime_dir / "timeline.json"
+            if plain_timeline_json_path.exists():
+                timeline_json_path = plain_timeline_json_path
+        if not timeline_jsonl_path.exists():
+            plain_timeline_jsonl_path = runtime_dir / "timeline.jsonl"
+            if plain_timeline_jsonl_path.exists():
+                timeline_jsonl_path = plain_timeline_jsonl_path
     if not report_path.exists():
         report_candidates = sorted(scenario_root.glob("*_report.md"))
         if len(report_candidates) == 1:
@@ -626,6 +638,52 @@ def event_primary_payload(event: Dict[str, object]) -> Dict[str, object]:
         if isinstance(candidate, dict):
             return candidate
     return {}
+
+
+def command_pose_from_payload(payload: Dict[str, object]) -> Optional[Dict[str, float]]:
+    command = payload.get("command")
+    if not isinstance(command, list):
+        return None
+
+    x_value: Optional[float] = None
+    y_value: Optional[float] = None
+    z_value: Optional[float] = None
+    yaw_value: Optional[float] = None
+
+    index = 0
+    while index < len(command):
+        token = command[index]
+        if not isinstance(token, str):
+            index += 1
+            continue
+        if token in {"-x", "-y", "-z", "-Y"} and index + 1 < len(command):
+            next_token = command[index + 1]
+            if isinstance(next_token, str):
+                try:
+                    numeric = float(next_token)
+                except ValueError:
+                    numeric = None
+                if numeric is not None:
+                    if token == "-x":
+                        x_value = numeric
+                    elif token == "-y":
+                        y_value = numeric
+                    elif token == "-z":
+                        z_value = numeric
+                    elif token == "-Y":
+                        yaw_value = numeric
+            index += 2
+            continue
+        index += 1
+
+    if x_value is None or y_value is None:
+        return None
+    pose = {"x": x_value, "y": y_value}
+    if z_value is not None:
+        pose["z"] = z_value
+    if yaw_value is not None:
+        pose["yaw"] = yaw_value
+    return pose
 
 
 def event_style(event: Dict[str, object]) -> Optional[Tuple[str, str, str, Optional[str]]]:
@@ -694,6 +752,14 @@ def runtime_rock_pose(
     for event in timeline:
         if not isinstance(event, dict) or event.get("event") != "fault_injected":
             continue
+        primary = event_primary_payload(event)
+        command_pose = command_pose_from_payload(primary)
+        if command_pose is not None:
+            return {
+                "x": float(command_pose["x"]),
+                "y": float(command_pose["y"]),
+                "yaw": float(command_pose.get("yaw", 0.0)),
+            }
         for candidate in event_payload_candidates(event):
             if {"x", "y"} <= set(candidate):
                 return {
@@ -854,6 +920,10 @@ def build_scenario_markers(
             if isinstance(pose, dict) and {"x", "y"} <= set(pose):
                 xy = (float(pose["x"]), float(pose["y"]))
                 break
+            command_pose = command_pose_from_payload(details)
+            if command_pose is not None:
+                xy = (float(command_pose["x"]), float(command_pose["y"]))
+                break
             if {"x", "y"} <= set(details):
                 xy = (float(details["x"]), float(details["y"]))
                 break
@@ -1004,6 +1074,10 @@ def route_deviation_value(bag_path: Path) -> Optional[float]:
     if not metrics:
         return None
     route_deviation = metrics.get("route_deviation_m")
+    if not isinstance(route_deviation, (int, float)):
+        core_metrics = metrics.get("core_metrics")
+        if isinstance(core_metrics, dict):
+            route_deviation = core_metrics.get("route_deviation_m")
     if not isinstance(route_deviation, (int, float)):
         return None
     return float(route_deviation)

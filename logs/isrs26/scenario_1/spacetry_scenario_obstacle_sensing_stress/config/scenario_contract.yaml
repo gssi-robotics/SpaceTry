@@ -1,0 +1,147 @@
+scenario_name: obstacle_sensing_stress
+autonomy_aspect: obstacle intelligence
+uncertainty_location:
+  - environment
+  - managed system
+fault_subject:
+  primary: nominal route segment from dock_pad_01 to science_rock_01
+  secondary: autonomy-facing obstacle interpretation consumed by the BT
+fault_attribute:
+  primary: traversability of the active route corridor
+  secondary: truthfulness and stability of obstacle classification
+manifestation:
+  primary: inserted static rock blocker
+  secondary: noisy and intermittently suppressing obstacle classification
+space_domain:
+  primary: contiguous
+  secondary: isolated
+time_domain:
+  primary: permanent
+  secondary: transient
+trigger:
+  type: robot_state_predicate
+  description: >
+    Inject after the rover has made sustained progress beyond the baseline block_island
+    interaction region, obstacle topics have been clear for a short window, and enough
+    mission time remains for fair post-encounter evaluation.
+core_metrics:
+  - adaptation_speed_ms
+  - obstacle_detection_latency_ms
+  - autonomy_reaction_status
+  - detection_signal_source
+  - observed_control_rationale
+  - reaction_scope
+  - reaction_attribution_status
+  - active_context_at_reaction
+  - safety_preservation
+  - goal_viability
+  - recovery_rate_ms
+  - route_deviation_m
+  - detection_attribution_status
+  - minimum_fault_distance_at_detection_m
+  - baseline_confound_status
+  - injected_uncertainty_encounter_status
+  - evaluation_window_after_encounter_s
+  - baseline_uncertainty_exercised_status
+  - attribution_scope
+  - injected_uncertainty_source
+additional_metrics:
+  - raw_scan_detection_latency_ms
+  - false_obstacle_rate_pct
+  - false_obstacle_classification_count
+  - post_injection_route_deviation_m
+  - mission_deadline_met
+  - science_rock_01_reached
+  - collision_with_obstacle_observed
+baseline_uncertainties:
+  - block_island is a pre-existing route-side hazard near the southbound route.
+  - NavigateWithAvoidance already couples obstacle topics with raw scan fallback and memory-based turning.
+  - ObstacleDirection uses wide sectors and a 9.0 m threshold, which can make obstacle interpretation conservative.
+  - MR_009 and MR_011 monitors remain active runtime safety context; MR_011 is isolated from this scenario by starting below its full-battery guard threshold.
+primary_evaluation_target: navigation autonomy under runtime obstacle blocking
+secondary_injected_uncertainties:
+  - degraded obstacle interpretation on the autonomy-facing obstacle topics
+interaction_hypothesis: >
+  Delayed and noisy obstacle classifications will postpone or destabilize avoidance,
+  increasing recovery time and route deviation after the blocker appears.
+injected_uncertainties:
+  - source: injected_route_blocker
+    location: environment
+    manifestation: inserted static rock obstacle
+  - source: obstacle_topic_degradation
+    location: managed system
+    manifestation: transient clear masking followed by noisy lateral obstacle classification
+outcome_assessment: derived at runtime from injected_outcome_assessment plus safety status
+baseline_outcome_assessment: derived at runtime
+injected_outcome_assessment: derived at runtime
+baseline_map_assessment: >
+  The active world already contains dock_pad_01, science_rock_01, and the block_island
+  baseline hazard. The scenario reuses science_rock_01 as the canonical goal and injects
+  the new blocker only after the rover has progressed beyond the baseline hazard corridor.
+fault_attribution_rule: >
+  Credit injected detection or reaction only when the injected rock has been verified in
+  Gazebo, the rover is within the configured encounter geometry, the candidate signal
+  occurs after injection, and no closer baseline hazard or unrelated monitor event better
+  explains the observation.
+reaction_scope_rule: >
+  Classify rover reactions as baseline_only, injected_only, baseline_and_injected, or
+  indeterminate from the simultaneous presence of baseline hazard proximity, injected fault
+  proximity, obstacle-topic degradation activity, and active monitor violations.
+control_rationale_rule: >
+  Classify each significant cmd_vel change as goal_alignment, obstacle_avoidance,
+  replan_execution, monitor_enforcement, or unknown based on obstacle context, motion
+  direction, angular demand, and monitor state, independently from injected attribution.
+encounter_rule: >
+  The injected uncertainty is encountered when the rock insertion was verified and the rover
+  comes within the configured encounter distance while the rock lies inside the configured
+  forward bearing corridor relative to the rover.
+meaningful_evaluation_rule: >
+  Injected autonomy may be judged only when at least the minimum post-encounter observation
+  window remains after encounter; otherwise the injected outcome is INCONCLUSIVE or UNTESTED.
+minimum_post_encounter_observation_window_s: 30.0
+runtime_parameter_interface:
+  - parameter_name: scenario_contract_file
+    type: string
+    consumer_node: scenario_driver
+    source: launch path to share/spacetry_scenario_obstacle_sensing_stress/config/scenario_contract.yaml
+    transport: inline_launch_dict
+  - parameter_name: scenario_config_file
+    type: string
+    consumer_node: scenario_driver
+    source: launch path to share/spacetry_scenario_obstacle_sensing_stress/config/scenario_config.yaml
+    transport: inline_launch_dict
+  - parameter_name: output_root
+    type: string
+    consumer_node: scenario_driver
+    source: launch argument output_root
+    transport: inline_launch_dict
+  - parameter_name: run_timeout_s
+    type: double
+    consumer_node: scenario_driver
+    source: launch argument run_timeout_s
+    transport: inline_launch_dict
+  - parameter_name: goal_name
+    type: string
+    consumer_node: scenario_driver
+    source: launch literal science_rock_01
+    transport: inline_launch_dict
+  - parameter_name: goal_x
+    type: double
+    consumer_node: scenario_driver
+    source: launch literal from baseline mission waypoint
+    transport: inline_launch_dict
+  - parameter_name: goal_y
+    type: double
+    consumer_node: scenario_driver
+    source: launch literal from baseline mission waypoint
+    transport: inline_launch_dict
+  - parameter_name: goal_tolerance_m
+    type: double
+    consumer_node: scenario_driver
+    source: launch literal matched to baseline goal tolerance
+    transport: inline_launch_dict
+artifact_consumption_rule: >
+  scenario_contract.yaml and scenario_config.yaml are plain files parsed by the scenario
+  driver after their paths are passed as string ROS parameters through inline launch dict
+  parameters. The launch file does not pass either YAML file as a ROS params file, and no
+  separate driver_params.yaml is used.

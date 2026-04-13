@@ -1,0 +1,88 @@
+scenario_name: spacetry_scenario_navigation_obstacle_degraded_perception
+world_name: mars_outpost
+
+start:
+  id: dock_pad_01
+  x: 0.0
+  y: 0.0
+
+goal:
+  id: science_rock_01
+  x: 50.10
+  y: -80.0
+  yaw: 3.07
+  tolerance_m: 1.5
+
+baseline_hazard:
+  id: block_island
+  x: 20.0
+  y: -40.5
+  confound_radius_m: 14.0
+
+runtime:
+  timeout_s: 1200.0
+  start_guard_s: 20.0
+  min_progress_ratio_before_injection: 0.55
+  max_progress_ratio_for_injection: 0.92
+  max_distance_to_injection_pose_m: 14.0
+  min_distance_to_goal_after_injection_m: 18.0
+  min_distance_from_baseline_hazard_m: 18.0
+  progress_window_s: 6.0
+  min_progress_distance_m_over_window: 2.0
+  minimum_post_encounter_observation_window_s: 30.0
+
+injected_obstacle:
+  model_name: rock_5
+  model_relative_path: rock_5/model.sdf
+  entity_name_prefix: injected_route_rock
+  x: 36.0
+  y: -57.5
+  z: -14.5
+  roll: -1.1
+  pitch: -0.1
+  yaw: 3.07
+  encounter_distance_m: 11.0
+  attribution_distance_m: 12.0
+  clear_distance_m: 14.0
+  collision_distance_m: 3.0
+
+degradation:
+  publish_hz: 5.0
+  max_duration_s: 22.0
+  pre_encounter_noise_duration_s: 6.0
+  side_flip_period_s: 0.4
+
+metrics:
+  obstacle_threshold_m: 9.0
+  reaction_angular_threshold_radps: 0.45
+  slow_linear_threshold_mps: 0.70
+  resumed_linear_threshold_mps: 0.80
+  resumed_progress_window_s: 6.0
+
+topics:
+  odom: /mobile_base_controller/odom
+  scan: /scan
+  cmd_vel: /cmd_vel
+  battery_soc: /battery/soc
+  battery_near_outpost: /battery/near_outpost
+  obstacle_front: /obstacle/front
+  obstacle_left: /obstacle/left
+  obstacle_right: /obstacle/right
+  obstacle_state: /obstacle/state
+  monitor_events: /monitor/events
+  handler_mr_009: /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+  handler_mr_011: /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
+  rosbag_topics:
+    - /clock
+    - /cmd_vel
+    - /mobile_base_controller/odom
+    - /scan
+    - /obstacle/front
+    - /obstacle/left
+    - /obstacle/right
+    - /obstacle/state
+    - /battery/soc
+    - /battery/near_outpost
+    - /monitor/events
+    - /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+    - /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY

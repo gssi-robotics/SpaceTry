@@ -1,0 +1,548 @@
+[INFO] [launch]: All log files can be found below /home/spaceros-user/.ros/log/2026-04-11-10-20-33-172183-sheilona-4468
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [gz-1]: process started with pid [4471]
+[INFO] [robot_state_publisher-2]: process started with pid [4472]
+[INFO] [parameter_bridge-3]: process started with pid [4473]
+[INFO] [image_bridge-4]: process started with pid [4474]
+[INFO] [odom_tf_publisher-5]: process started with pid [4475]
+[INFO] [odom_relay_node-6]: process started with pid [4476]
+[INFO] [battery_manager-7]: process started with pid [4477]
+[INFO] [obstacle_direction_node-8]: process started with pid [4478]
+[INFO] [copilot-9]: process started with pid [4479]
+[INFO] [move_wheel-10]: process started with pid [4480]
+[INFO] [scenario_driver-11]: process started with pid [4481]
+[robot_state_publisher-2] Warning: link 'lidar_link' material 'black' undefined.
+[robot_state_publisher-2]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[robot_state_publisher-2] Warning: link 'lidar_link' material 'black' undefined.
+[robot_state_publisher-2]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[robot_state_publisher-2] [INFO] [1775902833.550190484] [robot_state_publisher]: Robot initialized
+[parameter_bridge-3] [INFO] [1775902833.571452219] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775902833.572138583] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/model/curiosity_mars_rover/odometry (gz.msgs.Odometry) -> /model/curiosity_mars_rover/odometry (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775902833.572700061] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/model/curiosity_mars_rover/odometry (nav_msgs/msg/Odometry) -> /model/curiosity_mars_rover/odometry (gz.msgs.Odometry)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775902833.573782272] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/scan (gz.msgs.LaserScan) -> /scan (sensor_msgs/msg/LaserScan)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775902833.574270904] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/scan (sensor_msgs/msg/LaserScan) -> /scan (gz.msgs.LaserScan)] (Lazy 0)
+[battery_manager-7] [INFO] [1775902833.916768255] [battery_manager]: BatteryManager: capacity=120.0Wh init=100% cmd_vel=/cmd_vel joint_states=/joint_states odom=/mobile_base_controller/odom
+[obstacle_direction_node-8] [INFO] [1775902833.933980795] [obstacle_direction]: Listening /scan (base_frame=base_link) thr=9.00m -> publishing obstacle/front|left|right (+ obstacle/state)
+[odom_tf_publisher-5] [INFO] [1775902833.935054540] [odom_tf_publisher]: Starting odometry_tf_publisher node
+[odom_relay_node-6] [INFO] [1775902833.948456558] [odom_relay]: Relaying odom /model/curiosity_mars_rover/odometry -> /mobile_base_controller/odom
+[INFO] [create-12]: process started with pid [4629]
+[create-12] [INFO] [1775902835.575577025] [spawn_curiosity]: Requesting list of world names.
+[create-12] [INFO] [1775902835.779546922] [spawn_curiosity]: Entity creation successful.
+[INFO] [create-12]: process has finished cleanly [pid 4629]
+[INFO] [ros2-13]: process started with pid [4649]
+[ros2-13] waiting for service to become available...
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="curiosity_mars_rover"]/link[@name="mast_cameras"]/sensor[@name="lidar"]/gz_frame_id:<urdf-string>:L0]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[gz-1] [INFO] [1775902836.588355899] [gz_ros_control]: Loading controller_manager
+[gz-1] [INFO] [1775902836.595494248] [controller_manager]: Using ROS clock for triggering controller manager cycles.
+[gz-1] [INFO] [1775902836.598568446] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[gz-1] [WARN] [1775902836.600931552] [gz_ros_control]: Waiting RM to load and initialize hardware...
+[gz-1] [INFO] [1775902836.601081219] [controller_manager]: Received robot description from topic.
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] [INFO] [1775902836.606357182] [gz_ros_control]: The position_proportional_gain has been set to: 0.1
+[gz-1] [INFO] [1775902836.606410201] [gz_ros_control]: Loading joint: arm_01_joint
+[gz-1] [INFO] [1775902836.606415114] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606419651] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606424114] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606430155] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606432976] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606450285] [gz_ros_control]: Loading joint: arm_02_joint
+[gz-1] [INFO] [1775902836.606452707] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606455131] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606457976] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606460296] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606462710] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606474546] [gz_ros_control]: Loading joint: arm_03_joint
+[gz-1] [INFO] [1775902836.606476935] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606479262] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606482029] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606484478] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606486864] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606497879] [gz_ros_control]: Loading joint: arm_04_joint
+[gz-1] [INFO] [1775902836.606500843] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606503190] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606505566] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606507853] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606510105] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606519936] [gz_ros_control]: Loading joint: arm_tools_joint
+[gz-1] [INFO] [1775902836.606522566] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606524932] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606528027] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606530502] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606532917] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606544088] [gz_ros_control]: Loading joint: mast_p_joint
+[gz-1] [INFO] [1775902836.606546699] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606549032] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606551401] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606553671] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606555937] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606565254] [gz_ros_control]: Loading joint: mast_02_joint
+[gz-1] [INFO] [1775902836.606567765] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606570026] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606572312] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606574610] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606576890] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606586168] [gz_ros_control]: Loading joint: mast_cameras_joint
+[gz-1] [INFO] [1775902836.606588816] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606591197] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606593579] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606596069] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606598349] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606608332] [gz_ros_control]: Loading joint: front_wheel_L_joint
+[gz-1] [INFO] [1775902836.606610770] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606613097] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606616709] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606619240] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606628786] [gz_ros_control]: Loading joint: middle_wheel_L_joint
+[gz-1] [INFO] [1775902836.606631225] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606633721] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606635996] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606660637] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606671933] [gz_ros_control]: Loading joint: back_wheel_L_joint
+[gz-1] [INFO] [1775902836.606674523] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606676911] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606679338] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606682261] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606691490] [gz_ros_control]: Loading joint: front_wheel_R_joint
+[gz-1] [INFO] [1775902836.606694158] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606696519] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606698803] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606701188] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606710005] [gz_ros_control]: Loading joint: middle_wheel_R_joint
+[gz-1] [INFO] [1775902836.606712401] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606714810] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606717083] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606719327] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606728519] [gz_ros_control]: Loading joint: back_wheel_R_joint
+[gz-1] [INFO] [1775902836.606730992] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606733449] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606735768] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606737972] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606746205] [gz_ros_control]: Loading joint: suspension_steer_F_L_joint
+[gz-1] [INFO] [1775902836.606748604] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606750920] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606753313] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606755661] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606757911] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606767241] [gz_ros_control]: Loading joint: suspension_steer_B_L_joint
+[gz-1] [INFO] [1775902836.606769690] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606771978] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606774293] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606776571] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606778846] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606788132] [gz_ros_control]: Loading joint: suspension_steer_F_R_joint
+[gz-1] [INFO] [1775902836.606790615] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606792956] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606795340] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606797774] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606800804] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606811700] [gz_ros_control]: Loading joint: suspension_steer_B_R_joint
+[gz-1] [INFO] [1775902836.606814216] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606816519] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606818936] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606821255] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606823569] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606833013] [gz_ros_control]: Loading joint: suspension_arm_F_L_joint
+[gz-1] [INFO] [1775902836.606837345] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606839704] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606842110] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606844538] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606849114] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606851652] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606861184] [gz_ros_control]: Loading joint: suspension_arm_B_L_joint
+[gz-1] [INFO] [1775902836.606863623] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606865857] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606868228] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606870553] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606872975] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606875249] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606884855] [gz_ros_control]: Loading joint: suspension_arm_F_R_joint
+[gz-1] [INFO] [1775902836.606887370] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606889758] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606892168] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606894551] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606901156] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606903669] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606913022] [gz_ros_control]: Loading joint: suspension_arm_B_R_joint
+[gz-1] [INFO] [1775902836.606915486] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606917775] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606920990] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775902836.606923363] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606925707] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606927995] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775902836.606937260] [gz_ros_control]: Loading joint: suspension_arm_B2_L_joint
+[gz-1] [INFO] [1775902836.606939701] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606942016] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606944464] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.606950688] [gz_ros_control]: Loading joint: suspension_arm_B2_R_joint
+[gz-1] [INFO] [1775902836.606953065] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775902836.606955388] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775902836.606957769] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775902836.607081062] [controller_manager]: Initialize hardware 'GazeboSystem' 
+[gz-1] [WARN] [1775902836.607100044] [controller_manager.hardware_component.system.GazeboSystem]: Executor is not available during hardware component initialization for 'GazeboSystem'. Skipping node creation!
+[gz-1] [INFO] [1775902836.607166718] [controller_manager]: Successful initialization of hardware 'GazeboSystem'
+[gz-1] [INFO] [1775902836.607333169] [resource_manager]: 'configure' hardware 'GazeboSystem' 
+[gz-1] [INFO] [1775902836.607336730] [gz_ros_control]: System Successfully configured!
+[gz-1] [INFO] [1775902836.607340982] [resource_manager]: Successful 'configure' of hardware 'GazeboSystem'
+[gz-1] [INFO] [1775902836.607349897] [resource_manager]: 'activate' hardware 'GazeboSystem' 
+[gz-1] [INFO] [1775902836.607357911] [resource_manager]: Successful 'activate' of hardware 'GazeboSystem'
+[gz-1] [WARN] [1775902836.607389310] [controller_manager]: Component 'GazeboSystem' does not have read or write statistics initialized, skipping registration.
+[gz-1] [INFO] [1775902836.607395576] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[ros2-13] requester: making request: controller_manager_msgs.srv.SetHardwareComponentState_Request(name='GazeboSystem', target_state=lifecycle_msgs.msg.State(id=3, label=''))
+[ros2-13] 
+[ros2-13] response:
+[ros2-13] controller_manager_msgs.srv.SetHardwareComponentState_Response(ok=True, state=lifecycle_msgs.msg.State(id=3, label='active'))
+[ros2-13] 
+[INFO] [ros2-13]: process has finished cleanly [pid 4649]
+[INFO] [ros2-14]: process started with pid [4694]
+[gz-1] [INFO] [1775902837.688870941] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[gz-1] [INFO] [1775902837.688906050] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[gz-1] [INFO] [1775902837.693374693] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[ros2-14] Successfully loaded controller joint_state_broadcaster
+[gz-1] [INFO] [1775902837.698684539] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[gz-1] [INFO] [1775902837.698821018] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] [INFO] [1775902837.704917341] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[gz-1] [WARN] [1775902838.832395057] [gz_ros_control]:  Desired controller update period (0.01 s) is slower than the gazebo simulation period (0.004 s).
+[gz-1] [INFO] [1775902838.834561403] [controller_manager]: Activated controllers: [ joint_state_broadcaster ]
+[gz-1] [INFO] [1775902838.834624215] [controller_manager]: Successfully switched controllers!
+[gz-1] glx: failed to create dri3 screen
+[gz-1] failed to load driver: 
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31m../materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [Material.cc:176] [0m[1;31mUnable to find texture [[0m[1;31m../materials/textures/FallingRocks_Albedo.jpg[0m[1;31m] as a locally cached texture or in path [[0m[1;31m/ws/install/share/spacetry_models/models/rock_5/meshes[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:880] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:928] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:940] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m
+[ros2-14] Successfully loaded controller joint_state_broadcaster into state active
+[INFO] [ros2-14]: process has finished cleanly [pid 4694]
+[INFO] [ros2-15]: process started with pid [4817]
+[INFO] [ros2-16]: process started with pid [4818]
+[INFO] [ros2-17]: process started with pid [4819]
+[INFO] [ros2-18]: process started with pid [4820]
+[INFO] [ros2-19]: process started with pid [4821]
+[obstacle_direction_node-8] [INFO] [1775902842.243439595] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[gz-1] [INFO] [1775902842.736296443] [controller_manager]: Loading controller : 'arm_joint_trajectory_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gz-1] [INFO] [1775902842.736336314] [controller_manager]: Loading controller 'arm_joint_trajectory_controller'
+[gz-1] [INFO] [1775902842.741028822] [controller_manager]: Controller 'arm_joint_trajectory_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[ros2-15] Successfully loaded controller arm_joint_trajectory_controller
+[gz-1] [INFO] [1775902842.800186106] [controller_manager]: Configuring controller: 'arm_joint_trajectory_controller'
+[gz-1] [INFO] [1775902842.800440196] [arm_joint_trajectory_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gz-1] [INFO] [1775902842.800482557] [arm_joint_trajectory_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gz-1] [INFO] [1775902842.800514494] [arm_joint_trajectory_controller]: Using 'splines' interpolation method.
+[gz-1] [INFO] [1775902842.801918002] [arm_joint_trajectory_controller]: Action status changes will be monitored at 20.00 Hz.
+[gz-1] [INFO] [1775902842.809696298] [controller_manager]: Loading controller : 'wheel_velocity_controller' of type 'velocity_controllers/JointGroupVelocityController'
+[gz-1] [INFO] [1775902842.809743379] [controller_manager]: Loading controller 'wheel_velocity_controller'
+[gz-1] [INFO] [1775902842.814265062] [controller_manager]: Controller 'wheel_velocity_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[ros2-17] Successfully loaded controller wheel_velocity_controller
+[gz-1] [INFO] [1775902842.827425890] [controller_manager]: Activating controllers: [ arm_joint_trajectory_controller ]
+[gz-1] [INFO] [1775902842.836234924] [controller_manager]: Activated controllers: [ arm_joint_trajectory_controller ]
+[gz-1] [INFO] [1775902842.836273415] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775902842.849976231] [controller_manager]: Configuring controller: 'wheel_velocity_controller'
+[ros2-15] Successfully loaded controller arm_joint_trajectory_controller into state active
+[gz-1] [INFO] [1775902842.850658889] [wheel_velocity_controller]: configure successful
+[gz-1] [INFO] [1775902842.861177090] [controller_manager]: Loading controller : 'mast_joint_trajectory_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gz-1] [INFO] [1775902842.861214430] [controller_manager]: Loading controller 'mast_joint_trajectory_controller'
+[gz-1] [INFO] [1775902842.861364511] [controller_manager]: Controller 'mast_joint_trajectory_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[ros2-16] Successfully loaded controller mast_joint_trajectory_controller
+[gz-1] [INFO] [1775902842.885711150] [controller_manager]: Loading controller : 'wheel_tree_position_controller' of type 'effort_controllers/JointGroupEffortController'
+[gz-1] [INFO] [1775902842.885751690] [controller_manager]: Loading controller 'wheel_tree_position_controller'
+[gz-1] [INFO] [1775902842.887770723] [controller_manager]: Controller 'wheel_tree_position_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[obstacle_direction_node-8] [INFO] [1775902842.925024507] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[ros2-19] Successfully loaded controller wheel_tree_position_controller
+[gz-1] [INFO] [1775902842.932381943] [controller_manager]: Activating controllers: [ wheel_velocity_controller ]
+[gz-1] [INFO] [1775902842.941939171] [wheel_velocity_controller]: activate successful
+[gz-1] [INFO] [1775902842.942029585] [controller_manager]: Activated controllers: [ wheel_velocity_controller ]
+[gz-1] [INFO] [1775902842.942049313] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775902842.955384345] [controller_manager]: Loading controller : 'steer_position_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gz-1] [INFO] [1775902842.955423282] [controller_manager]: Loading controller 'steer_position_controller'
+[ros2-17] Successfully loaded controller wheel_velocity_controller into state active
+[gz-1] [INFO] [1775902842.955656358] [controller_manager]: Controller 'steer_position_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[ros2-18] Successfully loaded controller steer_position_controller
+[gz-1] [INFO] [1775902842.983372073] [controller_manager]: Configuring controller: 'mast_joint_trajectory_controller'
+[gz-1] [INFO] [1775902842.983505919] [mast_joint_trajectory_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gz-1] [INFO] [1775902842.983518985] [mast_joint_trajectory_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gz-1] [INFO] [1775902842.983527885] [mast_joint_trajectory_controller]: Using 'splines' interpolation method.
+[gz-1] [INFO] [1775902842.984586919] [mast_joint_trajectory_controller]: Action status changes will be monitored at 20.00 Hz.
+[gz-1] [INFO] [1775902842.998028964] [controller_manager]: Configuring controller: 'wheel_tree_position_controller'
+[gz-1] [INFO] [1775902842.999111385] [wheel_tree_position_controller]: configure successful
+[gz-1] [INFO] [1775902843.006956902] [controller_manager]: Activating controllers: [ mast_joint_trajectory_controller ]
+[gz-1] [INFO] [1775902843.018943544] [controller_manager]: Activated controllers: [ mast_joint_trajectory_controller ]
+[gz-1] [INFO] [1775902843.018970283] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775902843.084002551] [controller_manager]: Activating controllers: [ wheel_tree_position_controller ]
+[ros2-16] Successfully loaded controller mast_joint_trajectory_controller into state active
+[gz-1] [INFO] [1775902843.094738107] [wheel_tree_position_controller]: activate successful
+[gz-1] [INFO] [1775902843.094847561] [controller_manager]: Activated controllers: [ wheel_tree_position_controller ]
+[gz-1] [INFO] [1775902843.094882022] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775902843.106890405] [controller_manager]: Configuring controller: 'steer_position_controller'
+[INFO] [ros2-15]: process has finished cleanly [pid 4817]
+[gz-1] [INFO] [1775902843.107047597] [steer_position_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gz-1] [INFO] [1775902843.107075774] [steer_position_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gz-1] [INFO] [1775902843.107083929] [steer_position_controller]: Using 'splines' interpolation method.
+[ros2-19] Successfully loaded controller wheel_tree_position_controller into state active
+[gz-1] [INFO] [1775902843.108064904] [steer_position_controller]: Action status changes will be monitored at 20.00 Hz.
+[gz-1] [INFO] [1775902843.125020395] [controller_manager]: Activating controllers: [ steer_position_controller ]
+[gz-1] [INFO] [1775902843.134514705] [controller_manager]: Activated controllers: [ steer_position_controller ]
+[gz-1] [INFO] [1775902843.134567355] [controller_manager]: Successfully switched controllers!
+[ros2-18] Successfully loaded controller steer_position_controller into state active
+[INFO] [ros2-17]: process has finished cleanly [pid 4819]
+[INFO] [ros2-16]: process has finished cleanly [pid 4818]
+[INFO] [ros2-18]: process has finished cleanly [pid 4820]
+[INFO] [ros2-19]: process has finished cleanly [pid 4821]
+[INFO] [spacetry_bt_runner-20]: process started with pid [4885]
+[spacetry_bt_runner-20] [1775902843.408]: MissionSequence           [36mIDLE[0m -> [33mRUNNING[0m
+[spacetry_bt_runner-20] [1775902843.408]: SetGoal                   [36mIDLE[0m -> [32mSUCCESS[0m
+[spacetry_bt_runner-20] [1775902843.409]: NavigateWithAvoidance     [36mIDLE[0m -> [33mRUNNING[0m
+[spacetry_bt_runner-20] [INFO] [1775902843.508167951] [spacetry_bt_runner]: BT heartbeat: tick=2 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902843.617158900] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902844.322769228] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902845.507909297] [spacetry_bt_runner]: BT heartbeat: tick=22 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902845.800467377] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=5/640 range=[1.00,20.00] thr=9.00 min_any=18.14 front=inf left=18.14 right=19.99
+[obstacle_direction_node-8] [INFO] [1775902847.148521595] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902848.307901163] [spacetry_bt_runner]: BT heartbeat: tick=50 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902848.542836122] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902850.209571249] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902851.207807937] [spacetry_bt_runner]: BT heartbeat: tick=79 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902851.591427221] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902852.854272921] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902853.807977230] [spacetry_bt_runner]: BT heartbeat: tick=105 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902854.084530405] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902855.302075673] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902856.207877243] [spacetry_bt_runner]: BT heartbeat: tick=129 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902856.462895340] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902857.776021403] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902858.408471130] [spacetry_bt_runner]: BT heartbeat: tick=151 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902858.536536106] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902858.984566294] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902859.536530608] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902859.877176173] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902860.308245333] [spacetry_bt_runner]: BT heartbeat: tick=170 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902860.536547961] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902860.770883610] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902861.536625231] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902861.602280023] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902862.007915246] [spacetry_bt_runner]: BT heartbeat: tick=187 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902862.536541880] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902862.552003785] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902863.414077725] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=7/640 range=[1.00,20.00] thr=9.00 min_any=19.68 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902863.536608391] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902863.707882582] [spacetry_bt_runner]: BT heartbeat: tick=204 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902864.224124282] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=52/640 range=[1.00,20.00] thr=9.00 min_any=14.39 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902864.536578379] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902865.033946777] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=138/640 range=[1.00,20.00] thr=9.00 min_any=15.60 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902865.407912852] [spacetry_bt_runner]: BT heartbeat: tick=221 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902865.536484561] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902865.986967563] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=207/640 range=[1.00,20.00] thr=9.00 min_any=13.52 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902866.536483314] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902866.805362798] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=223/640 range=[1.00,20.00] thr=9.00 min_any=11.12 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902867.107877781] [spacetry_bt_runner]: BT heartbeat: tick=238 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902867.536495738] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902867.633571205] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=208/640 range=[1.00,20.00] thr=9.00 min_any=13.49 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775902868.449686578] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=204/640 range=[1.00,20.00] thr=9.00 min_any=10.60 front=inf left=inf right=19.59
+[copilot-9] [ERROR] [1775902868.536484095] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902868.807983324] [spacetry_bt_runner]: BT heartbeat: tick=255 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902869.262005937] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=208/640 range=[1.00,20.00] thr=9.00 min_any=10.60 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902869.536493048] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902870.074752323] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=225/640 range=[1.00,20.00] thr=9.00 min_any=11.61 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902870.536508691] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902870.607897706] [spacetry_bt_runner]: BT heartbeat: tick=273 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902871.055482680] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=218/640 range=[1.00,20.00] thr=9.00 min_any=11.97 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902871.536506977] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902871.865531928] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=204/640 range=[1.00,20.00] thr=9.00 min_any=10.80 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902872.307875652] [spacetry_bt_runner]: BT heartbeat: tick=290 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902872.536490185] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902872.652873262] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=199/640 range=[1.00,20.00] thr=9.00 min_any=10.26 front=inf left=inf right=19.04
+[obstacle_direction_node-8] [INFO] [1775902873.441149776] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=205/640 range=[1.00,20.00] thr=9.00 min_any=9.89 front=inf left=inf right=16.93
+[copilot-9] [ERROR] [1775902873.536537131] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902874.008588271] [spacetry_bt_runner]: BT heartbeat: tick=307 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902874.287880814] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=206/640 range=[1.00,20.00] thr=9.00 min_any=9.62 front=inf left=inf right=16.44
+[copilot-9] [ERROR] [1775902874.536515777] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902875.321928100] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=209/640 range=[1.00,20.00] thr=9.00 min_any=9.39 front=inf left=inf right=15.53
+[copilot-9] [ERROR] [1775902875.536499778] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902875.808046890] [spacetry_bt_runner]: BT heartbeat: tick=325 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902876.460588375] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=193/640 range=[1.00,20.00] thr=9.00 min_any=9.35 front=inf left=inf right=14.65
+[copilot-9] [ERROR] [1775902876.536489528] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902877.518507256] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=197/640 range=[1.00,20.00] thr=9.00 min_any=9.39 front=inf left=inf right=11.53
+[copilot-9] [ERROR] [1775902877.536489996] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902877.707900626] [spacetry_bt_runner]: BT heartbeat: tick=344 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902878.378588769] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=199/640 range=[1.00,20.00] thr=9.00 min_any=8.99 front=17.85 left=inf right=9.02
+[copilot-9] [ERROR] [1775902878.536497525] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902879.268491469] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=216/640 range=[1.00,20.00] thr=9.00 min_any=8.89 front=15.47 left=inf right=8.93
+[spacetry_bt_runner-20] [INFO] [1775902879.507924681] [spacetry_bt_runner]: BT heartbeat: tick=362 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902879.536491804] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902880.294990949] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=218/640 range=[1.00,20.00] thr=9.00 min_any=9.87 front=15.84 left=inf right=10.06
+[copilot-9] [ERROR] [1775902880.536507700] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902881.230993844] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=214/640 range=[1.00,20.00] thr=9.00 min_any=9.92 front=16.94 left=inf right=10.17
+[spacetry_bt_runner-20] [INFO] [1775902881.407904907] [spacetry_bt_runner]: BT heartbeat: tick=381 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902881.536522695] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902882.145022855] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=228/640 range=[1.00,20.00] thr=9.00 min_any=9.89 front=15.17 left=inf right=9.91
+[copilot-9] [ERROR] [1775902882.536523110] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902883.225070119] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=242/640 range=[1.00,20.00] thr=9.00 min_any=8.90 front=12.60 left=inf right=8.90
+[spacetry_bt_runner-20] [INFO] [1775902883.310121757] [spacetry_bt_runner]: BT heartbeat: tick=400 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902883.536528014] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902884.360889394] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=245/640 range=[1.00,20.00] thr=9.00 min_any=8.31 front=11.53 left=inf right=8.31
+[copilot-9] [ERROR] [1775902884.536491272] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902885.207958455] [spacetry_bt_runner]: BT heartbeat: tick=419 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902885.496445898] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=246/640 range=[1.00,20.00] thr=9.00 min_any=8.32 front=11.79 left=inf right=8.32
+[copilot-9] [ERROR] [1775902885.536501958] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[copilot-9] [ERROR] [1775902886.536501553] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902886.605783327] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=246/640 range=[1.00,20.00] thr=9.00 min_any=8.30 front=11.67 left=inf right=8.30
+[spacetry_bt_runner-20] [INFO] [1775902887.107856446] [spacetry_bt_runner]: BT heartbeat: tick=438 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902887.536516180] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902887.689966338] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=245/640 range=[1.00,20.00] thr=9.00 min_any=8.41 front=11.72 left=inf right=8.41
+[copilot-9] [ERROR] [1775902888.536525049] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902888.721109533] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=244/640 range=[1.00,20.00] thr=9.00 min_any=8.49 front=11.74 left=inf right=8.49
+[spacetry_bt_runner-20] [INFO] [1775902888.908352678] [spacetry_bt_runner]: BT heartbeat: tick=456 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902889.536490606] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902889.642376155] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=244/640 range=[1.00,20.00] thr=9.00 min_any=8.54 front=12.25 left=inf right=8.54
+[obstacle_direction_node-8] [INFO] [1775902890.511991625] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=242/640 range=[1.00,20.00] thr=9.00 min_any=8.58 front=12.70 left=inf right=8.58
+[copilot-9] [ERROR] [1775902890.536523654] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902890.707884407] [spacetry_bt_runner]: BT heartbeat: tick=474 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902891.536530392] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902891.574167163] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=242/640 range=[1.00,20.00] thr=9.00 min_any=8.65 front=12.97 left=inf right=8.65
+[spacetry_bt_runner-20] [INFO] [1775902892.507974222] [spacetry_bt_runner]: BT heartbeat: tick=492 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902892.536497043] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902892.664085934] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=241/640 range=[1.00,20.00] thr=9.00 min_any=8.71 front=13.10 left=inf right=8.71
+[copilot-9] [ERROR] [1775902893.536494827] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902893.762026494] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=241/640 range=[1.00,20.00] thr=9.00 min_any=8.81 front=13.31 left=inf right=8.86
+[spacetry_bt_runner-20] [INFO] [1775902894.407876803] [spacetry_bt_runner]: BT heartbeat: tick=511 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902894.536523470] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902894.808864248] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=239/640 range=[1.00,20.00] thr=9.00 min_any=8.92 front=13.71 left=inf right=9.18
+[copilot-9] [ERROR] [1775902895.536496730] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902895.735012463] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=235/640 range=[1.00,20.00] thr=9.00 min_any=9.02 front=13.64 left=inf right=9.26
+[spacetry_bt_runner-20] [INFO] [1775902896.307968965] [spacetry_bt_runner]: BT heartbeat: tick=530 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902896.536490747] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902896.798348562] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=232/640 range=[1.00,20.00] thr=9.00 min_any=9.12 front=14.31 left=inf right=9.27
+[copilot-9] [ERROR] [1775902897.536497686] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902897.871922224] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=232/640 range=[1.00,20.00] thr=9.00 min_any=8.97 front=14.08 left=inf right=9.06
+[spacetry_bt_runner-20] [INFO] [1775902898.107868494] [spacetry_bt_runner]: BT heartbeat: tick=548 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902898.536492344] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902898.950113538] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=240/640 range=[1.00,20.00] thr=9.00 min_any=8.86 front=17.77 left=inf right=9.21
+[copilot-9] [ERROR] [1775902899.536500648] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902899.907836586] [spacetry_bt_runner]: BT heartbeat: tick=566 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902899.976364910] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=242/640 range=[1.00,20.00] thr=9.00 min_any=8.80 front=17.02 left=inf right=9.31
+[copilot-9] [ERROR] [1775902900.536468833] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902900.865470933] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=247/640 range=[1.00,20.00] thr=9.00 min_any=8.72 front=16.13 left=inf right=9.33
+[copilot-9] [ERROR] [1775902901.536508490] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902901.708051768] [spacetry_bt_runner]: BT heartbeat: tick=584 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902901.786826851] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=244/640 range=[1.00,20.00] thr=9.00 min_any=9.17 front=16.82 left=inf right=9.66
+[copilot-9] [ERROR] [1775902902.536525663] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902902.691335017] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=238/640 range=[1.00,20.00] thr=9.00 min_any=10.05 front=17.45 left=inf right=10.05
+[spacetry_bt_runner-20] [INFO] [1775902903.509599939] [spacetry_bt_runner]: BT heartbeat: tick=602 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902903.536518587] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902903.557493659] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=231/640 range=[1.00,20.00] thr=9.00 min_any=11.33 front=17.78 left=inf right=11.35
+[obstacle_direction_node-8] [INFO] [1775902904.451685831] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=227/640 range=[1.00,20.00] thr=9.00 min_any=12.02 front=18.41 left=inf right=12.02
+[copilot-9] [ERROR] [1775902904.536507189] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902905.299799004] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=196/640 range=[1.00,20.00] thr=9.00 min_any=12.79 front=19.71 left=inf right=12.79
+[spacetry_bt_runner-20] [INFO] [1775902905.307894977] [spacetry_bt_runner]: BT heartbeat: tick=620 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902905.536505866] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902906.366349042] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=142/640 range=[1.00,20.00] thr=9.00 min_any=13.91 front=inf left=inf right=13.91
+[copilot-9] [ERROR] [1775902906.536521222] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902907.107944772] [spacetry_bt_runner]: BT heartbeat: tick=638 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902907.238477763] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=115/640 range=[1.00,20.00] thr=9.00 min_any=17.83 front=inf left=inf right=18.31
+[copilot-9] [ERROR] [1775902907.536504360] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902908.345449200] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=34/640 range=[1.00,20.00] thr=9.00 min_any=19.22 front=inf left=inf right=19.22
+[copilot-9] [ERROR] [1775902908.536501923] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902909.008132777] [spacetry_bt_runner]: BT heartbeat: tick=657 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902909.234156611] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=28/640 range=[1.00,20.00] thr=9.00 min_any=19.32 front=inf left=inf right=19.32
+[copilot-9] [ERROR] [1775902909.536491525] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902910.359256650] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=13/640 range=[1.00,20.00] thr=9.00 min_any=19.49 front=inf left=inf right=19.49
+[copilot-9] [ERROR] [1775902910.536531672] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902910.908046548] [spacetry_bt_runner]: BT heartbeat: tick=676 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902911.506427313] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902911.536475975] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[copilot-9] [ERROR] [1775902912.536491735] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902912.700842143] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902912.907962773] [spacetry_bt_runner]: BT heartbeat: tick=696 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902913.536484381] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902913.755502117] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902914.536499310] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902914.798215342] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902915.007879369] [spacetry_bt_runner]: BT heartbeat: tick=717 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902915.536508137] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902915.851569870] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902916.536504192] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902917.252128554] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902917.307963122] [spacetry_bt_runner]: BT heartbeat: tick=740 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902917.536534864] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902918.359972994] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902918.536434274] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902919.508941671] [spacetry_bt_runner]: BT heartbeat: tick=762 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902919.536666577] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902919.658014517] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902920.536528391] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902920.700537093] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902921.508224125] [spacetry_bt_runner]: BT heartbeat: tick=782 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902921.536502205] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902921.834250667] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902922.536530876] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902922.905126371] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902923.536492196] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902923.608314316] [spacetry_bt_runner]: BT heartbeat: tick=803 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902924.104575920] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902924.536500046] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902925.117324999] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902925.536543863] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902925.607963511] [spacetry_bt_runner]: BT heartbeat: tick=823 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902926.134874641] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=33/640 range=[1.00,20.00] thr=9.00 min_any=18.85 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902926.536527941] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902927.335867111] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=106/640 range=[1.00,20.00] thr=9.00 min_any=15.58 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902927.536510736] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[spacetry_bt_runner-20] [INFO] [1775902927.707893120] [spacetry_bt_runner]: BT heartbeat: tick=844 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902928.488555977] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=117/640 range=[1.00,20.00] thr=9.00 min_any=14.94 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902928.536525105] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[copilot-9] [ERROR] [1775902929.536492541] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902929.566546560] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=125/640 range=[1.00,20.00] thr=9.00 min_any=14.70 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902929.807989101] [spacetry_bt_runner]: BT heartbeat: tick=865 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902930.536493057] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902930.784668150] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=129/640 range=[1.00,20.00] thr=9.00 min_any=14.77 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902931.536542685] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902931.897765028] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=127/640 range=[1.00,20.00] thr=9.00 min_any=14.94 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902932.007922737] [spacetry_bt_runner]: BT heartbeat: tick=887 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902932.536494919] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902932.965630027] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=124/640 range=[1.00,20.00] thr=9.00 min_any=15.09 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902933.536483886] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902933.935724704] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=109/640 range=[1.00,20.00] thr=9.00 min_any=15.61 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902934.008736807] [spacetry_bt_runner]: BT heartbeat: tick=907 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902934.536517737] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902934.916707983] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=16.36 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902935.536489165] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902935.816741420] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=46/640 range=[1.00,20.00] thr=9.00 min_any=17.58 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902935.907853533] [spacetry_bt_runner]: BT heartbeat: tick=926 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[copilot-9] [ERROR] [1775902936.536628317] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902936.671562976] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=14/640 range=[1.00,20.00] thr=9.00 min_any=19.22 front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902937.536494428] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.
+[obstacle_direction_node-8] [INFO] [1775902937.543131418] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=1/640 range=[1.00,20.00] thr=9.00 min_any=19.85 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775902937.707905738] [spacetry_bt_runner]: BT heartbeat: tick=944 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775902938.397609519] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[copilot-9] [ERROR] [1775902938.536490996] [curiosity_monitor]: [Copilot] handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY fired.

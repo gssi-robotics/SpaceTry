@@ -1,0 +1,23 @@
+[WARN] [ros2bag]: Positional "topics" argument deprecated. Please use optional "--topics" argument instead.
+stdin is not a terminal device. Keyboard handling disabled.[INFO] [1775901755.705420940] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1775901755.710063790] [rosbag2_recorder]: Listening for topics...
+[INFO] [1775901755.710075951] [rosbag2_recorder]: Event publisher thread: Starting
+[INFO] [1775901755.711363925] [rosbag2_recorder]: Subscribed to topic '/scan'
+[INFO] [1775901755.712089613] [rosbag2_recorder]: Subscribed to topic '/obstacle/right'
+[INFO] [1775901755.712520600] [rosbag2_recorder]: Subscribed to topic '/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY'
+[INFO] [1775901755.712892979] [rosbag2_recorder]: Subscribed to topic '/monitor/events'
+[INFO] [1775901755.713243579] [rosbag2_recorder]: Subscribed to topic '/obstacle/state'
+[INFO] [1775901755.713595215] [rosbag2_recorder]: Subscribed to topic '/obstacle/front'
+[INFO] [1775901755.713934370] [rosbag2_recorder]: Subscribed to topic '/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY'
+[INFO] [1775901755.714290954] [rosbag2_recorder]: Subscribed to topic '/clock'
+[INFO] [1775901755.714634000] [rosbag2_recorder]: Subscribed to topic '/obstacle/left'
+[INFO] [1775901755.715986532] [rosbag2_recorder]: Subscribed to topic '/mobile_base_controller/odom'
+[INFO] [1775901755.716385004] [rosbag2_recorder]: Subscribed to topic '/battery/soc'
+[INFO] [1775901755.716727695] [rosbag2_recorder]: Subscribed to topic '/battery/near_outpost'
+[INFO] [1775901755.716874109] [rosbag2_recorder]: Recording...
+[INFO] [1775901764.697117310] [rosbag2_recorder]: Subscribed to topic '/cmd_vel'
+[INFO] [1775901764.797404305] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1775902314.129613590] [rosbag2_recorder]: Pausing recording.
+[INFO] [1775902314.129674755] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1775902314.137568210] [rosbag2_recorder]: Event publisher thread: Exiting
+[INFO] [1775902314.137664866] [rosbag2_recorder]: Recording stopped
