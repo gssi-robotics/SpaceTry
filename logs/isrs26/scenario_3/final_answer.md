@@ -7,10 +7,9 @@ Key outcomes:
 - Final assessments: `baseline_outcome_assessment=DEGRADED`, `injected_outcome_assessment=FAIL`, `outcome_assessment=DEGRADED`
 
 Artifacts are here:
-- [report.md](</home/keila/robotics/marti/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/spacetry_scenario_navigation_obstacle_degraded_perception_report.md>)
-- [metrics.json](</home/keila/robotics/marti/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/metrics/spacetry_scenario_navigation_obstacle_degraded_perception_metrics.json>)
-- [timeline.jsonl](</home/keila/robotics/marti/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/runtime/spacetry_scenario_navigation_obstacle_degraded_perception_timeline.jsonl>)
-- [rosbag.mcap](</home/keila/robotics/marti/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/rosbags/spacetry_scenario_navigation_obstacle_degraded_perception_bag/spacetry_scenario_navigation_obstacle_degraded_perception_bag_0.mcap>)
+- [report.md](log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/spacetry_scenario_navigation_obstacle_degraded_perception_report.md)
+- [metrics.json](log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/metrics/spacetry_scenario_navigation_obstacle_degraded_perception_metrics.json)
+- [timeline.jsonl](log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/runtime/spacetry_scenario_navigation_obstacle_degraded_perception_timeline.jsonl)
+- [rosbag.mcap](log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/rosbags/spacetry_scenario_navigation_obstacle_degraded_perception_bag/spacetry_scenario_navigation_obstacle_degraded_perception_bag_0.mcap)
 
 One caveat: the Markdown report’s collision wording is inconsistent with the raw metric field. The raw metrics say `collision_with_obstacle=false`, so I’d trust the JSON over that sentence in the report.
-
