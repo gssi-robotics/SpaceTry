@@ -335,9 +335,9 @@ The workflow consists of:
 | Step | Task | Description | Workflow |
 |------|------|-------------|----------|
 | 1 | **Scenario Prompt Template** | Specify the autonomy under text and mission context and objectives using the prompt template. | User Input |
-| 2 | **Scenario Driver Generation** | Use the LLM agent custom Skill to generate and parametrize the evaluation scenario from the prompt. | Automated |
-| 3 | **Scenario Driver Parametrization** | Configure and fine-tune scenario parameters before execution. | Automated |
-| 4 | **Scenario Driver Execution** | Execute the generated scenario in the simulation environment. | Automated |
+| 2 | **Scenario Driver Generation** | Use the LLM agent custom Skill to generate and parametrize the evaluation scenario from the prompt. | Authoring |
+| 3 | **Scenario Driver Parametrization** | Configure and fine-tune scenario parameters before execution. | Authoring |
+| 4 | **Scenario Driver Execution** | Execute the generated scenario in the simulation environment. | Authoring |
 | 5 | **Autonomy Evaluation Report** | Analyze the output report from the agent to assess the rover's self-adaptation capabilities in the uncertainty test scenario. | User Input |
 
 A quick reference guide with examples is available at [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md).
