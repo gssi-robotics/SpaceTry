@@ -1,0 +1,26 @@
+[WARN] [ros2bag]: Positional "topics" argument deprecated. Please use optional "--topics" argument instead.
+stdin is not a terminal device. Keyboard handling disabled.[INFO] [1775903027.690274448] [rosbag2_recorder]: Press SPACE for pausing/resuming
+[INFO] [1775903027.693478133] [rosbag2_recorder]: Listening for topics...
+[INFO] [1775903027.693484403] [rosbag2_recorder]: Event publisher thread: Starting
+[INFO] [1775903027.693526672] [rosbag2_recorder]: Recording...
+[INFO] [1775903027.693561449] [rosbag2_recorder]: use_sim_time set, waiting for /clock before starting recording...
+[INFO] [1775903029.837978409] [rosbag2_recorder]: Sim time /clock found, starting recording.
+[INFO] [1775903029.838971036] [rosbag2_recorder]: Subscribed to topic '/at_science_rock'
+[INFO] [1775903029.839326095] [rosbag2_recorder]: Subscribed to topic '/battery/near_outpost'
+[INFO] [1775903029.839659212] [rosbag2_recorder]: Subscribed to topic '/battery/soc'
+[INFO] [1775903029.840738525] [rosbag2_recorder]: Subscribed to topic '/mobile_base_controller/odom'
+[INFO] [1775903029.841103712] [rosbag2_recorder]: Subscribed to topic '/obstacle/left'
+[INFO] [1775903029.841440045] [rosbag2_recorder]: Subscribed to topic '/clock'
+[INFO] [1775903029.841753520] [rosbag2_recorder]: Subscribed to topic '/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY'
+[INFO] [1775903029.842158240] [rosbag2_recorder]: Subscribed to topic '/obstacle/front'
+[INFO] [1775903029.842665675] [rosbag2_recorder]: Subscribed to topic '/obstacle/state'
+[INFO] [1775903029.842950487] [rosbag2_recorder]: Subscribed to topic '/monitor/events'
+[INFO] [1775903029.843218261] [rosbag2_recorder]: Subscribed to topic '/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY'
+[INFO] [1775903029.843568821] [rosbag2_recorder]: Subscribed to topic '/obstacle/right'
+[INFO] [1775903029.844747363] [rosbag2_recorder]: Subscribed to topic '/scan'
+[INFO] [1775903037.201257156] [rosbag2_recorder]: Subscribed to topic '/cmd_vel'
+[INFO] [1775903037.301423510] [rosbag2_recorder]: All requested topics are subscribed. Stopping discovery...
+[INFO] [1775903521.767606286] [rosbag2_recorder]: Pausing recording.
+[INFO] [1775903521.767661541] [rosbag2_cpp]: Writing remaining messages from cache to the bag. It may take a while
+[INFO] [1775903521.774794840] [rosbag2_recorder]: Event publisher thread: Exiting
+[INFO] [1775903521.774875880] [rosbag2_recorder]: Recording stopped

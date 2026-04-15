@@ -1,0 +1,12 @@
+{
+  "scenario_name": "spacetry_scenario_navigation_obstacle_degraded_perception",
+  "run_label": "smoke_termination_check",
+  "contract_file": "/ws/install/share/spacetry_scenario_navigation_obstacle_degraded_perception/config/scenario_contract.yaml",
+  "config_file": "/ws/install/share/spacetry_scenario_navigation_obstacle_degraded_perception/config/scenario_config.yaml",
+  "output_root": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception",
+  "report_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/smoke_termination_check/spacetry_scenario_navigation_obstacle_degraded_perception_report.md",
+  "metrics_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/smoke_termination_check/metrics/spacetry_scenario_navigation_obstacle_degraded_perception_metrics.json",
+  "timeline_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/smoke_termination_check/runtime/spacetry_scenario_navigation_obstacle_degraded_perception_timeline.jsonl",
+  "termination_reason": "signal",
+  "injection_status": "pending"
+}

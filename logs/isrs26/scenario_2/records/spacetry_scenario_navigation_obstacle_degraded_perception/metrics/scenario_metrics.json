@@ -1,0 +1,91 @@
+{
+  "scenario_name": "navigation_obstacle_degraded_perception",
+  "termination_reason": "goal_reached",
+  "started_at_sim_s": 0.1,
+  "finished_at_sim_s": 273.5,
+  "runtime_s": 273.4,
+  "injection_succeeded": true,
+  "injection_failed_reason": null,
+  "progress_ratio_at_injection": 0.0831,
+  "core_metrics": {
+    "adaptation_speed_ms": null,
+    "obstacle_detection_latency_ms": 8600.0,
+    "autonomy_reaction_status": true,
+    "detection_signal_source": "/obstacle/front",
+    "observed_control_rationale": "obstacle_avoidance",
+    "reaction_scope": "indeterminate",
+    "reaction_attribution_status": false,
+    "active_context_at_reaction": {
+      "progress_ratio": 0.3108,
+      "goal_distance_m": 65.104,
+      "distance_to_injected_m": 11.505,
+      "distance_to_baseline_hazard_m": 17.138,
+      "battery_soc": 0.768,
+      "battery_near_outpost": false,
+      "obstacle_front": false,
+      "obstacle_left": false,
+      "obstacle_right": true,
+      "obstacle_state": "RIGHT",
+      "degradation_active": false,
+      "monitor_violations": {
+        "MR_009": false,
+        "MR_011": false
+      }
+    },
+    "safety_preservation": {
+      "MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY": true,
+      "MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY": true,
+      "collision_with_injected_obstacle": false
+    },
+    "goal_viability": {
+      "science_rock_01_reached": true,
+      "mission_deadline_met": true
+    },
+    "recovery_rate_ms": 11900.0,
+    "route_deviation_m": 9.913,
+    "detection_attribution_status": true,
+    "minimum_fault_distance_at_detection_m": 1.348,
+    "baseline_confound_status": "indeterminate",
+    "injected_uncertainty_encounter_status": true,
+    "evaluation_window_after_encounter_s": 239.296,
+    "baseline_uncertainty_exercised_status": true,
+    "attribution_scope": "indeterminate",
+    "injected_uncertainty_source": [
+      "runtime_blocking_rock",
+      "degraded_obstacle_classification"
+    ]
+  },
+  "additional_metrics": {
+    "raw_scan_detection_latency_ms": null,
+    "false_obstacle_rate": 0.0,
+    "post_injection_route_deviation_m": 9.913,
+    "progress_ratio_at_injection": 0.0831
+  },
+  "events": {
+    "injection_time_s": 30.0,
+    "encounter_time_s": 34.204,
+    "detection_time_s": 38.6,
+    "raw_scan_detection_time_s": null,
+    "first_reaction_time_s": 90.6,
+    "attributed_reaction_time_s": null,
+    "recovery_time_s": 102.5
+  },
+  "outcomes": {
+    "goal_status": "PASS",
+    "safety_status": "FAIL",
+    "autonomy_assessment": "FAIL",
+    "baseline_outcome_assessment": "PASS",
+    "injected_outcome_assessment": "FAIL",
+    "outcome_assessment": "FAIL"
+  },
+  "observability_gaps": [
+    "Collision is inferred from rover-to-injected-rock distance; there is no direct baseline collision topic in the stack.",
+    "The baseline stack does not publish /at_science_rock, so the scenario driver emits a derived status topic for monitor observability."
+  ],
+  "artifact_paths": {
+    "report": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/spacetry_scenario_navigation_obstacle_degraded_perception_report.md",
+    "metrics": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/metrics/scenario_metrics.json",
+    "timeline": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/runtime/timeline.jsonl",
+    "rosbags": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/rosbags"
+  }
+}

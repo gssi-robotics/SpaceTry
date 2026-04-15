@@ -1,0 +1,123 @@
+scenario_name: navigation_obstacle_degraded_perception
+autonomy_aspect: obstacle intelligence
+uncertainty_location:
+  - environment
+  - managed system
+fault_subject:
+  - environment object: nominal route segment to science_rock_01
+  - robot subsystem: autonomy-facing obstacle interpretation interface
+fault_attribute:
+  - route occupancy
+  - obstacle classification fidelity
+manifestation:
+  primary: runtime inserted rock obstacle
+  secondary: degrading noisy obstacle classification
+space_domain: isolated
+time_domain: transient
+trigger: >
+  Robot-state predicate: baseline obstacle handling has already been observed, progress_ratio >= 0.075,
+  rover distance to the dynamic injection gate corridor <= 60 m, recent route progress over 6 s >= 0.25 m,
+  the path has remained clear for at least 2 s, and remaining scenario time >= 120 s.
+baseline_uncertainties:
+  - The baseline world already contains the block_island hazard about 4.5 m off the nominal route, so baseline obstacle avoidance can occur before the injected challenge.
+  - The BT uses both /scan and /obstacle/* topics with freshness windows, so best-effort topic timing affects which perception signal is acted on.
+  - MR_011 expects a full-speed command of at least 2.0 m/s when battery_soc > 0.8, while the baseline BT nominal linear speed is 1.6 m/s.
+  - The baseline system does not publish /at_science_rock, so the scenario driver provides a derived status topic for monitor observability.
+primary_evaluation_target: navigation autonomy under runtime obstacle blocking on the route to science_rock_01
+secondary_injected_uncertainties:
+  - degrading noisy obstacle classification on /obstacle/front, /obstacle/left, /obstacle/right, and /obstacle/state
+interaction_hypothesis: >
+  When a runtime rock blocks the route while obstacle classification becomes noisier over time,
+  the rover may detect the obstacle but choose less stable avoidance directions, slowing forward recovery.
+injected_uncertainties:
+  - id: runtime_blocking_rock
+    uncertainty_location: environment
+    fault_subject: rock obstacle on the nominal route to science_rock_01
+    fault_attribute: route occupancy
+    manifestation: runtime inserted blocking obstacle
+    trigger: progress-ratio gate after the rover clears the baseline hazard corridor; the rock is placed about 10 m ahead of the rover along the current goal-bearing direction near the nominal segment around (31.3, -50.0)
+  - id: degraded_obstacle_classification
+    uncertainty_location: managed system
+    fault_subject: autonomy-facing obstacle interpretation
+    fault_attribute: front and lateral obstacle classification fidelity
+    manifestation: degrading noisy obstacle classification during the post-injection window
+    trigger: starts immediately after injected obstacle verification and lasts 18 s
+baseline_map_assessment: >
+  The baseline goal science_rock_01 already exists in the world and mission config, so the scenario reuses it as the evaluated target.
+  The baseline block_island hazard sits near the straight-line route and is treated as first-class baseline uncertainty.
+  The injected rock is planned for the same later route segment around (31.3, -50.0), but the final spawn pose is computed at runtime about 10 m ahead of the rover after the baseline hazard interaction clears so the injected challenge remains physically encounterable on the rover's actual traversed corridor.
+fault_attribution_rule: >
+  Credit an injected detection or injected-attributed reaction only if runtime obstacle insertion was verified,
+  the rover is within 12 m of the injected rock, the rock lies within +/-25 degrees of the rover heading,
+  and the candidate event occurs after injection.
+reaction_scope_rule: >
+  Classify a reaction as baseline_only when only baseline hazard or baseline monitor context is active,
+  injected_only when the injected rock or degradation window is active without baseline-hazard context,
+  baseline_and_injected when both are active together, and indeterminate otherwise.
+control_rationale_rule: >
+  Record obstacle_avoidance when obstacle context is active and cmd_vel shows slowdown, turning, or reverse motion;
+  record goal_alignment when angular steering occurs without obstacle context;
+  record monitor_enforcement only when a monitor violation is active and the command is suppressed;
+  record unknown only when the maneuver cannot be classified from available evidence.
+encounter_rule: >
+  The injected uncertainty is encountered when the verified injected rock exists and rover-to-rock distance becomes <= 9.0 m.
+meaningful_evaluation_rule: >
+  The injected challenge is meaningfully evaluable only if evaluation_window_after_encounter_s >= 20.0
+  or a credited recovery is observed before termination.
+minimum_post_encounter_observation_window_s: 20.0
+runtime_parameter_interface:
+  - parameter_name: scenario_contract_file
+    type: string
+    consumer_node: scenario_navigation_obstacle_degraded_perception_driver
+    source: config/scenario_contract.yaml
+    transport: inline_launch_dict
+  - parameter_name: scenario_config_file
+    type: string
+    consumer_node: scenario_navigation_obstacle_degraded_perception_driver
+    source: config/scenario_config.yaml
+    transport: inline_launch_dict
+  - parameter_name: output_root
+    type: string
+    consumer_node: scenario_navigation_obstacle_degraded_perception_driver
+    source: launch argument output_root
+    transport: inline_launch_dict
+  - parameter_name: rosbag_enabled
+    type: bool
+    consumer_node: scenario_navigation_obstacle_degraded_perception_driver
+    source: launch argument rosbag_enabled
+    transport: inline_launch_dict
+artifact_consumption_rule: >
+  scenario_contract.yaml and scenario_config.yaml are plain scenario artifacts parsed by the driver node from
+  file-path string parameters. The driver node receives those paths, output_root, and rosbag_enabled only
+  through inline launch-dict parameters. The scenario YAML files must never be passed to Node(parameters=[...])
+  as ROS parameter files.
+core_metrics:
+  - adaptation_speed_ms
+  - obstacle_detection_latency_ms
+  - autonomy_reaction_status
+  - detection_signal_source
+  - observed_control_rationale
+  - reaction_scope
+  - reaction_attribution_status
+  - active_context_at_reaction
+  - safety_preservation
+  - goal_viability
+  - recovery_rate_ms
+  - route_deviation_m
+  - detection_attribution_status
+  - minimum_fault_distance_at_detection_m
+  - baseline_confound_status
+  - injected_uncertainty_encounter_status
+  - evaluation_window_after_encounter_s
+  - baseline_uncertainty_exercised_status
+  - attribution_scope
+  - injected_uncertainty_source
+additional_metrics:
+  raw_scan_detection_latency_ms: Time from obstacle injection to the first attributable raw-scan front-sector hit.
+  false_obstacle_rate: Rate of received lateral-only obstacle-state classifications while the injected rock is geometrically ahead.
+  post_injection_route_deviation_m: Maximum route deviation measured only after obstacle injection.
+  progress_ratio_at_injection: Nominal-route progress ratio at the instant the gate allowed injection.
+report: /ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/spacetry_scenario_navigation_obstacle_degraded_perception_report.md
+baseline_outcome_assessment: PENDING
+injected_outcome_assessment: PENDING
+outcome_assessment: PENDING

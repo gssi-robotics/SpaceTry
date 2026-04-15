@@ -1,0 +1,52 @@
+{
+  "scenario_name": "spacetry_scenario_navigation_obstacle_degraded_perception",
+  "run_label": "full_run_20260411T100300",
+  "termination_reason": "goal_reached",
+  "injection_status": "verified",
+  "spawn_verified": true,
+  "adaptation_speed_ms": null,
+  "obstacle_detection_latency_ms": 1900.0,
+  "raw_scan_detection_latency_ms": null,
+  "autonomy_reaction_status": false,
+  "detection_signal_source": "/obstacle/left",
+  "observed_control_rationale": "unknown",
+  "reaction_scope": "indeterminate",
+  "reaction_attribution_status": false,
+  "active_context_at_reaction": {},
+  "safety_preservation": {
+    "MR_009": true,
+    "MR_011": false,
+    "collision_with_obstacle": false
+  },
+  "goal_viability": {
+    "science_rock_01_reached": true,
+    "mission_deadline_met": true
+  },
+  "recovery_rate_ms": null,
+  "route_deviation_m": 10.249,
+  "post_injection_route_deviation_m": 7.817,
+  "detection_attribution_status": true,
+  "minimum_fault_distance_at_detection_m": 11.995604917165718,
+  "baseline_confound_status": "none",
+  "injected_uncertainty_encounter_status": true,
+  "evaluation_window_after_encounter_s": 95.2,
+  "meaningful_evaluation_window_satisfied": true,
+  "baseline_uncertainty_exercised_status": true,
+  "attribution_scope": "indeterminate",
+  "injected_uncertainty_source": [],
+  "false_obstacle_rate_count": 33,
+  "false_obstacle_rate_pct": 30.56,
+  "minimum_distance_to_injected_obstacle_m": 1.301,
+  "minimum_distance_to_block_island_m": 14.649,
+  "detection_rejection_counts": {
+    "outside_injected_attribution_window": 640
+  },
+  "monitor_violation_count": 536,
+  "report_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/spacetry_scenario_navigation_obstacle_degraded_perception_report.md",
+  "metrics_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/metrics/spacetry_scenario_navigation_obstacle_degraded_perception_metrics.json",
+  "timeline_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/runtime/spacetry_scenario_navigation_obstacle_degraded_perception_timeline.jsonl",
+  "rosbag_dir": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_20260411T100300/rosbags",
+  "baseline_outcome_assessment": "DEGRADED",
+  "injected_outcome_assessment": "FAIL",
+  "outcome_assessment": "DEGRADED"
+}

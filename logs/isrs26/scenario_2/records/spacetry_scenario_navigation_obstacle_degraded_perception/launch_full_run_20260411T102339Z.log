@@ -1,0 +1,1239 @@
+[INFO] [launch]: All log files can be found below /home/spaceros-user/.ros/log/2026-04-11-10-23-46-715495-sheilona-1194
+[INFO] [launch]: Default logging verbosity is set to INFO
+[INFO] [gz-1]: process started with pid [1199]
+[INFO] [robot_state_publisher-2]: process started with pid [1200]
+[INFO] [parameter_bridge-3]: process started with pid [1201]
+[INFO] [image_bridge-4]: process started with pid [1202]
+[INFO] [odom_tf_publisher-5]: process started with pid [1203]
+[INFO] [odom_relay_node-6]: process started with pid [1204]
+[INFO] [battery_manager-7]: process started with pid [1205]
+[INFO] [obstacle_direction_node-8]: process started with pid [1206]
+[INFO] [copilot-9]: process started with pid [1207]
+[INFO] [move_wheel-10]: process started with pid [1208]
+[INFO] [scenario_driver-11]: process started with pid [1209]
+[robot_state_publisher-2] Warning: link 'lidar_link' material 'black' undefined.
+[robot_state_publisher-2]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[robot_state_publisher-2] Warning: link 'lidar_link' material 'black' undefined.
+[robot_state_publisher-2]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[robot_state_publisher-2] [INFO] [1775903027.061681597] [robot_state_publisher]: Robot initialized
+[parameter_bridge-3] [INFO] [1775903027.070755476] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/clock (gz.msgs.Clock) -> /clock (rosgraph_msgs/msg/Clock)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775903027.071297744] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/model/curiosity_mars_rover/odometry (gz.msgs.Odometry) -> /model/curiosity_mars_rover/odometry (nav_msgs/msg/Odometry)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775903027.071766405] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/model/curiosity_mars_rover/odometry (nav_msgs/msg/Odometry) -> /model/curiosity_mars_rover/odometry (gz.msgs.Odometry)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775903027.072279380] [ros_gz_bridge]: Creating GZ->ROS Bridge: [/scan (gz.msgs.LaserScan) -> /scan (sensor_msgs/msg/LaserScan)] (Lazy 0)
+[parameter_bridge-3] [INFO] [1775903027.072670611] [ros_gz_bridge]: Creating ROS->GZ Bridge: [/scan (sensor_msgs/msg/LaserScan) -> /scan (gz.msgs.LaserScan)] (Lazy 0)
+[odom_relay_node-6] [INFO] [1775903027.367396480] [odom_relay]: Relaying odom /model/curiosity_mars_rover/odometry -> /mobile_base_controller/odom
+[obstacle_direction_node-8] [INFO] [1775903027.445260579] [obstacle_direction]: Listening /scan (base_frame=base_link) thr=9.00m -> publishing obstacle/front|left|right (+ obstacle/state)
+[odom_tf_publisher-5] [INFO] [1775903027.477488561] [odom_tf_publisher]: Starting odometry_tf_publisher node
+[battery_manager-7] [INFO] [1775903027.489099341] [battery_manager]: BatteryManager: capacity=120.0Wh init=79% cmd_vel=/cmd_vel joint_states=/joint_states odom=/mobile_base_controller/odom
+[INFO] [create-12]: process started with pid [1358]
+[create-12] [INFO] [1775903029.102958428] [spawn_curiosity]: Requesting list of world names.
+[create-12] [INFO] [1775903029.305252754] [spawn_curiosity]: Entity creation successful.
+[INFO] [create-12]: process has finished cleanly [pid 1358]
+[INFO] [ros2-13]: process started with pid [1378]
+[ros2-13] waiting for service to become available...
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] [1;33mWarning [Utils.cc:132][0m [/sdf/model[@name="curiosity_mars_rover"]/link[@name="mast_cameras"]/sensor[@name="lidar"]/gz_frame_id:<urdf-string>:L0]: XML Element[gz_frame_id], child of element[sensor], not defined in SDF. Copying[gz_frame_id] as children of [sensor].
+[gz-1] [INFO] [1775903029.990657082] [gz_ros_control]: Loading controller_manager
+[gz-1] [INFO] [1775903029.997013822] [controller_manager]: Using ROS clock for triggering controller manager cycles.
+[gz-1] [INFO] [1775903029.998479605] [controller_manager]: Subscribing to '/robot_description' topic for robot description.
+[gz-1] [WARN] [1775903029.999889147] [gz_ros_control]: Waiting RM to load and initialize hardware...
+[gz-1] [INFO] [1775903030.000007747] [controller_manager]: Received robot description from topic.
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] [INFO] [1775903030.005037724] [gz_ros_control]: The position_proportional_gain has been set to: 0.1
+[gz-1] [INFO] [1775903030.005082666] [gz_ros_control]: Loading joint: arm_01_joint
+[gz-1] [INFO] [1775903030.005087809] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005092270] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005096595] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005102193] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005104919] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005122224] [gz_ros_control]: Loading joint: arm_02_joint
+[gz-1] [INFO] [1775903030.005125064] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005127717] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005130495] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005132904] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005135400] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005147289] [gz_ros_control]: Loading joint: arm_03_joint
+[gz-1] [INFO] [1775903030.005149773] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005152144] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005154904] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005157467] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005159822] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005170435] [gz_ros_control]: Loading joint: arm_04_joint
+[gz-1] [INFO] [1775903030.005173003] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005175341] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005177777] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005180155] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005182487] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005192447] [gz_ros_control]: Loading joint: arm_tools_joint
+[gz-1] [INFO] [1775903030.005194992] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005197299] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005200377] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005202977] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005205395] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005215694] [gz_ros_control]: Loading joint: mast_p_joint
+[gz-1] [INFO] [1775903030.005218253] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005220779] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005223246] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005225604] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005227911] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005236868] [gz_ros_control]: Loading joint: mast_02_joint
+[gz-1] [INFO] [1775903030.005239478] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005241814] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005244120] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005246474] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005248902] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005258056] [gz_ros_control]: Loading joint: mast_cameras_joint
+[gz-1] [INFO] [1775903030.005260743] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005263256] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005265682] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005268157] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005270565] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005280601] [gz_ros_control]: Loading joint: front_wheel_L_joint
+[gz-1] [INFO] [1775903030.005283063] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005285434] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005289025] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005291634] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005301313] [gz_ros_control]: Loading joint: middle_wheel_L_joint
+[gz-1] [INFO] [1775903030.005303891] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005306361] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005308930] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005324797] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005333411] [gz_ros_control]: Loading joint: back_wheel_L_joint
+[gz-1] [INFO] [1775903030.005336069] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005338486] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005340903] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005343799] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005352912] [gz_ros_control]: Loading joint: front_wheel_R_joint
+[gz-1] [INFO] [1775903030.005355378] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005358067] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005360504] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005362823] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005371386] [gz_ros_control]: Loading joint: middle_wheel_R_joint
+[gz-1] [INFO] [1775903030.005373853] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005376251] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005378641] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005380922] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005390083] [gz_ros_control]: Loading joint: back_wheel_R_joint
+[gz-1] [INFO] [1775903030.005392545] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005394960] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005397430] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005399780] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005407886] [gz_ros_control]: Loading joint: suspension_steer_F_L_joint
+[gz-1] [INFO] [1775903030.005410366] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005412740] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005415171] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005417579] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005419962] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005429162] [gz_ros_control]: Loading joint: suspension_steer_B_L_joint
+[gz-1] [INFO] [1775903030.005431601] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005433980] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005436364] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005438756] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005441088] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005450079] [gz_ros_control]: Loading joint: suspension_steer_F_R_joint
+[gz-1] [INFO] [1775903030.005452502] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005454879] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005457260] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005459711] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005462102] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005472788] [gz_ros_control]: Loading joint: suspension_steer_B_R_joint
+[gz-1] [INFO] [1775903030.005475219] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005477558] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005479964] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005482365] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005484730] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005493907] [gz_ros_control]: Loading joint: suspension_arm_F_L_joint
+[gz-1] [INFO] [1775903030.005496438] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005498781] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005501175] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005503679] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005508337] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005511050] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005520267] [gz_ros_control]: Loading joint: suspension_arm_B_L_joint
+[gz-1] [INFO] [1775903030.005522781] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005525143] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005527787] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005530302] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005532743] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005535123] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005544531] [gz_ros_control]: Loading joint: suspension_arm_F_R_joint
+[gz-1] [INFO] [1775903030.005547060] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005549417] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005551865] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005554277] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005560043] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005562571] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005571718] [gz_ros_control]: Loading joint: suspension_arm_B_R_joint
+[gz-1] [INFO] [1775903030.005574212] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005576587] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005579838] [gz_ros_control]: 		 velocity
+[gz-1] [INFO] [1775903030.005582310] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005584727] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005587020] [gz_ros_control]: 		 effort
+[gz-1] [INFO] [1775903030.005596140] [gz_ros_control]: Loading joint: suspension_arm_B2_L_joint
+[gz-1] [INFO] [1775903030.005598646] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005600977] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005603433] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005610607] [gz_ros_control]: Loading joint: suspension_arm_B2_R_joint
+[gz-1] [INFO] [1775903030.005613100] [gz_ros_control]: 	State:
+[gz-1] [INFO] [1775903030.005615502] [gz_ros_control]: 		 position
+[gz-1] [INFO] [1775903030.005617954] [gz_ros_control]: 	Command:
+[gz-1] [INFO] [1775903030.005739642] [controller_manager]: Initialize hardware 'GazeboSystem' 
+[gz-1] [WARN] [1775903030.005757230] [controller_manager.hardware_component.system.GazeboSystem]: Executor is not available during hardware component initialization for 'GazeboSystem'. Skipping node creation!
+[gz-1] [INFO] [1775903030.005824728] [controller_manager]: Successful initialization of hardware 'GazeboSystem'
+[gz-1] [INFO] [1775903030.005988553] [resource_manager]: 'configure' hardware 'GazeboSystem' 
+[gz-1] [INFO] [1775903030.005991967] [gz_ros_control]: System Successfully configured!
+[gz-1] [INFO] [1775903030.005995925] [resource_manager]: Successful 'configure' of hardware 'GazeboSystem'
+[gz-1] [INFO] [1775903030.006004940] [resource_manager]: 'activate' hardware 'GazeboSystem' 
+[gz-1] [INFO] [1775903030.006012260] [resource_manager]: Successful 'activate' of hardware 'GazeboSystem'
+[gz-1] [WARN] [1775903030.006040490] [controller_manager]: Component 'GazeboSystem' does not have read or write statistics initialized, skipping registration.
+[gz-1] [INFO] [1775903030.006046674] [controller_manager]: Resource Manager has been successfully initialized. Starting Controller Manager services...
+[ros2-13] requester: making request: controller_manager_msgs.srv.SetHardwareComponentState_Request(name='GazeboSystem', target_state=lifecycle_msgs.msg.State(id=3, label=''))
+[ros2-13] 
+[ros2-13] response:
+[ros2-13] controller_manager_msgs.srv.SetHardwareComponentState_Response(ok=True, state=lifecycle_msgs.msg.State(id=3, label='active'))
+[ros2-13] 
+[INFO] [ros2-13]: process has finished cleanly [pid 1378]
+[INFO] [ros2-14]: process started with pid [1423]
+[gz-1] [INFO] [1775903031.225642799] [controller_manager]: Loading controller : 'joint_state_broadcaster' of type 'joint_state_broadcaster/JointStateBroadcaster'
+[gz-1] [INFO] [1775903031.225719641] [controller_manager]: Loading controller 'joint_state_broadcaster'
+[gz-1] [INFO] [1775903031.232472200] [controller_manager]: Controller 'joint_state_broadcaster' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[ros2-14] Successfully loaded controller joint_state_broadcaster
+[gz-1] [INFO] [1775903031.241032288] [controller_manager]: Configuring controller: 'joint_state_broadcaster'
+[gz-1] [INFO] [1775903031.241237375] [joint_state_broadcaster]: 'joints' or 'interfaces' parameter is empty. All available state interfaces will be published
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] [INFO] [1775903031.252357785] [controller_manager]: Activating controllers: [ joint_state_broadcaster ]
+[gz-1] [WARN] [1775903032.199446231] [gz_ros_control]:  Desired controller update period (0.01 s) is slower than the gazebo simulation period (0.004 s).
+[gz-1] [INFO] [1775903032.201238658] [controller_manager]: Activated controllers: [ joint_state_broadcaster ]
+[gz-1] [INFO] [1775903032.201264533] [controller_manager]: Successfully switched controllers!
+[gz-1] glx: failed to create dri3 screen
+[gz-1] failed to load driver: 
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] libEGL warning: egl: failed to create dri2 screen
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31m../materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [Material.cc:176] [0m[1;31mUnable to find texture [[0m[1;31m../materials/textures/FallingRocks_Albedo.jpg[0m[1;31m] as a locally cached texture or in path [[0m[1;31m/ws/install/share/spacetry_models/models/rock_5/meshes[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:880] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:928] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:940] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m
+[ros2-14] Successfully loaded controller joint_state_broadcaster into state active
+[INFO] [ros2-14]: process has finished cleanly [pid 1423]
+[INFO] [ros2-15]: process started with pid [1558]
+[INFO] [ros2-16]: process started with pid [1559]
+[INFO] [ros2-17]: process started with pid [1560]
+[INFO] [ros2-18]: process started with pid [1561]
+[INFO] [ros2-19]: process started with pid [1562]
+[obstacle_direction_node-8] [INFO] [1775903036.503925920] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[gz-1] [INFO] [1775903036.610891120] [controller_manager]: Loading controller : 'arm_joint_trajectory_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gz-1] [INFO] [1775903036.610958343] [controller_manager]: Loading controller 'arm_joint_trajectory_controller'
+[gz-1] [INFO] [1775903036.617106138] [controller_manager]: Controller 'arm_joint_trajectory_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[ros2-15] Successfully loaded controller arm_joint_trajectory_controller
+[gz-1] [INFO] [1775903036.648558462] [controller_manager]: Configuring controller: 'arm_joint_trajectory_controller'
+[gz-1] [INFO] [1775903036.649344577] [arm_joint_trajectory_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gz-1] [INFO] [1775903036.649443160] [arm_joint_trajectory_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gz-1] [INFO] [1775903036.649538976] [arm_joint_trajectory_controller]: Using 'splines' interpolation method.
+[gz-1] [INFO] [1775903036.652154410] [arm_joint_trajectory_controller]: Action status changes will be monitored at 20.00 Hz.
+[gz-1] [INFO] [1775903036.658757894] [controller_manager]: Loading controller : 'wheel_tree_position_controller' of type 'effort_controllers/JointGroupEffortController'
+[gz-1] [INFO] [1775903036.658820643] [controller_manager]: Loading controller 'wheel_tree_position_controller'
+[gz-1] [INFO] [1775903036.663715720] [controller_manager]: Controller 'wheel_tree_position_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[ros2-19] Successfully loaded controller wheel_tree_position_controller
+[gz-1] [INFO] [1775903036.686221075] [controller_manager]: Activating controllers: [ arm_joint_trajectory_controller ]
+[gz-1] [INFO] [1775903036.698985610] [controller_manager]: Activated controllers: [ arm_joint_trajectory_controller ]
+[gz-1] [INFO] [1775903036.699043065] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775903036.709422162] [controller_manager]: Loading controller : 'wheel_velocity_controller' of type 'velocity_controllers/JointGroupVelocityController'
+[gz-1] [INFO] [1775903036.709515363] [controller_manager]: Loading controller 'wheel_velocity_controller'
+[ros2-15] Successfully loaded controller arm_joint_trajectory_controller into state active
+[gz-1] [INFO] [1775903036.713164061] [controller_manager]: Controller 'wheel_velocity_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] [INFO] [1775903036.721495868] [controller_manager]: Configuring controller: 'wheel_tree_position_controller'
+[ros2-17] Successfully loaded controller wheel_velocity_controller
+[gz-1] [INFO] [1775903036.721869387] [wheel_tree_position_controller]: configure successful
+[gz-1] [INFO] [1775903036.733635042] [controller_manager]: Configuring controller: 'wheel_velocity_controller'
+[gz-1] [INFO] [1775903036.734008663] [wheel_velocity_controller]: configure successful
+[gz-1] [INFO] [1775903036.777283447] [controller_manager]: Loading controller : 'mast_joint_trajectory_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gz-1] [INFO] [1775903036.777325746] [controller_manager]: Loading controller 'mast_joint_trajectory_controller'
+[gz-1] [INFO] [1775903036.777563164] [controller_manager]: Controller 'mast_joint_trajectory_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[ros2-16] Successfully loaded controller mast_joint_trajectory_controller
+[gz-1] [INFO] [1775903036.800913519] [controller_manager]: Activating controllers: [ wheel_tree_position_controller ]
+[gz-1] [INFO] [1775903036.813606595] [wheel_tree_position_controller]: activate successful
+[gz-1] [INFO] [1775903036.813811803] [controller_manager]: Activated controllers: [ wheel_tree_position_controller ]
+[gz-1] [INFO] [1775903036.813867590] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775903036.824579448] [controller_manager]: Configuring controller: 'mast_joint_trajectory_controller'
+[gz-1] [INFO] [1775903036.824996521] [mast_joint_trajectory_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gz-1] [INFO] [1775903036.825176777] [mast_joint_trajectory_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gz-1] [INFO] [1775903036.825207553] [mast_joint_trajectory_controller]: Using 'splines' interpolation method.
+[ros2-19] Successfully loaded controller wheel_tree_position_controller into state active
+[gz-1] [INFO] [1775903036.827919106] [mast_joint_trajectory_controller]: Action status changes will be monitored at 20.00 Hz.
+[gz-1] [INFO] [1775903036.838250509] [controller_manager]: Loading controller : 'steer_position_controller' of type 'joint_trajectory_controller/JointTrajectoryController'
+[gz-1] [INFO] [1775903036.838278595] [controller_manager]: Loading controller 'steer_position_controller'
+[gz-1] [INFO] [1775903036.838415839] [controller_manager]: Controller 'steer_position_controller' node arguments: --ros-args --params-file /ws/install/share/curiosity_description/models/config/mars_rover_control.yaml -p use_sim_time:=true --param use_sim_time:=true 
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[gz-1] Warning: link 'lidar_link' material 'black' undefined.
+[gz-1]          at line 85 in /spaceros_ws/src/urdfdom/urdf_parser/src/model.cpp
+[ros2-18] Successfully loaded controller steer_position_controller
+[gz-1] [INFO] [1775903036.863974696] [controller_manager]: Activating controllers: [ wheel_velocity_controller ]
+[gz-1] [INFO] [1775903036.902981566] [wheel_velocity_controller]: activate successful
+[gz-1] [INFO] [1775903036.903144723] [controller_manager]: Activated controllers: [ wheel_velocity_controller ]
+[gz-1] [INFO] [1775903036.903218441] [controller_manager]: Successfully switched controllers!
+[ros2-17] Successfully loaded controller wheel_velocity_controller into state active
+[gz-1] [INFO] [1775903036.916827822] [controller_manager]: Configuring controller: 'steer_position_controller'
+[gz-1] [INFO] [1775903036.917142552] [steer_position_controller]: No specific joint names are used for command interfaces. Using 'joints' parameter.
+[gz-1] [INFO] [1775903036.917192426] [steer_position_controller]: Command interfaces are [position] and state interfaces are [position velocity].
+[gz-1] [INFO] [1775903036.917203497] [steer_position_controller]: Using 'splines' interpolation method.
+[gz-1] [INFO] [1775903036.918584892] [steer_position_controller]: Action status changes will be monitored at 20.00 Hz.
+[gz-1] [INFO] [1775903036.931205232] [controller_manager]: Activating controllers: [ mast_joint_trajectory_controller ]
+[gz-1] [INFO] [1775903036.948902506] [controller_manager]: Activated controllers: [ mast_joint_trajectory_controller ]
+[gz-1] [INFO] [1775903036.948971496] [controller_manager]: Successfully switched controllers!
+[gz-1] [INFO] [1775903036.961591241] [controller_manager]: Activating controllers: [ steer_position_controller ]
+[ros2-16] Successfully loaded controller mast_joint_trajectory_controller into state active
+[gz-1] [INFO] [1775903036.972190702] [controller_manager]: Activated controllers: [ steer_position_controller ]
+[gz-1] [INFO] [1775903036.972222123] [controller_manager]: Successfully switched controllers!
+[ros2-18] Successfully loaded controller steer_position_controller into state active
+[INFO] [ros2-15]: process has finished cleanly [pid 1558]
+[INFO] [ros2-19]: process has finished cleanly [pid 1562]
+[INFO] [spacetry_bt_runner-20]: process started with pid [1626]
+[INFO] [ros2-17]: process has finished cleanly [pid 1560]
+[spacetry_bt_runner-20] [1775903037.155]: MissionSequence           [36mIDLE[0m -> [33mRUNNING[0m
+[spacetry_bt_runner-20] [1775903037.155]: SetGoal                   [36mIDLE[0m -> [32mSUCCESS[0m
+[spacetry_bt_runner-20] [1775903037.157]: NavigateWithAvoidance     [36mIDLE[0m -> [33mRUNNING[0m
+[obstacle_direction_node-8] [INFO] [1775903037.174122810] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[INFO] [ros2-18]: process has finished cleanly [pid 1561]
+[INFO] [ros2-16]: process has finished cleanly [pid 1559]
+[spacetry_bt_runner-20] [INFO] [1775903037.255545894] [spacetry_bt_runner]: BT heartbeat: tick=2 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903037.806473895] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903038.449663342] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903038.655615532] [spacetry_bt_runner]: BT heartbeat: tick=16 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903039.795579397] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903041.064379760] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903041.255430686] [spacetry_bt_runner]: BT heartbeat: tick=42 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903042.277370078] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903043.537501652] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903043.755530943] [spacetry_bt_runner]: BT heartbeat: tick=67 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903044.853054333] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903046.298669445] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903046.355492578] [spacetry_bt_runner]: BT heartbeat: tick=93 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903047.420034904] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903048.482384689] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903048.555527992] [spacetry_bt_runner]: BT heartbeat: tick=115 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903049.483821614] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903050.555517949] [spacetry_bt_runner]: BT heartbeat: tick=135 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903050.594020936] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903051.492231300] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903052.406359882] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903052.455540841] [spacetry_bt_runner]: BT heartbeat: tick=154 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903053.184223599] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903053.922857536] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903053.956247181] [spacetry_bt_runner]: BT heartbeat: tick=169 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903054.866270621] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903055.555973684] [spacetry_bt_runner]: BT heartbeat: tick=185 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903055.853348767] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=12/640 range=[1.00,20.00] thr=9.00 min_any=19.33 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903056.613128642] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=69/640 range=[1.00,20.00] thr=9.00 min_any=15.35 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903057.155489220] [spacetry_bt_runner]: BT heartbeat: tick=201 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903057.346651498] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=163/640 range=[1.00,20.00] thr=9.00 min_any=16.17 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903058.083232616] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=200/640 range=[1.00,20.00] thr=9.00 min_any=10.81 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903058.655540212] [spacetry_bt_runner]: BT heartbeat: tick=216 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903058.818277008] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=218/640 range=[1.00,20.00] thr=9.00 min_any=10.80 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903059.563785570] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=209/640 range=[1.00,20.00] thr=9.00 min_any=12.42 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903060.158102321] [spacetry_bt_runner]: BT heartbeat: tick=231 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903060.258568312] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=210/640 range=[1.00,20.00] thr=9.00 min_any=10.44 front=inf left=inf right=19.17
+[obstacle_direction_node-8] [INFO] [1775903060.936341260] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=220/640 range=[1.00,20.00] thr=9.00 min_any=12.88 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903061.555894050] [spacetry_bt_runner]: BT heartbeat: tick=245 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903061.649848750] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=225/640 range=[1.00,20.00] thr=9.00 min_any=11.55 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903062.340782703] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=217/640 range=[1.00,20.00] thr=9.00 min_any=12.07 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903062.955560651] [spacetry_bt_runner]: BT heartbeat: tick=259 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903063.023997335] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=204/640 range=[1.00,20.00] thr=9.00 min_any=10.91 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903063.724036901] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=195/640 range=[1.00,20.00] thr=9.00 min_any=10.34 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903064.444634293] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=197/640 range=[1.00,20.00] thr=9.00 min_any=9.96 front=inf left=inf right=17.06
+[spacetry_bt_runner-20] [INFO] [1775903064.455454896] [spacetry_bt_runner]: BT heartbeat: tick=274 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903065.201956580] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=205/640 range=[1.00,20.00] thr=9.00 min_any=9.69 front=inf left=inf right=16.51
+[spacetry_bt_runner-20] [INFO] [1775903066.055725918] [spacetry_bt_runner]: BT heartbeat: tick=290 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903066.118121087] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=207/640 range=[1.00,20.00] thr=9.00 min_any=9.46 front=inf left=inf right=15.98
+[obstacle_direction_node-8] [INFO] [1775903066.877880478] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=200/640 range=[1.00,20.00] thr=9.00 min_any=9.42 front=inf left=inf right=15.29
+[spacetry_bt_runner-20] [INFO] [1775903067.655780054] [spacetry_bt_runner]: BT heartbeat: tick=306 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903067.914823189] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=187/640 range=[1.00,20.00] thr=9.00 min_any=9.47 front=inf left=inf right=14.52
+[obstacle_direction_node-8] [INFO] [1775903069.005421938] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=192/640 range=[1.00,20.00] thr=9.00 min_any=9.49 front=19.62 left=inf right=10.98
+[spacetry_bt_runner-20] [INFO] [1775903069.455494817] [spacetry_bt_runner]: BT heartbeat: tick=324 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903069.951018278] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=215/640 range=[1.00,20.00] thr=9.00 min_any=9.71 front=15.70 left=inf right=10.11
+[obstacle_direction_node-8] [INFO] [1775903070.779527937] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=212/640 range=[1.00,20.00] thr=9.00 min_any=10.02 front=16.63 left=inf right=11.14
+[spacetry_bt_runner-20] [INFO] [1775903071.155566696] [spacetry_bt_runner]: BT heartbeat: tick=341 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903071.819222891] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=207/640 range=[1.00,20.00] thr=9.00 min_any=10.02 front=17.97 left=inf right=11.47
+[obstacle_direction_node-8] [INFO] [1775903072.960235794] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=225/640 range=[1.00,20.00] thr=9.00 min_any=10.24 front=15.78 left=inf right=10.28
+[spacetry_bt_runner-20] [INFO] [1775903073.055741894] [spacetry_bt_runner]: BT heartbeat: tick=360 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903073.881215353] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=239/640 range=[1.00,20.00] thr=9.00 min_any=9.36 front=13.44 left=inf right=9.36
+[spacetry_bt_runner-20] [INFO] [1775903074.856057659] [spacetry_bt_runner]: BT heartbeat: tick=378 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903074.931121444] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=243/640 range=[1.00,20.00] thr=9.00 min_any=8.64 front=11.86 left=inf right=8.64
+[obstacle_direction_node-8] [INFO] [1775903075.812997359] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=245/640 range=[1.00,20.00] thr=9.00 min_any=8.20 front=11.31 left=inf right=8.20
+[spacetry_bt_runner-20] [INFO] [1775903076.656096110] [spacetry_bt_runner]: BT heartbeat: tick=396 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903076.945854132] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=244/640 range=[1.00,20.00] thr=9.00 min_any=8.48 front=11.76 left=inf right=8.48
+[obstacle_direction_node-8] [INFO] [1775903078.111379929] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=243/640 range=[1.00,20.00] thr=9.00 min_any=8.57 front=11.84 left=inf right=8.57
+[spacetry_bt_runner-20] [INFO] [1775903078.655536804] [spacetry_bt_runner]: BT heartbeat: tick=416 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903078.982040429] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=243/640 range=[1.00,20.00] thr=9.00 min_any=8.63 front=12.17 left=inf right=8.63
+[obstacle_direction_node-8] [INFO] [1775903079.998238126] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=243/640 range=[1.00,20.00] thr=9.00 min_any=8.71 front=12.79 left=inf right=8.71
+[spacetry_bt_runner-20] [INFO] [1775903080.355499142] [spacetry_bt_runner]: BT heartbeat: tick=433 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903080.973362843] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=241/640 range=[1.00,20.00] thr=9.00 min_any=8.78 front=12.97 left=inf right=8.78
+[obstacle_direction_node-8] [INFO] [1775903082.068498860] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=241/640 range=[1.00,20.00] thr=9.00 min_any=8.83 front=13.12 left=inf right=8.83
+[spacetry_bt_runner-20] [INFO] [1775903082.155542707] [spacetry_bt_runner]: BT heartbeat: tick=451 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903082.942436066] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=240/640 range=[1.00,20.00] thr=9.00 min_any=8.89 front=13.23 left=inf right=8.89
+[obstacle_direction_node-8] [INFO] [1775903083.785405217] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=241/640 range=[1.00,20.00] thr=9.00 min_any=8.97 front=13.42 left=inf right=8.97
+[spacetry_bt_runner-20] [INFO] [1775903083.855523852] [spacetry_bt_runner]: BT heartbeat: tick=468 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903084.829636274] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=241/640 range=[1.00,20.00] thr=9.00 min_any=9.05 front=13.74 left=inf right=9.07
+[spacetry_bt_runner-20] [INFO] [1775903085.655813546] [spacetry_bt_runner]: BT heartbeat: tick=486 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903085.848277162] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=233/640 range=[1.00,20.00] thr=9.00 min_any=8.97 front=12.80 left=inf right=9.16
+[obstacle_direction_node-8] [INFO] [1775903086.753989349] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=239/640 range=[1.00,20.00] thr=9.00 min_any=8.96 front=14.23 left=inf right=9.20
+[spacetry_bt_runner-20] [INFO] [1775903087.455756828] [spacetry_bt_runner]: BT heartbeat: tick=504 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903087.723901834] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=233/640 range=[1.00,20.00] thr=9.00 min_any=9.14 front=16.07 left=inf right=9.66
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:880] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Roughness.jpg[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:928] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Albedo.jpg[0m[1;31m][0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:425] [0m[1;31mUnable to find file with URI [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SystemPaths.cc:525] [0m[1;31mCould not resolve file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m[1;31m[0m
+[gz-1] [1;31m[Err] [SceneManager.cc:940] [0m[1;31mUnable to find file [[0m[1;31mmodel://rock_5/materials/textures/FallingRocks_Normal.jpg[0m[1;31m][0m
+[obstacle_direction_node-8] [INFO] [1775903088.795050209] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=242/640 range=[1.00,20.00] thr=9.00 min_any=9.13 front=16.36 left=inf right=9.63
+[spacetry_bt_runner-20] [INFO] [1775903089.255610912] [spacetry_bt_runner]: BT heartbeat: tick=522 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903089.640757162] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=242/640 range=[1.00,20.00] thr=9.00 min_any=9.40 front=17.12 left=inf right=9.73
+[obstacle_direction_node-8] [INFO] [1775903090.722573718] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=235/640 range=[1.00,20.00] thr=9.00 min_any=10.86 front=17.72 left=inf right=10.92
+[spacetry_bt_runner-20] [INFO] [1775903091.155759450] [spacetry_bt_runner]: BT heartbeat: tick=541 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903091.585593950] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=230/640 range=[1.00,20.00] thr=9.00 min_any=11.51 front=18.02 left=inf right=11.61
+[obstacle_direction_node-8] [INFO] [1775903092.401459338] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=220/640 range=[1.00,20.00] thr=9.00 min_any=12.12 front=19.54 left=inf right=12.12
+[spacetry_bt_runner-20] [INFO] [1775903092.855477872] [spacetry_bt_runner]: BT heartbeat: tick=558 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903093.195360428] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=208/640 range=[1.00,20.00] thr=9.00 min_any=12.64 front=inf left=inf right=12.64
+[obstacle_direction_node-8] [INFO] [1775903094.145514561] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=188/640 range=[1.00,20.00] thr=9.00 min_any=13.09 front=inf left=inf right=13.09
+[spacetry_bt_runner-20] [INFO] [1775903094.455846783] [spacetry_bt_runner]: BT heartbeat: tick=574 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903094.944809202] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=154/640 range=[1.00,20.00] thr=9.00 min_any=13.73 front=inf left=inf right=13.73
+[obstacle_direction_node-8] [INFO] [1775903095.744688004] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=135/640 range=[1.00,20.00] thr=9.00 min_any=14.12 front=inf left=inf right=14.12
+[spacetry_bt_runner-20] [INFO] [1775903096.055529254] [spacetry_bt_runner]: BT heartbeat: tick=590 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903096.684693884] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=17.20 front=inf left=inf right=17.20
+[obstacle_direction_node-8] [INFO] [1775903097.474005175] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=65/640 range=[1.00,20.00] thr=9.00 min_any=18.85 front=inf left=inf right=18.85
+[spacetry_bt_runner-20] [INFO] [1775903097.656261307] [spacetry_bt_runner]: BT heartbeat: tick=606 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903098.385462761] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=33/640 range=[1.00,20.00] thr=9.00 min_any=19.26 front=inf left=inf right=19.26
+[spacetry_bt_runner-20] [INFO] [1775903099.255502191] [spacetry_bt_runner]: BT heartbeat: tick=622 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903099.292630597] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=27/640 range=[1.00,20.00] thr=9.00 min_any=19.39 front=inf left=inf right=19.39
+[obstacle_direction_node-8] [INFO] [1775903100.119251186] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=19/640 range=[1.00,20.00] thr=9.00 min_any=19.41 front=inf left=inf right=19.41
+[spacetry_bt_runner-20] [INFO] [1775903100.955994359] [spacetry_bt_runner]: BT heartbeat: tick=639 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903100.963541531] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=13/640 range=[1.00,20.00] thr=9.00 min_any=19.47 front=inf left=inf right=19.47
+[obstacle_direction_node-8] [INFO] [1775903101.791157067] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=8/640 range=[1.00,20.00] thr=9.00 min_any=19.80 front=inf left=inf right=19.80
+[obstacle_direction_node-8] [INFO] [1775903102.683270476] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903102.755653093] [spacetry_bt_runner]: BT heartbeat: tick=657 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903103.578302415] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903104.555611358] [spacetry_bt_runner]: BT heartbeat: tick=675 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903104.604323279] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903105.506512449] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903106.442723282] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903106.455682239] [spacetry_bt_runner]: BT heartbeat: tick=694 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903107.542836196] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903108.355653068] [spacetry_bt_runner]: BT heartbeat: tick=713 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903108.459130373] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903109.389796772] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903110.255555847] [spacetry_bt_runner]: BT heartbeat: tick=732 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903110.518173626] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903111.671924329] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903112.255484019] [spacetry_bt_runner]: BT heartbeat: tick=752 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903112.905864549] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903113.952525703] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903114.355549850] [spacetry_bt_runner]: BT heartbeat: tick=773 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903114.869246305] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903115.834754389] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903116.255894996] [spacetry_bt_runner]: BT heartbeat: tick=792 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903116.948572537] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903118.110462427] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903118.255540476] [spacetry_bt_runner]: BT heartbeat: tick=812 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903119.195561421] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903120.318513185] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=5/640 range=[1.00,20.00] thr=9.00 min_any=19.66 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903120.355588553] [spacetry_bt_runner]: BT heartbeat: tick=833 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903121.259556244] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=53/640 range=[1.00,20.00] thr=9.00 min_any=17.90 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903122.157117446] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=106/640 range=[1.00,20.00] thr=9.00 min_any=17.30 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903122.256110834] [spacetry_bt_runner]: BT heartbeat: tick=852 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903123.180619345] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=17.68 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903124.055565895] [spacetry_bt_runner]: BT heartbeat: tick=870 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903124.236105690] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=101/640 range=[1.00,20.00] thr=9.00 min_any=16.45 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903125.316585876] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=16.58 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903125.955680908] [spacetry_bt_runner]: BT heartbeat: tick=889 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903126.289996713] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=15.89 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903127.483663365] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=15.48 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903127.955613805] [spacetry_bt_runner]: BT heartbeat: tick=909 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903128.468105640] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=113/640 range=[1.00,20.00] thr=9.00 min_any=15.45 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903129.557985907] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=117/640 range=[1.00,20.00] thr=9.00 min_any=15.41 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903129.855498227] [spacetry_bt_runner]: BT heartbeat: tick=928 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903130.462037573] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=15.68 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903131.344604425] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=95/640 range=[1.00,20.00] thr=9.00 min_any=16.21 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903131.655877618] [spacetry_bt_runner]: BT heartbeat: tick=946 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903132.389859695] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=16.65 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903133.189256972] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=49/640 range=[1.00,20.00] thr=9.00 min_any=17.48 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903133.355592670] [spacetry_bt_runner]: BT heartbeat: tick=963 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903134.001630737] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=9/640 range=[1.00,20.00] thr=9.00 min_any=19.68 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903134.811560557] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903134.955752837] [spacetry_bt_runner]: BT heartbeat: tick=979 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903135.612424073] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903136.414012738] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903136.555497552] [spacetry_bt_runner]: BT heartbeat: tick=995 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903137.199584639] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=16/640 range=[1.00,20.00] thr=9.00 min_any=19.64 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903137.992708626] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=18/640 range=[1.00,20.00] thr=9.00 min_any=19.61 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903138.155892821] [spacetry_bt_runner]: BT heartbeat: tick=1011 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903138.755422055] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=14/640 range=[1.00,20.00] thr=9.00 min_any=19.75 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903139.572444256] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=3/640 range=[1.00,20.00] thr=9.00 min_any=19.85 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903139.755765554] [spacetry_bt_runner]: BT heartbeat: tick=1027 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903140.349320426] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=13/640 range=[1.00,20.00] thr=9.00 min_any=19.24 front=inf left=19.24 right=inf
+[obstacle_direction_node-8] [INFO] [1775903141.186598010] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=1/640 range=[1.00,20.00] thr=9.00 min_any=19.99 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903141.455785735] [spacetry_bt_runner]: BT heartbeat: tick=1044 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903141.961917095] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903142.728503442] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903143.055557357] [spacetry_bt_runner]: BT heartbeat: tick=1060 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903143.553415896] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903144.358666696] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=17.36 front=18.46 left=17.36 right=inf
+[spacetry_bt_runner-20] [INFO] [1775903144.756187663] [spacetry_bt_runner]: BT heartbeat: tick=1077 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903145.138512333] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=117/640 range=[1.00,20.00] thr=9.00 min_any=16.71 front=17.44 left=16.71 right=inf
+[obstacle_direction_node-8] [INFO] [1775903145.930034336] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=129/640 range=[1.00,20.00] thr=9.00 min_any=16.35 front=16.98 left=16.35 right=inf
+[spacetry_bt_runner-20] [INFO] [1775903146.356069496] [spacetry_bt_runner]: BT heartbeat: tick=1093 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903146.719734751] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=138/640 range=[1.00,20.00] thr=9.00 min_any=16.05 front=16.71 left=16.05 right=inf
+[obstacle_direction_node-8] [INFO] [1775903147.497121738] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=137/640 range=[1.00,20.00] thr=9.00 min_any=15.98 front=16.82 left=15.98 right=inf
+[spacetry_bt_runner-20] [INFO] [1775903147.956028637] [spacetry_bt_runner]: BT heartbeat: tick=1109 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903148.272885761] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=130/640 range=[1.00,20.00] thr=9.00 min_any=16.07 front=17.15 left=16.07 right=inf
+[obstacle_direction_node-8] [INFO] [1775903149.072215468] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=127/640 range=[1.00,20.00] thr=9.00 min_any=16.08 front=17.07 left=16.08 right=inf
+[spacetry_bt_runner-20] [INFO] [1775903149.555523440] [spacetry_bt_runner]: BT heartbeat: tick=1125 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903149.846393487] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=113/640 range=[1.00,20.00] thr=9.00 min_any=17.05 front=17.05 left=17.93 right=inf
+[obstacle_direction_node-8] [INFO] [1775903150.626944810] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=76/640 range=[1.00,20.00] thr=9.00 min_any=18.69 front=18.69 left=19.08 right=19.64
+[spacetry_bt_runner-20] [INFO] [1775903151.155782051] [spacetry_bt_runner]: BT heartbeat: tick=1141 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903151.394703724] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=13/640 range=[1.00,20.00] thr=9.00 min_any=18.39 front=18.39 left=inf right=19.35
+[obstacle_direction_node-8] [INFO] [1775903152.296484679] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=23/640 range=[1.00,20.00] thr=9.00 min_any=18.16 front=18.16 left=19.90 right=18.99
+[spacetry_bt_runner-20] [INFO] [1775903152.755663528] [spacetry_bt_runner]: BT heartbeat: tick=1157 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903153.102743498] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=36/640 range=[1.00,20.00] thr=9.00 min_any=17.91 front=17.91 left=19.73 right=18.53
+[obstacle_direction_node-8] [INFO] [1775903153.907869766] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=57/640 range=[1.00,20.00] thr=9.00 min_any=17.70 front=17.70 left=19.55 right=18.11
+[spacetry_bt_runner-20] [INFO] [1775903154.455775604] [spacetry_bt_runner]: BT heartbeat: tick=1174 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903154.725531082] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=17.54 front=17.54 left=19.13 right=17.94
+[obstacle_direction_node-8] [INFO] [1775903155.511601288] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=71/640 range=[1.00,20.00] thr=9.00 min_any=17.35 front=17.35 left=19.26 right=17.70
+[spacetry_bt_runner-20] [INFO] [1775903156.155764066] [spacetry_bt_runner]: BT heartbeat: tick=1191 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903156.505939215] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=60/640 range=[1.00,20.00] thr=9.00 min_any=17.09 front=17.09 left=19.51 right=17.55
+[obstacle_direction_node-8] [INFO] [1775903157.600024178] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=44/640 range=[1.00,20.00] thr=9.00 min_any=16.81 front=16.81 left=19.88 right=17.23
+[spacetry_bt_runner-20] [INFO] [1775903158.055535109] [spacetry_bt_runner]: BT heartbeat: tick=1210 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903158.507492045] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=27/640 range=[1.00,20.00] thr=9.00 min_any=16.59 front=16.59 left=inf right=16.70
+[obstacle_direction_node-8] [INFO] [1775903159.505200945] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=28/640 range=[1.00,20.00] thr=9.00 min_any=16.36 front=16.36 left=inf right=16.39
+[spacetry_bt_runner-20] [INFO] [1775903159.755735824] [spacetry_bt_runner]: BT heartbeat: tick=1227 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903160.491302609] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=30/640 range=[1.00,20.00] thr=9.00 min_any=16.13 front=16.13 left=inf right=16.13
+[obstacle_direction_node-8] [INFO] [1775903161.453543492] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=30/640 range=[1.00,20.00] thr=9.00 min_any=15.88 front=15.88 left=inf right=15.89
+[spacetry_bt_runner-20] [INFO] [1775903161.455531421] [spacetry_bt_runner]: BT heartbeat: tick=1244 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903162.249401196] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=32/640 range=[1.00,20.00] thr=9.00 min_any=15.66 front=15.66 left=inf right=15.68
+[spacetry_bt_runner-20] [INFO] [1775903163.055563477] [spacetry_bt_runner]: BT heartbeat: tick=1260 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903163.058202638] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=33/640 range=[1.00,20.00] thr=9.00 min_any=15.46 front=15.46 left=inf right=15.50
+[obstacle_direction_node-8] [INFO] [1775903163.913556826] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=36/640 range=[1.00,20.00] thr=9.00 min_any=15.26 front=15.26 left=inf right=15.33
+[spacetry_bt_runner-20] [INFO] [1775903164.755934264] [spacetry_bt_runner]: BT heartbeat: tick=1277 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903164.873904741] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=39/640 range=[1.00,20.00] thr=9.00 min_any=15.04 front=15.04 left=inf right=15.06
+[obstacle_direction_node-8] [INFO] [1775903165.709942146] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=42/640 range=[1.00,20.00] thr=9.00 min_any=14.84 front=14.84 left=inf right=14.88
+[spacetry_bt_runner-20] [INFO] [1775903166.456350602] [spacetry_bt_runner]: BT heartbeat: tick=1294 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903166.698273984] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=40/640 range=[1.00,20.00] thr=9.00 min_any=14.62 front=14.62 left=inf right=15.04
+[obstacle_direction_node-8] [INFO] [1775903167.543417326] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=41/640 range=[1.00,20.00] thr=9.00 min_any=14.39 front=14.39 left=inf right=14.80
+[spacetry_bt_runner-20] [INFO] [1775903168.155804999] [spacetry_bt_runner]: BT heartbeat: tick=1311 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903168.498407012] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=47/640 range=[1.00,20.00] thr=9.00 min_any=14.17 front=14.17 left=inf right=14.26
+[obstacle_direction_node-8] [INFO] [1775903169.362144208] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=45/640 range=[1.00,20.00] thr=9.00 min_any=13.97 front=13.97 left=inf right=14.08
+[spacetry_bt_runner-20] [INFO] [1775903169.855816197] [spacetry_bt_runner]: BT heartbeat: tick=1328 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903170.359180685] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=47/640 range=[1.00,20.00] thr=9.00 min_any=13.72 front=13.72 left=inf right=13.83
+[obstacle_direction_node-8] [INFO] [1775903171.216897503] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=43/640 range=[1.00,20.00] thr=9.00 min_any=13.58 front=13.58 left=inf right=13.87
+[spacetry_bt_runner-20] [INFO] [1775903171.555500816] [spacetry_bt_runner]: BT heartbeat: tick=1345 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903172.053230963] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=44/640 range=[1.00,20.00] thr=9.00 min_any=13.40 front=13.40 left=inf right=13.85
+[obstacle_direction_node-8] [INFO] [1775903172.859047475] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=47/640 range=[1.00,20.00] thr=9.00 min_any=13.20 front=13.20 left=inf right=13.58
+[spacetry_bt_runner-20] [INFO] [1775903173.255946185] [spacetry_bt_runner]: BT heartbeat: tick=1362 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903173.672970519] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=46/640 range=[1.00,20.00] thr=9.00 min_any=13.01 front=13.01 left=inf right=13.79
+[obstacle_direction_node-8] [INFO] [1775903174.469483164] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=47/640 range=[1.00,20.00] thr=9.00 min_any=12.83 front=12.83 left=inf right=13.74
+[spacetry_bt_runner-20] [INFO] [1775903174.955768189] [spacetry_bt_runner]: BT heartbeat: tick=1379 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903175.305751301] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=46/640 range=[1.00,20.00] thr=9.00 min_any=12.65 front=12.65 left=inf right=13.60
+[obstacle_direction_node-8] [INFO] [1775903176.130926705] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=48/640 range=[1.00,20.00] thr=9.00 min_any=12.43 front=12.43 left=inf right=13.42
+[spacetry_bt_runner-20] [INFO] [1775903176.555511602] [spacetry_bt_runner]: BT heartbeat: tick=1395 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903176.915867652] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=51/640 range=[1.00,20.00] thr=9.00 min_any=12.17 front=12.17 left=inf right=13.23
+[obstacle_direction_node-8] [INFO] [1775903177.695161800] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=52/640 range=[1.00,20.00] thr=9.00 min_any=12.00 front=12.00 left=inf right=13.07
+[spacetry_bt_runner-20] [INFO] [1775903178.255873044] [spacetry_bt_runner]: BT heartbeat: tick=1412 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903178.514252090] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=49/640 range=[1.00,20.00] thr=9.00 min_any=11.87 front=11.87 left=inf right=12.95
+[obstacle_direction_node-8] [INFO] [1775903179.321160472] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=50/640 range=[1.00,20.00] thr=9.00 min_any=11.66 front=11.66 left=inf right=12.71
+[spacetry_bt_runner-20] [INFO] [1775903179.855726962] [spacetry_bt_runner]: BT heartbeat: tick=1428 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903180.104940042] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=52/640 range=[1.00,20.00] thr=9.00 min_any=11.41 front=11.41 left=inf right=12.54
+[obstacle_direction_node-8] [INFO] [1775903180.866516870] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=54/640 range=[1.00,20.00] thr=9.00 min_any=11.22 front=11.22 left=inf right=12.52
+[spacetry_bt_runner-20] [INFO] [1775903181.455599470] [spacetry_bt_runner]: BT heartbeat: tick=1444 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903181.644761386] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=58/640 range=[1.00,20.00] thr=9.00 min_any=11.01 front=11.01 left=inf right=12.66
+[obstacle_direction_node-8] [INFO] [1775903182.432349645] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=58/640 range=[1.00,20.00] thr=9.00 min_any=10.80 front=10.80 left=inf right=13.17
+[spacetry_bt_runner-20] [INFO] [1775903183.055546529] [spacetry_bt_runner]: BT heartbeat: tick=1460 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903183.221540224] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=58/640 range=[1.00,20.00] thr=9.00 min_any=10.60 front=10.60 left=inf right=12.91
+[obstacle_direction_node-8] [INFO] [1775903184.015572548] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=60/640 range=[1.00,20.00] thr=9.00 min_any=10.40 front=10.40 left=inf right=11.93
+[spacetry_bt_runner-20] [INFO] [1775903184.655539639] [spacetry_bt_runner]: BT heartbeat: tick=1476 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903184.823168259] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=61/640 range=[1.00,20.00] thr=9.00 min_any=10.22 front=10.22 left=inf right=11.55
+[obstacle_direction_node-8] [INFO] [1775903185.709364194] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=63/640 range=[1.00,20.00] thr=9.00 min_any=10.02 front=10.02 left=inf right=11.32
+[spacetry_bt_runner-20] [INFO] [1775903186.455548353] [spacetry_bt_runner]: BT heartbeat: tick=1494 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903186.588902838] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=64/640 range=[1.00,20.00] thr=9.00 min_any=9.80 front=9.80 left=inf right=11.08
+[obstacle_direction_node-8] [INFO] [1775903187.397076510] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=65/640 range=[1.00,20.00] thr=9.00 min_any=9.62 front=9.62 left=inf right=10.78
+[spacetry_bt_runner-20] [INFO] [1775903188.965786202] [spacetry_bt_runner]: BT heartbeat: tick=1519 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903189.985624570] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=70/640 range=[1.00,20.00] thr=9.00 min_any=9.43 front=9.43 left=inf right=10.41
+[obstacle_direction_node-8] [INFO] [1775903191.051769595] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=73/640 range=[1.00,20.00] thr=9.00 min_any=9.22 front=9.22 left=inf right=9.41
+[spacetry_bt_runner-20] [INFO] [1775903191.855580417] [spacetry_bt_runner]: BT heartbeat: tick=1548 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903192.008748992] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=75/640 range=[1.00,20.00] thr=9.00 min_any=9.00 front=9.02 left=inf right=9.00
+[obstacle_direction_node-8] [INFO] [1775903192.949326383] [obstacle_direction]: state=FRONT_RIGHT scan_frame=lidar_link valid=76/640 range=[1.00,20.00] thr=9.00 min_any=8.81 front=8.96 left=inf right=8.81
+[spacetry_bt_runner-20] [INFO] [1775903193.755660520] [spacetry_bt_runner]: BT heartbeat: tick=1567 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903193.898626611] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=8.63 front=9.03 left=inf right=8.63
+[obstacle_direction_node-8] [INFO] [1775903195.006873757] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=80/640 range=[1.00,20.00] thr=9.00 min_any=8.47 front=9.28 left=inf right=8.47
+[spacetry_bt_runner-20] [INFO] [1775903195.956090617] [spacetry_bt_runner]: BT heartbeat: tick=1589 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903196.073363196] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=8.34 front=9.63 left=inf right=8.34
+[obstacle_direction_node-8] [INFO] [1775903197.231118218] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=90/640 range=[1.00,20.00] thr=9.00 min_any=8.23 front=9.85 left=inf right=8.23
+[spacetry_bt_runner-20] [INFO] [1775903198.255874789] [spacetry_bt_runner]: BT heartbeat: tick=1612 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903198.336626658] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=94/640 range=[1.00,20.00] thr=9.00 min_any=8.12 front=9.96 left=inf right=8.12
+[obstacle_direction_node-8] [INFO] [1775903199.446012118] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=96/640 range=[1.00,20.00] thr=9.00 min_any=8.05 front=9.94 left=inf right=8.05
+[spacetry_bt_runner-20] [INFO] [1775903200.555878140] [spacetry_bt_runner]: BT heartbeat: tick=1635 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903200.561212778] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=7.94 front=9.89 left=inf right=7.94
+[obstacle_direction_node-8] [INFO] [1775903201.690873377] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=95/640 range=[1.00,20.00] thr=9.00 min_any=7.85 front=10.02 left=inf right=7.85
+[obstacle_direction_node-8] [INFO] [1775903202.812696347] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=7.76 front=9.98 left=inf right=7.76
+[spacetry_bt_runner-20] [INFO] [1775903202.860537662] [spacetry_bt_runner]: BT heartbeat: tick=1658 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903203.958415516] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=7.69 front=9.88 left=inf right=7.69
+[obstacle_direction_node-8] [INFO] [1775903205.104390127] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=92/640 range=[1.00,20.00] thr=9.00 min_any=7.61 front=9.75 left=inf right=7.61
+[spacetry_bt_runner-20] [INFO] [1775903205.255968797] [spacetry_bt_runner]: BT heartbeat: tick=1682 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903206.202254186] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=89/640 range=[1.00,20.00] thr=9.00 min_any=7.55 front=10.51 left=inf right=7.55
+[obstacle_direction_node-8] [INFO] [1775903207.293712216] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=87/640 range=[1.00,20.00] thr=9.00 min_any=7.49 front=10.68 left=inf right=7.49
+[spacetry_bt_runner-20] [INFO] [1775903207.456040515] [spacetry_bt_runner]: BT heartbeat: tick=1704 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903208.377628317] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=87/640 range=[1.00,20.00] thr=9.00 min_any=7.43 front=inf left=inf right=7.43
+[obstacle_direction_node-8] [INFO] [1775903209.544837705] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=86/640 range=[1.00,20.00] thr=9.00 min_any=7.37 front=inf left=inf right=7.37
+[spacetry_bt_runner-20] [INFO] [1775903209.756163786] [spacetry_bt_runner]: BT heartbeat: tick=1727 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903210.665399762] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=87/640 range=[1.00,20.00] thr=9.00 min_any=7.33 front=inf left=inf right=7.33
+[obstacle_direction_node-8] [INFO] [1775903211.756796194] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=86/640 range=[1.00,20.00] thr=9.00 min_any=7.28 front=inf left=inf right=7.28
+[spacetry_bt_runner-20] [INFO] [1775903211.955887527] [spacetry_bt_runner]: BT heartbeat: tick=1749 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903213.080382493] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=86/640 range=[1.00,20.00] thr=9.00 min_any=7.24 front=inf left=inf right=7.24
+[obstacle_direction_node-8] [INFO] [1775903214.237176284] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.19 front=inf left=inf right=7.19
+[spacetry_bt_runner-20] [INFO] [1775903214.256281505] [spacetry_bt_runner]: BT heartbeat: tick=1772 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903215.348251874] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.14 front=inf left=inf right=7.14
+[obstacle_direction_node-8] [INFO] [1775903216.451444619] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.10 front=inf left=inf right=7.10
+[spacetry_bt_runner-20] [INFO] [1775903216.556114187] [spacetry_bt_runner]: BT heartbeat: tick=1795 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903217.539936291] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.07 front=inf left=inf right=7.07
+[obstacle_direction_node-8] [INFO] [1775903218.630615953] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.04 front=inf left=inf right=7.04
+[spacetry_bt_runner-20] [INFO] [1775903218.755873762] [spacetry_bt_runner]: BT heartbeat: tick=1817 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903219.767654155] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.01 front=inf left=inf right=7.07
+[obstacle_direction_node-8] [INFO] [1775903220.864388141] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=82/640 range=[1.00,20.00] thr=9.00 min_any=6.99 front=inf left=inf right=7.20
+[spacetry_bt_runner-20] [INFO] [1775903221.055980095] [spacetry_bt_runner]: BT heartbeat: tick=1840 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903221.978296213] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=82/640 range=[1.00,20.00] thr=9.00 min_any=6.96 front=inf left=inf right=7.36
+[obstacle_direction_node-8] [INFO] [1775903223.035576727] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=6.94 front=inf left=inf right=7.53
+[spacetry_bt_runner-20] [INFO] [1775903223.255913273] [spacetry_bt_runner]: BT heartbeat: tick=1862 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903224.127552678] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=6.94 front=inf left=inf right=7.69
+[obstacle_direction_node-8] [INFO] [1775903225.463607349] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=80/640 range=[1.00,20.00] thr=9.00 min_any=6.95 front=inf left=inf right=7.88
+[spacetry_bt_runner-20] [INFO] [1775903225.556410487] [spacetry_bt_runner]: BT heartbeat: tick=1885 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903226.590221334] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=6.96 front=inf left=inf right=8.31
+[obstacle_direction_node-8] [INFO] [1775903227.629907665] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=80/640 range=[1.00,20.00] thr=9.00 min_any=6.99 front=inf left=inf right=8.96
+[spacetry_bt_runner-20] [INFO] [1775903227.755597080] [spacetry_bt_runner]: BT heartbeat: tick=1907 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903228.568311276] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=7.03 front=inf left=inf right=9.64
+[obstacle_direction_node-8] [INFO] [1775903229.530182170] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=7.07 front=inf left=inf right=9.61
+[spacetry_bt_runner-20] [INFO] [1775903229.655497402] [spacetry_bt_runner]: BT heartbeat: tick=1926 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903230.655539644] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=80/640 range=[1.00,20.00] thr=9.00 min_any=7.15 front=inf left=inf right=9.60
+[spacetry_bt_runner-20] [INFO] [1775903231.555993579] [spacetry_bt_runner]: BT heartbeat: tick=1945 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903231.599579338] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=77/640 range=[1.00,20.00] thr=9.00 min_any=7.18 front=inf left=inf right=9.75
+[obstacle_direction_node-8] [INFO] [1775903232.568394386] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=76/640 range=[1.00,20.00] thr=9.00 min_any=7.21 front=inf left=inf right=9.77
+[obstacle_direction_node-8] [INFO] [1775903233.527623196] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=77/640 range=[1.00,20.00] thr=9.00 min_any=7.22 front=inf left=inf right=9.69
+[spacetry_bt_runner-20] [INFO] [1775903233.555845876] [spacetry_bt_runner]: BT heartbeat: tick=1965 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903234.462435991] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=76/640 range=[1.00,20.00] thr=9.00 min_any=7.23 front=inf left=inf right=9.57
+[obstacle_direction_node-8] [INFO] [1775903235.358307027] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=7.22 front=inf left=inf right=9.40
+[spacetry_bt_runner-20] [INFO] [1775903235.455546757] [spacetry_bt_runner]: BT heartbeat: tick=1984 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903236.282335776] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=80/640 range=[1.00,20.00] thr=9.00 min_any=7.20 front=inf left=inf right=9.11
+[spacetry_bt_runner-20] [INFO] [1775903237.355902655] [spacetry_bt_runner]: BT heartbeat: tick=2003 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903237.424849467] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.21 front=inf left=inf right=8.44
+[obstacle_direction_node-8] [INFO] [1775903238.363117386] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=7.23 front=inf left=inf right=8.28
+[spacetry_bt_runner-20] [INFO] [1775903239.255602190] [spacetry_bt_runner]: BT heartbeat: tick=2022 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903239.322540853] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=7.25 front=inf left=inf right=8.19
+[obstacle_direction_node-8] [INFO] [1775903240.258414470] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=7.29 front=inf left=inf right=8.33
+[spacetry_bt_runner-20] [INFO] [1775903241.155493434] [spacetry_bt_runner]: BT heartbeat: tick=2041 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903241.174353065] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.34 front=inf left=inf right=8.28
+[obstacle_direction_node-8] [INFO] [1775903242.077255862] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.40 front=inf left=inf right=8.28
+[obstacle_direction_node-8] [INFO] [1775903243.010620211] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.46 front=inf left=inf right=8.30
+[spacetry_bt_runner-20] [INFO] [1775903243.056109977] [spacetry_bt_runner]: BT heartbeat: tick=2060 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903243.952080750] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.54 front=inf left=inf right=8.31
+[obstacle_direction_node-8] [INFO] [1775903244.894086233] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.59 front=inf left=inf right=8.29
+[spacetry_bt_runner-20] [INFO] [1775903244.955512432] [spacetry_bt_runner]: BT heartbeat: tick=2079 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903246.028352258] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.64 front=inf left=inf right=8.19
+[spacetry_bt_runner-20] [INFO] [1775903246.955482612] [spacetry_bt_runner]: BT heartbeat: tick=2099 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903246.984590196] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=82/640 range=[1.00,20.00] thr=9.00 min_any=7.69 front=inf left=inf right=8.10
+[obstacle_direction_node-8] [INFO] [1775903247.897333662] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=7.76 front=inf left=inf right=8.17
+[obstacle_direction_node-8] [INFO] [1775903248.815178974] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=7.84 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903248.857927796] [spacetry_bt_runner]: BT heartbeat: tick=2118 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903249.729325765] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=7.92 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903250.628635035] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=80/640 range=[1.00,20.00] thr=9.00 min_any=7.95 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903250.755566623] [spacetry_bt_runner]: BT heartbeat: tick=2137 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903251.571158521] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=8.03 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903252.488725196] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=8.12 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903252.655540828] [spacetry_bt_runner]: BT heartbeat: tick=2156 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903253.413139331] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=8.11 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903254.331358312] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=8.05 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903254.556142152] [spacetry_bt_runner]: BT heartbeat: tick=2175 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903255.279150028] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=7.92 front=inf left=inf right=8.09
+[obstacle_direction_node-8] [INFO] [1775903256.202821854] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=7.90 front=inf left=inf right=7.93
+[spacetry_bt_runner-20] [INFO] [1775903256.455655637] [spacetry_bt_runner]: BT heartbeat: tick=2194 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903257.126345418] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=7.71 front=inf left=inf right=7.71
+[obstacle_direction_node-8] [INFO] [1775903258.080345542] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=77/640 range=[1.00,20.00] thr=9.00 min_any=7.62 front=inf left=inf right=7.96
+[spacetry_bt_runner-20] [INFO] [1775903258.355670615] [spacetry_bt_runner]: BT heartbeat: tick=2213 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903258.988504244] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=7.61 front=inf left=inf right=8.18
+[obstacle_direction_node-8] [INFO] [1775903260.131112636] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=77/640 range=[1.00,20.00] thr=9.00 min_any=7.61 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903260.255606511] [spacetry_bt_runner]: BT heartbeat: tick=2232 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903261.066200521] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=76/640 range=[1.00,20.00] thr=9.00 min_any=7.62 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903262.000836958] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=7.63 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903262.155513843] [spacetry_bt_runner]: BT heartbeat: tick=2251 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903262.929947008] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=7.57 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903263.870310764] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=79/640 range=[1.00,20.00] thr=9.00 min_any=7.52 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903264.056291582] [spacetry_bt_runner]: BT heartbeat: tick=2270 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903264.778927446] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=7.46 front=inf left=inf right=17.18
+[obstacle_direction_node-8] [INFO] [1775903265.693865235] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=81/640 range=[1.00,20.00] thr=9.00 min_any=7.44 front=inf left=inf right=13.41
+[spacetry_bt_runner-20] [INFO] [1775903265.955540070] [spacetry_bt_runner]: BT heartbeat: tick=2289 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903266.600463107] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=83/640 range=[1.00,20.00] thr=9.00 min_any=7.33 front=inf left=inf right=14.21
+[obstacle_direction_node-8] [INFO] [1775903267.486708621] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=7.26 front=inf left=inf right=11.51
+[spacetry_bt_runner-20] [INFO] [1775903267.755622600] [spacetry_bt_runner]: BT heartbeat: tick=2307 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903268.534342698] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=7.20 front=inf left=inf right=10.40
+[obstacle_direction_node-8] [INFO] [1775903269.408008914] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=7.14 front=inf left=inf right=10.10
+[spacetry_bt_runner-20] [INFO] [1775903269.555637703] [spacetry_bt_runner]: BT heartbeat: tick=2325 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903270.303494429] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=87/640 range=[1.00,20.00] thr=9.00 min_any=7.09 front=inf left=inf right=9.82
+[obstacle_direction_node-8] [INFO] [1775903271.169908757] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=87/640 range=[1.00,20.00] thr=9.00 min_any=7.01 front=inf left=inf right=9.08
+[spacetry_bt_runner-20] [INFO] [1775903271.356182809] [spacetry_bt_runner]: BT heartbeat: tick=2343 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903272.111166074] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=88/640 range=[1.00,20.00] thr=9.00 min_any=6.92 front=inf left=inf right=9.91
+[obstacle_direction_node-8] [INFO] [1775903272.984027046] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=89/640 range=[1.00,20.00] thr=9.00 min_any=6.91 front=inf left=inf right=14.30
+[spacetry_bt_runner-20] [INFO] [1775903273.155489047] [spacetry_bt_runner]: BT heartbeat: tick=2361 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903273.848402008] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=89/640 range=[1.00,20.00] thr=9.00 min_any=6.90 front=inf left=inf right=17.42
+[obstacle_direction_node-8] [INFO] [1775903274.759195541] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=90/640 range=[1.00,20.00] thr=9.00 min_any=6.91 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903274.955520426] [spacetry_bt_runner]: BT heartbeat: tick=2379 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903275.646791082] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=6.90 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903276.562699327] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=6.89 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903276.755639489] [spacetry_bt_runner]: BT heartbeat: tick=2397 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903277.596441850] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=92/640 range=[1.00,20.00] thr=9.00 min_any=6.89 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903278.493320165] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=93/640 range=[1.00,20.00] thr=9.00 min_any=6.87 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903278.556527875] [spacetry_bt_runner]: BT heartbeat: tick=2415 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903279.576210707] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=93/640 range=[1.00,20.00] thr=9.00 min_any=6.82 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903280.356521044] [spacetry_bt_runner]: BT heartbeat: tick=2433 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903280.502102713] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=94/640 range=[1.00,20.00] thr=9.00 min_any=6.77 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903281.391997612] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=95/640 range=[1.00,20.00] thr=9.00 min_any=6.71 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903282.155617068] [spacetry_bt_runner]: BT heartbeat: tick=2451 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903282.267640137] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=96/640 range=[1.00,20.00] thr=9.00 min_any=6.66 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903283.149211322] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=6.61 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903283.955538734] [spacetry_bt_runner]: BT heartbeat: tick=2469 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903284.028713214] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=6.51 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903284.978309851] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=6.50 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903285.855897336] [spacetry_bt_runner]: BT heartbeat: tick=2488 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903285.868416849] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=6.53 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903286.724313630] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=6.54 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903287.556352171] [spacetry_bt_runner]: BT heartbeat: tick=2505 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903287.613522176] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=6.55 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903288.696510811] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=6.54 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903289.723867422] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=102/640 range=[1.00,20.00] thr=9.00 min_any=6.50 front=inf left=inf right=17.42
+[spacetry_bt_runner-20] [INFO] [1775903289.756442574] [spacetry_bt_runner]: BT heartbeat: tick=2527 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903290.599103931] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=102/640 range=[1.00,20.00] thr=9.00 min_any=6.44 front=inf left=inf right=15.42
+[spacetry_bt_runner-20] [INFO] [1775903291.555801230] [spacetry_bt_runner]: BT heartbeat: tick=2545 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903291.627237879] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=103/640 range=[1.00,20.00] thr=9.00 min_any=6.38 front=inf left=inf right=14.24
+[obstacle_direction_node-8] [INFO] [1775903292.661188545] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=104/640 range=[1.00,20.00] thr=9.00 min_any=6.40 front=inf left=inf right=13.12
+[spacetry_bt_runner-20] [INFO] [1775903293.355862879] [spacetry_bt_runner]: BT heartbeat: tick=2563 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903293.562193307] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=104/640 range=[1.00,20.00] thr=9.00 min_any=6.44 front=inf left=inf right=12.11
+[obstacle_direction_node-8] [INFO] [1775903294.531087717] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=105/640 range=[1.00,20.00] thr=9.00 min_any=6.51 front=inf left=inf right=11.31
+[spacetry_bt_runner-20] [INFO] [1775903295.256111984] [spacetry_bt_runner]: BT heartbeat: tick=2582 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903295.647778743] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=104/640 range=[1.00,20.00] thr=9.00 min_any=6.69 front=inf left=inf right=10.70
+[obstacle_direction_node-8] [INFO] [1775903296.692509529] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=104/640 range=[1.00,20.00] thr=9.00 min_any=6.71 front=inf left=inf right=10.55
+[spacetry_bt_runner-20] [INFO] [1775903297.255892394] [spacetry_bt_runner]: BT heartbeat: tick=2602 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903297.652369835] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=104/640 range=[1.00,20.00] thr=9.00 min_any=6.64 front=inf left=inf right=10.58
+[obstacle_direction_node-8] [INFO] [1775903298.593338079] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=106/640 range=[1.00,20.00] thr=9.00 min_any=6.66 front=inf left=inf right=11.28
+[spacetry_bt_runner-20] [INFO] [1775903299.155628811] [spacetry_bt_runner]: BT heartbeat: tick=2621 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903299.614119911] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=106/640 range=[1.00,20.00] thr=9.00 min_any=6.74 front=inf left=inf right=11.45
+[obstacle_direction_node-8] [INFO] [1775903300.581402408] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=106/640 range=[1.00,20.00] thr=9.00 min_any=6.76 front=inf left=inf right=11.22
+[spacetry_bt_runner-20] [INFO] [1775903301.156272463] [spacetry_bt_runner]: BT heartbeat: tick=2641 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903301.566557774] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=107/640 range=[1.00,20.00] thr=9.00 min_any=6.79 front=inf left=inf right=10.84
+[obstacle_direction_node-8] [INFO] [1775903302.537539508] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=107/640 range=[1.00,20.00] thr=9.00 min_any=6.83 front=inf left=inf right=10.55
+[spacetry_bt_runner-20] [INFO] [1775903303.156113595] [spacetry_bt_runner]: BT heartbeat: tick=2661 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903303.507627175] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=107/640 range=[1.00,20.00] thr=9.00 min_any=6.85 front=inf left=inf right=10.47
+[obstacle_direction_node-8] [INFO] [1775903304.521256569] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=108/640 range=[1.00,20.00] thr=9.00 min_any=6.88 front=inf left=inf right=10.54
+[spacetry_bt_runner-20] [INFO] [1775903305.155808604] [spacetry_bt_runner]: BT heartbeat: tick=2681 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903305.505278878] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=107/640 range=[1.00,20.00] thr=9.00 min_any=6.91 front=inf left=inf right=10.51
+[obstacle_direction_node-8] [INFO] [1775903306.439108713] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=109/640 range=[1.00,20.00] thr=9.00 min_any=6.94 front=inf left=inf right=10.11
+[spacetry_bt_runner-20] [INFO] [1775903307.056150588] [spacetry_bt_runner]: BT heartbeat: tick=2700 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903307.291618762] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=109/640 range=[1.00,20.00] thr=9.00 min_any=6.94 front=inf left=inf right=9.83
+[obstacle_direction_node-8] [INFO] [1775903308.226590679] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=109/640 range=[1.00,20.00] thr=9.00 min_any=6.97 front=inf left=inf right=9.55
+[spacetry_bt_runner-20] [INFO] [1775903308.855579755] [spacetry_bt_runner]: BT heartbeat: tick=2718 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903309.236421649] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=7.00 front=inf left=inf right=9.30
+[obstacle_direction_node-8] [INFO] [1775903310.101437517] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=7.02 front=inf left=inf right=9.17
+[spacetry_bt_runner-20] [INFO] [1775903310.555790441] [spacetry_bt_runner]: BT heartbeat: tick=2735 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903310.939653298] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=7.06 front=inf left=inf right=9.03
+[obstacle_direction_node-8] [INFO] [1775903311.814555265] [obstacle_direction]: state=RIGHT scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.09 front=inf left=inf right=8.96
+[spacetry_bt_runner-20] [INFO] [1775903312.355754698] [spacetry_bt_runner]: BT heartbeat: tick=2753 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903312.698854446] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.13 front=inf left=inf right=9.03
+[obstacle_direction_node-8] [INFO] [1775903313.524690246] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.23 front=inf left=inf right=9.47
+[spacetry_bt_runner-20] [INFO] [1775903314.056237725] [spacetry_bt_runner]: BT heartbeat: tick=2770 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903314.539235451] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.33 front=inf left=inf right=9.90
+[obstacle_direction_node-8] [INFO] [1775903315.593855841] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.44 front=inf left=inf right=9.94
+[spacetry_bt_runner-20] [INFO] [1775903315.855972036] [spacetry_bt_runner]: BT heartbeat: tick=2788 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903316.495058652] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.50 front=inf left=inf right=10.06
+[obstacle_direction_node-8] [INFO] [1775903317.546325594] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.57 front=inf left=inf right=10.11
+[spacetry_bt_runner-20] [INFO] [1775903317.655793833] [spacetry_bt_runner]: BT heartbeat: tick=2806 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903318.394056023] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=7.63 front=inf left=inf right=10.09
+[obstacle_direction_node-8] [INFO] [1775903319.236759968] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=7.70 front=inf left=inf right=10.07
+[spacetry_bt_runner-20] [INFO] [1775903319.458745850] [spacetry_bt_runner]: BT heartbeat: tick=2824 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903320.087653838] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=7.80 front=inf left=inf right=10.06
+[obstacle_direction_node-8] [INFO] [1775903321.017578316] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=7.86 front=inf left=inf right=10.02
+[spacetry_bt_runner-20] [INFO] [1775903321.256376848] [spacetry_bt_runner]: BT heartbeat: tick=2842 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903321.911615886] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=7.96 front=inf left=inf right=10.16
+[obstacle_direction_node-8] [INFO] [1775903322.797293997] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=8.08 front=inf left=inf right=10.30
+[spacetry_bt_runner-20] [INFO] [1775903323.056114936] [spacetry_bt_runner]: BT heartbeat: tick=2860 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903323.718373200] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=8.20 front=inf left=inf right=10.46
+[obstacle_direction_node-8] [INFO] [1775903324.762783989] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=8.34 front=inf left=inf right=10.70
+[spacetry_bt_runner-20] [INFO] [1775903324.855868813] [spacetry_bt_runner]: BT heartbeat: tick=2878 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903325.742103764] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=8.44 front=inf left=inf right=10.94
+[obstacle_direction_node-8] [INFO] [1775903326.757818586] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=8.56 front=inf left=inf right=11.20
+[spacetry_bt_runner-20] [INFO] [1775903326.856248970] [spacetry_bt_runner]: BT heartbeat: tick=2898 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903327.628651286] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=8.69 front=inf left=inf right=11.48
+[spacetry_bt_runner-20] [INFO] [1775903328.655622882] [spacetry_bt_runner]: BT heartbeat: tick=2916 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903328.688382823] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=8.84 front=inf left=inf right=11.62
+[obstacle_direction_node-8] [INFO] [1775903329.557915939] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=8.95 front=inf left=inf right=11.61
+[obstacle_direction_node-8] [INFO] [1775903330.457236240] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=9.07 front=inf left=inf right=11.55
+[spacetry_bt_runner-20] [INFO] [1775903330.457365697] [spacetry_bt_runner]: BT heartbeat: tick=2934 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903331.376901389] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=114/640 range=[1.00,20.00] thr=9.00 min_any=9.17 front=inf left=inf right=11.55
+[obstacle_direction_node-8] [INFO] [1775903332.260215994] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=117/640 range=[1.00,20.00] thr=9.00 min_any=9.27 front=inf left=inf right=11.69
+[spacetry_bt_runner-20] [INFO] [1775903332.355658402] [spacetry_bt_runner]: BT heartbeat: tick=2953 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903333.169221195] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=163/640 range=[1.00,20.00] thr=9.00 min_any=9.34 front=19.77 left=inf right=11.99
+[obstacle_direction_node-8] [INFO] [1775903334.026287346] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=197/640 range=[1.00,20.00] thr=9.00 min_any=9.41 front=19.02 left=inf right=12.20
+[spacetry_bt_runner-20] [INFO] [1775903334.155600050] [spacetry_bt_runner]: BT heartbeat: tick=2971 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903334.914994460] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=202/640 range=[1.00,20.00] thr=9.00 min_any=9.46 front=18.86 left=inf right=12.28
+[spacetry_bt_runner-20] [INFO] [1775903335.956242964] [spacetry_bt_runner]: BT heartbeat: tick=2989 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903335.970923228] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=175/640 range=[1.00,20.00] thr=9.00 min_any=9.53 front=19.43 left=inf right=12.41
+[obstacle_direction_node-8] [INFO] [1775903336.898020140] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=122/640 range=[1.00,20.00] thr=9.00 min_any=9.61 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903337.755644388] [spacetry_bt_runner]: BT heartbeat: tick=3007 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903337.773896345] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=116/640 range=[1.00,20.00] thr=9.00 min_any=9.69 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903338.650944810] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=114/640 range=[1.00,20.00] thr=9.00 min_any=9.73 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903339.524353872] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=113/640 range=[1.00,20.00] thr=9.00 min_any=9.82 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903339.557642157] [spacetry_bt_runner]: BT heartbeat: tick=3025 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903340.455203310] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=9.90 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903341.355557249] [spacetry_bt_runner]: BT heartbeat: tick=3043 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903341.476568014] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=112/640 range=[1.00,20.00] thr=9.00 min_any=9.99 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903342.390229465] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=10.06 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903343.155543386] [spacetry_bt_runner]: BT heartbeat: tick=3061 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903343.241979113] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=111/640 range=[1.00,20.00] thr=9.00 min_any=10.12 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903344.112752948] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=10.19 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903344.955530675] [spacetry_bt_runner]: BT heartbeat: tick=3079 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903345.003433087] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=109/640 range=[1.00,20.00] thr=9.00 min_any=10.27 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903345.865052335] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=107/640 range=[1.00,20.00] thr=9.00 min_any=10.35 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903346.716963800] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=105/640 range=[1.00,20.00] thr=9.00 min_any=10.44 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903346.755901652] [spacetry_bt_runner]: BT heartbeat: tick=3097 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903347.812374093] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=108/640 range=[1.00,20.00] thr=9.00 min_any=10.58 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903348.555964627] [spacetry_bt_runner]: BT heartbeat: tick=3115 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903348.701783677] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=103/640 range=[1.00,20.00] thr=9.00 min_any=10.65 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903349.710033927] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=10.73 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903350.355580779] [spacetry_bt_runner]: BT heartbeat: tick=3133 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903350.566190709] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=10.82 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903351.390331136] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=10.92 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903352.055677504] [spacetry_bt_runner]: BT heartbeat: tick=3150 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903352.245499343] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=11.03 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903353.129084645] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=11.14 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903353.855588671] [spacetry_bt_runner]: BT heartbeat: tick=3168 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903353.993350577] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=103/640 range=[1.00,20.00] thr=9.00 min_any=11.25 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903354.859418623] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=102/640 range=[1.00,20.00] thr=9.00 min_any=11.35 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903355.655658229] [spacetry_bt_runner]: BT heartbeat: tick=3186 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903355.727954793] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=102/640 range=[1.00,20.00] thr=9.00 min_any=11.44 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903356.613825719] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=101/640 range=[1.00,20.00] thr=9.00 min_any=11.51 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903357.455886472] [spacetry_bt_runner]: BT heartbeat: tick=3204 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903357.490529844] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=11.59 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903358.357359878] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=11.69 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903359.226162719] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=98/640 range=[1.00,20.00] thr=9.00 min_any=11.79 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903359.255853419] [spacetry_bt_runner]: BT heartbeat: tick=3222 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903360.105338572] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=11.89 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903361.013589534] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=102/640 range=[1.00,20.00] thr=9.00 min_any=11.99 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903361.057345628] [spacetry_bt_runner]: BT heartbeat: tick=3240 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903361.881381226] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=101/640 range=[1.00,20.00] thr=9.00 min_any=12.08 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903362.855583696] [spacetry_bt_runner]: BT heartbeat: tick=3258 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903362.948218126] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=101/640 range=[1.00,20.00] thr=9.00 min_any=12.18 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903363.828707810] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=101/640 range=[1.00,20.00] thr=9.00 min_any=12.27 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903364.655552507] [spacetry_bt_runner]: BT heartbeat: tick=3276 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903364.706076593] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=12.35 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903365.613807035] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=98/640 range=[1.00,20.00] thr=9.00 min_any=12.42 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903366.455481371] [spacetry_bt_runner]: BT heartbeat: tick=3294 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903366.658152911] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=98/640 range=[1.00,20.00] thr=9.00 min_any=12.52 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903367.550966235] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=97/640 range=[1.00,20.00] thr=9.00 min_any=12.57 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903368.255620745] [spacetry_bt_runner]: BT heartbeat: tick=3312 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903368.431463462] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=98/640 range=[1.00,20.00] thr=9.00 min_any=12.63 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903369.309166118] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=12.69 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903370.055829401] [spacetry_bt_runner]: BT heartbeat: tick=3330 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903370.209912004] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=12.76 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903371.076492749] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=100/640 range=[1.00,20.00] thr=9.00 min_any=12.82 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903371.855575563] [spacetry_bt_runner]: BT heartbeat: tick=3348 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903371.942664974] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=99/640 range=[1.00,20.00] thr=9.00 min_any=12.88 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903372.836514467] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=98/640 range=[1.00,20.00] thr=9.00 min_any=12.95 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903373.656044587] [spacetry_bt_runner]: BT heartbeat: tick=3366 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903373.886856232] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=96/640 range=[1.00,20.00] thr=9.00 min_any=13.04 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903374.806191388] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=96/640 range=[1.00,20.00] thr=9.00 min_any=13.11 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903375.455953917] [spacetry_bt_runner]: BT heartbeat: tick=3384 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903375.894213245] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=96/640 range=[1.00,20.00] thr=9.00 min_any=13.19 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903376.979786118] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=94/640 range=[1.00,20.00] thr=9.00 min_any=13.29 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903377.355491305] [spacetry_bt_runner]: BT heartbeat: tick=3403 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903377.939145804] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=94/640 range=[1.00,20.00] thr=9.00 min_any=13.36 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903378.843370799] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=93/640 range=[1.00,20.00] thr=9.00 min_any=13.43 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903379.256299117] [spacetry_bt_runner]: BT heartbeat: tick=3422 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903379.767387126] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=13.50 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903380.622634419] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=91/640 range=[1.00,20.00] thr=9.00 min_any=13.57 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903381.055684451] [spacetry_bt_runner]: BT heartbeat: tick=3440 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903381.492801006] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=90/640 range=[1.00,20.00] thr=9.00 min_any=13.65 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903382.356206139] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=88/640 range=[1.00,20.00] thr=9.00 min_any=13.74 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903382.855562668] [spacetry_bt_runner]: BT heartbeat: tick=3458 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903383.244292854] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=87/640 range=[1.00,20.00] thr=9.00 min_any=13.83 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903384.128094955] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=85/640 range=[1.00,20.00] thr=9.00 min_any=13.92 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903384.655588919] [spacetry_bt_runner]: BT heartbeat: tick=3476 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903384.986348024] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=14.01 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903385.848273703] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=82/640 range=[1.00,20.00] thr=9.00 min_any=14.09 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903386.455734371] [spacetry_bt_runner]: BT heartbeat: tick=3494 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903386.777700204] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=78/640 range=[1.00,20.00] thr=9.00 min_any=14.19 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903387.703800869] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=76/640 range=[1.00,20.00] thr=9.00 min_any=14.30 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903388.355741630] [spacetry_bt_runner]: BT heartbeat: tick=3513 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903388.598348870] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=74/640 range=[1.00,20.00] thr=9.00 min_any=14.41 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903389.472754440] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=72/640 range=[1.00,20.00] thr=9.00 min_any=14.53 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903390.155547085] [spacetry_bt_runner]: BT heartbeat: tick=3531 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903390.331869179] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=71/640 range=[1.00,20.00] thr=9.00 min_any=14.66 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903391.374911092] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=68/640 range=[1.00,20.00] thr=9.00 min_any=14.82 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903391.955741180] [spacetry_bt_runner]: BT heartbeat: tick=3549 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903392.250479349] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=66/640 range=[1.00,20.00] thr=9.00 min_any=14.96 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903393.115655953] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=64/640 range=[1.00,20.00] thr=9.00 min_any=15.08 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903393.755532790] [spacetry_bt_runner]: BT heartbeat: tick=3567 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903393.977683880] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=62/640 range=[1.00,20.00] thr=9.00 min_any=15.20 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903394.847289092] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=60/640 range=[1.00,20.00] thr=9.00 min_any=15.35 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903395.555573740] [spacetry_bt_runner]: BT heartbeat: tick=3585 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903395.721697151] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=59/640 range=[1.00,20.00] thr=9.00 min_any=15.51 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903396.641331702] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=82/640 range=[1.00,20.00] thr=9.00 min_any=15.64 front=19.71 left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903397.355590170] [spacetry_bt_runner]: BT heartbeat: tick=3603 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903397.527203840] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=86/640 range=[1.00,20.00] thr=9.00 min_any=15.73 front=19.51 left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903398.604042264] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=89/640 range=[1.00,20.00] thr=9.00 min_any=15.86 front=19.28 left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903399.155718678] [spacetry_bt_runner]: BT heartbeat: tick=3621 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903399.496918406] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=89/640 range=[1.00,20.00] thr=9.00 min_any=15.97 front=19.20 left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903400.362900217] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=52/640 range=[1.00,20.00] thr=9.00 min_any=16.12 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903400.955678901] [spacetry_bt_runner]: BT heartbeat: tick=3639 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903401.213767792] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=50/640 range=[1.00,20.00] thr=9.00 min_any=16.25 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903401.994142588] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=49/640 range=[1.00,20.00] thr=9.00 min_any=16.35 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903402.655621204] [spacetry_bt_runner]: BT heartbeat: tick=3656 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903402.835281739] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=47/640 range=[1.00,20.00] thr=9.00 min_any=16.47 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903403.663911215] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=46/640 range=[1.00,20.00] thr=9.00 min_any=16.58 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903404.355631356] [spacetry_bt_runner]: BT heartbeat: tick=3673 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903404.486622794] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=45/640 range=[1.00,20.00] thr=9.00 min_any=16.68 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903405.317275664] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=44/640 range=[1.00,20.00] thr=9.00 min_any=16.79 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903406.055662341] [spacetry_bt_runner]: BT heartbeat: tick=3690 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903406.195429901] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=42/640 range=[1.00,20.00] thr=9.00 min_any=16.91 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903407.226797729] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=41/640 range=[1.00,20.00] thr=9.00 min_any=17.04 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903407.855583739] [spacetry_bt_runner]: BT heartbeat: tick=3708 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903408.092386222] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=39/640 range=[1.00,20.00] thr=9.00 min_any=17.16 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903408.973322121] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=38/640 range=[1.00,20.00] thr=9.00 min_any=17.29 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903409.655606409] [spacetry_bt_runner]: BT heartbeat: tick=3726 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903410.032010058] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=36/640 range=[1.00,20.00] thr=9.00 min_any=17.46 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903411.076258610] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=33/640 range=[1.00,20.00] thr=9.00 min_any=17.62 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903411.455662514] [spacetry_bt_runner]: BT heartbeat: tick=3744 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903411.978221068] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=31/640 range=[1.00,20.00] thr=9.00 min_any=17.76 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903413.038031114] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=29/640 range=[1.00,20.00] thr=9.00 min_any=17.93 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903413.255504327] [spacetry_bt_runner]: BT heartbeat: tick=3762 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903413.980033571] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=26/640 range=[1.00,20.00] thr=9.00 min_any=18.06 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903415.072573884] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=23/640 range=[1.00,20.00] thr=9.00 min_any=18.26 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903415.155731125] [spacetry_bt_runner]: BT heartbeat: tick=3781 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903416.137479818] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=23/640 range=[1.00,20.00] thr=9.00 min_any=18.41 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903417.155606257] [spacetry_bt_runner]: BT heartbeat: tick=3801 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903417.208237148] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=21/640 range=[1.00,20.00] thr=9.00 min_any=18.57 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903418.097192356] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=20/640 range=[1.00,20.00] thr=9.00 min_any=18.73 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903419.055643779] [spacetry_bt_runner]: BT heartbeat: tick=3820 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903419.127918031] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=19/640 range=[1.00,20.00] thr=9.00 min_any=18.87 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903420.231829023] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=17/640 range=[1.00,20.00] thr=9.00 min_any=19.11 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903420.955641210] [spacetry_bt_runner]: BT heartbeat: tick=3839 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903421.158512492] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=15/640 range=[1.00,20.00] thr=9.00 min_any=19.27 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903422.035119475] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=11/640 range=[1.00,20.00] thr=9.00 min_any=19.47 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903422.755747534] [spacetry_bt_runner]: BT heartbeat: tick=3857 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903422.892783946] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=8/640 range=[1.00,20.00] thr=9.00 min_any=19.67 front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903423.752100322] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=5/640 range=[1.00,20.00] thr=9.00 min_any=19.87 front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903424.455571434] [spacetry_bt_runner]: BT heartbeat: tick=3874 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903424.591261232] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903425.421196210] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903426.155564851] [spacetry_bt_runner]: BT heartbeat: tick=3891 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903426.247410409] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903427.082346535] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903427.855559144] [spacetry_bt_runner]: BT heartbeat: tick=3908 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903427.922632485] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903428.737796331] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903429.527001906] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903429.555523039] [spacetry_bt_runner]: BT heartbeat: tick=3925 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903430.337003053] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903431.255663681] [spacetry_bt_runner]: BT heartbeat: tick=3942 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903431.371328229] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903432.357065202] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903432.955765348] [spacetry_bt_runner]: BT heartbeat: tick=3959 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903433.158700205] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903433.951268156] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903434.655514970] [spacetry_bt_runner]: BT heartbeat: tick=3976 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903434.756336212] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903435.561047483] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903436.255506955] [spacetry_bt_runner]: BT heartbeat: tick=3992 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903436.333621719] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903437.150465459] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903437.955571557] [spacetry_bt_runner]: BT heartbeat: tick=4009 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903437.984016006] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903438.792965734] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903439.655582702] [spacetry_bt_runner]: BT heartbeat: tick=4026 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903439.750539916] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903440.625531979] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903441.355657473] [spacetry_bt_runner]: BT heartbeat: tick=4043 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903441.426678085] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=2/640 range=[1.00,20.00] thr=9.00 min_any=19.52 front=19.52 left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903442.239436618] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903443.055605042] [spacetry_bt_runner]: BT heartbeat: tick=4060 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903443.077997963] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=3/640 range=[1.00,20.00] thr=9.00 min_any=19.05 front=19.05 left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903443.912076101] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=49/640 range=[1.00,20.00] thr=9.00 min_any=19.10 front=19.10 left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903444.734064221] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=92/640 range=[1.00,20.00] thr=9.00 min_any=17.55 front=17.55 left=18.96 right=18.98
+[spacetry_bt_runner-20] [INFO] [1775903444.755616955] [spacetry_bt_runner]: BT heartbeat: tick=4077 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903445.579251708] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=90/640 range=[1.00,20.00] thr=9.00 min_any=17.64 front=17.64 left=18.95 right=19.17
+[spacetry_bt_runner-20] [INFO] [1775903446.455581998] [spacetry_bt_runner]: BT heartbeat: tick=4094 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903446.551326682] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=74/640 range=[1.00,20.00] thr=9.00 min_any=18.32 front=18.32 left=19.54 right=inf
+[obstacle_direction_node-8] [INFO] [1775903447.349871881] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=84/640 range=[1.00,20.00] thr=9.00 min_any=18.07 front=18.07 left=19.22 right=19.97
+[spacetry_bt_runner-20] [INFO] [1775903448.055839391] [spacetry_bt_runner]: BT heartbeat: tick=4110 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903448.319115271] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=105/640 range=[1.00,20.00] thr=9.00 min_any=16.94 front=16.94 left=18.29 right=18.41
+[obstacle_direction_node-8] [INFO] [1775903449.143723707] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=90/640 range=[1.00,20.00] thr=9.00 min_any=17.72 front=17.72 left=19.01 right=19.32
+[spacetry_bt_runner-20] [INFO] [1775903449.755523249] [spacetry_bt_runner]: BT heartbeat: tick=4127 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903449.980413744] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=58/640 range=[1.00,20.00] thr=9.00 min_any=17.38 front=17.38 left=19.90 right=inf
+[obstacle_direction_node-8] [INFO] [1775903450.823764912] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=4/640 range=[1.00,20.00] thr=9.00 min_any=17.16 front=17.16 left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903451.555694147] [spacetry_bt_runner]: BT heartbeat: tick=4145 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903451.841589061] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=2/640 range=[1.00,20.00] thr=9.00 min_any=17.01 front=17.01 left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903452.667232109] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903453.255558052] [spacetry_bt_runner]: BT heartbeat: tick=4162 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903453.477364243] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903454.353441250] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903454.955569721] [spacetry_bt_runner]: BT heartbeat: tick=4179 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903455.340548858] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903456.192157105] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903456.655495327] [spacetry_bt_runner]: BT heartbeat: tick=4196 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903457.161884135] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903458.058513430] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903458.455729323] [spacetry_bt_runner]: BT heartbeat: tick=4214 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903459.053962346] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903460.121496252] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903460.255652135] [spacetry_bt_runner]: BT heartbeat: tick=4232 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903461.035976022] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903462.055538629] [spacetry_bt_runner]: BT heartbeat: tick=4250 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903462.070810289] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903462.973312362] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903463.930691054] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903463.955584831] [spacetry_bt_runner]: BT heartbeat: tick=4269 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903464.804639376] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903465.755654228] [spacetry_bt_runner]: BT heartbeat: tick=4287 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903465.873608382] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903466.739901252] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903467.455932837] [spacetry_bt_runner]: BT heartbeat: tick=4304 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903467.746761503] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903468.690462272] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903469.255474154] [spacetry_bt_runner]: BT heartbeat: tick=4322 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903469.478460360] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903470.361862513] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903471.055844851] [spacetry_bt_runner]: BT heartbeat: tick=4340 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903471.209264558] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903472.180805810] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903472.755539679] [spacetry_bt_runner]: BT heartbeat: tick=4357 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903472.958210385] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903473.789904162] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903474.455514959] [spacetry_bt_runner]: BT heartbeat: tick=4374 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903474.703973176] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903475.491542375] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903476.155746800] [spacetry_bt_runner]: BT heartbeat: tick=4391 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903476.273818614] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903477.221848899] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903477.755589912] [spacetry_bt_runner]: BT heartbeat: tick=4407 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903478.008253205] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903478.995824803] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903479.455519702] [spacetry_bt_runner]: BT heartbeat: tick=4424 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903479.837687155] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903480.755363640] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903481.155494657] [spacetry_bt_runner]: BT heartbeat: tick=4441 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903481.868403533] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903482.704888929] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903482.855506247] [spacetry_bt_runner]: BT heartbeat: tick=4458 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903483.512504156] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903484.507007215] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903484.555607533] [spacetry_bt_runner]: BT heartbeat: tick=4475 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903485.456729233] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903486.255312341] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=39/640 range=[1.00,20.00] thr=9.00 min_any=19.36 front=19.36 left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903486.255534254] [spacetry_bt_runner]: BT heartbeat: tick=4492 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903487.085659982] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=68/640 range=[1.00,20.00] thr=9.00 min_any=18.83 front=18.83 left=inf right=19.86
+[obstacle_direction_node-8] [INFO] [1775903487.919956472] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=72/640 range=[1.00,20.00] thr=9.00 min_any=18.57 front=18.57 left=19.97 right=inf
+[spacetry_bt_runner-20] [INFO] [1775903487.955608521] [spacetry_bt_runner]: BT heartbeat: tick=4509 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903488.905565237] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=110/640 range=[1.00,20.00] thr=9.00 min_any=16.61 front=16.61 left=17.32 right=19.08
+[spacetry_bt_runner-20] [INFO] [1775903489.655479203] [spacetry_bt_runner]: BT heartbeat: tick=4526 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903489.711740434] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903490.653923281] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903491.255531260] [spacetry_bt_runner]: BT heartbeat: tick=4542 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903491.471294154] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903492.279888812] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903492.955627876] [spacetry_bt_runner]: BT heartbeat: tick=4559 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903493.249942718] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903494.194485382] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903494.655564369] [spacetry_bt_runner]: BT heartbeat: tick=4576 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903495.194910456] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903496.269164163] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903496.455577142] [spacetry_bt_runner]: BT heartbeat: tick=4594 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903497.188584753] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903498.120437082] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903498.156539322] [spacetry_bt_runner]: BT heartbeat: tick=4611 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903499.026300102] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903499.755595255] [spacetry_bt_runner]: BT heartbeat: tick=4627 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903499.854772038] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903500.629878763] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903501.355544779] [spacetry_bt_runner]: BT heartbeat: tick=4643 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903501.554446685] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903502.381541880] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903503.055681882] [spacetry_bt_runner]: BT heartbeat: tick=4660 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903503.356878017] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903504.207614499] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903504.755429511] [spacetry_bt_runner]: BT heartbeat: tick=4677 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903505.035527669] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903505.913371578] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903506.455500568] [spacetry_bt_runner]: BT heartbeat: tick=4694 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903506.902132415] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903507.928117810] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903508.155656751] [spacetry_bt_runner]: BT heartbeat: tick=4711 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903508.915400493] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903509.986604424] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903510.055662644] [spacetry_bt_runner]: BT heartbeat: tick=4730 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903510.914259344] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903512.055642103] [spacetry_bt_runner]: BT heartbeat: tick=4750 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903512.066247427] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903513.172557042] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903514.055796616] [spacetry_bt_runner]: BT heartbeat: tick=4770 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903514.248932249] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903515.299864370] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903516.055728153] [spacetry_bt_runner]: BT heartbeat: tick=4790 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903516.170878271] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903517.073078441] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903517.955506196] [spacetry_bt_runner]: BT heartbeat: tick=4809 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903518.048394325] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903519.285235955] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [INFO] [1775903519.955818453] [spacetry_bt_runner]: BT heartbeat: tick=4829 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[obstacle_direction_node-8] [INFO] [1775903520.338230830] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[obstacle_direction_node-8] [INFO] [1775903521.409208999] [obstacle_direction]: state=CLEAR scan_frame=lidar_link valid=0/640 range=[1.00,20.00] thr=9.00 min_any=inf front=inf left=inf right=inf
+[spacetry_bt_runner-20] [1775903521.656]: NavigateWithAvoidance     [33mRUNNING[0m -> [32mSUCCESS[0m
+[spacetry_bt_runner-20] [1775903521.656]: AlignToGoal               [36mIDLE[0m -> [33mRUNNING[0m
+[spacetry_bt_runner-20] [1775903521.855]: AlignToGoal               [33mRUNNING[0m -> [32mSUCCESS[0m
+[spacetry_bt_runner-20] [1775903521.856]: StopAndObserve            [36mIDLE[0m -> [33mRUNNING[0m
+[spacetry_bt_runner-20] [INFO] [1775903521.955524316] [spacetry_bt_runner]: BT heartbeat: tick=4849 root=RUNNING tree=/ws/install/share/spacetry_bt/trees/base_bt.xml
+[scenario_driver-11] [INFO] [1775903522.045275448] [scenario_navigation_obstacle_degraded_perception_driver]: Scenario finalised with reason=goal_reached, report=/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/spacetry_scenario_navigation_obstacle_degraded_perception_report.md
+[INFO] [scenario_driver-11]: process has finished cleanly [pid 1209]
+[INFO] [spacetry_bt_runner-20]: sending signal 'SIGINT' to process[spacetry_bt_runner-20]
+[INFO] [move_wheel-10]: sending signal 'SIGINT' to process[move_wheel-10]
+[INFO] [copilot-9]: sending signal 'SIGINT' to process[copilot-9]
+[INFO] [obstacle_direction_node-8]: sending signal 'SIGINT' to process[obstacle_direction_node-8]
+[INFO] [battery_manager-7]: sending signal 'SIGINT' to process[battery_manager-7]
+[INFO] [odom_relay_node-6]: sending signal 'SIGINT' to process[odom_relay_node-6]
+[INFO] [odom_tf_publisher-5]: sending signal 'SIGINT' to process[odom_tf_publisher-5]
+[INFO] [image_bridge-4]: sending signal 'SIGINT' to process[image_bridge-4]
+[INFO] [parameter_bridge-3]: sending signal 'SIGINT' to process[parameter_bridge-3]
+[INFO] [robot_state_publisher-2]: sending signal 'SIGINT' to process[robot_state_publisher-2]
+[INFO] [gz-1]: sending signal 'SIGINT' to process[gz-1]
+[spacetry_bt_runner-20] [INFO] [1775903522.302709118] [rclcpp]: signal_handler(signum=2)
+[move_wheel-10] Traceback (most recent call last):
+[move_wheel-10]   File "/ws/install/lib/curiosity_rover_demo/move_wheel", line 148, in <module>
+[move_wheel-10]     main()
+[move_wheel-10]   File "/ws/install/lib/curiosity_rover_demo/move_wheel", line 138, in main
+[move_wheel-10]     rclpy.spin(wheel_node)
+[move_wheel-10]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/__init__.py", line 247, in spin
+[move_wheel-10]     executor.spin_once()
+[move_wheel-10]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 845, in spin_once
+[move_wheel-10]     self._spin_once_impl(timeout_sec)
+[move_wheel-10]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 829, in _spin_once_impl
+[move_wheel-10]     handler, entity, node = self.wait_for_ready_callbacks(
+[move_wheel-10]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[move_wheel-10]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 799, in wait_for_ready_callbacks
+[move_wheel-10]     return next(self._cb_iter)
+[move_wheel-10]            ^^^^^^^^^^^^^^^^^^^
+[move_wheel-10]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 703, in _wait_for_ready_callbacks
+[move_wheel-10]     wait_set.wait(timeout_nsec)
+[move_wheel-10] KeyboardInterrupt
+[INFO] [parameter_bridge-3]: process has finished cleanly [pid 1201]
+[copilot-9] [INFO] [1775903522.306600833] [rclcpp]: signal_handler(signum=2)
+[obstacle_direction_node-8] Traceback (most recent call last):
+[obstacle_direction_node-8]   File "/ws/install/lib/spacetry_perception/obstacle_direction_node", line 33, in <module>
+[obstacle_direction_node-8]     sys.exit(load_entry_point('spacetry-perception==0.0.0', 'console_scripts', 'obstacle_direction_node')())
+[obstacle_direction_node-8]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[obstacle_direction_node-8]   File "/ws/install/lib/python3.12/site-packages/spacetry_perception/obstacle_direction_node.py", line 186, in main
+[obstacle_direction_node-8]     rclpy.spin(node)
+[obstacle_direction_node-8]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/__init__.py", line 247, in spin
+[obstacle_direction_node-8]     executor.spin_once()
+[obstacle_direction_node-8]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 845, in spin_once
+[obstacle_direction_node-8]     self._spin_once_impl(timeout_sec)
+[obstacle_direction_node-8]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 829, in _spin_once_impl
+[obstacle_direction_node-8]     handler, entity, node = self.wait_for_ready_callbacks(
+[obstacle_direction_node-8]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[obstacle_direction_node-8]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 799, in wait_for_ready_callbacks
+[obstacle_direction_node-8]     return next(self._cb_iter)
+[obstacle_direction_node-8]            ^^^^^^^^^^^^^^^^^^^
+[obstacle_direction_node-8]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 703, in _wait_for_ready_callbacks
+[obstacle_direction_node-8]     wait_set.wait(timeout_nsec)
+[obstacle_direction_node-8] KeyboardInterrupt
+[odom_relay_node-6] Traceback (most recent call last):
+[odom_relay_node-6]   File "/ws/install/lib/spacetry_perception/odom_relay_node", line 33, in <module>
+[odom_relay_node-6]     sys.exit(load_entry_point('spacetry-perception==0.0.0', 'console_scripts', 'odom_relay_node')())
+[odom_relay_node-6]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[odom_relay_node-6]   File "/ws/install/lib/python3.12/site-packages/spacetry_perception/odom_relay_node.py", line 34, in main
+[odom_relay_node-6]     rclpy.spin(node)
+[odom_relay_node-6]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/__init__.py", line 247, in spin
+[odom_relay_node-6]     executor.spin_once()
+[odom_relay_node-6]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 845, in spin_once
+[odom_relay_node-6]     self._spin_once_impl(timeout_sec)
+[odom_relay_node-6]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 829, in _spin_once_impl
+[odom_relay_node-6]     handler, entity, node = self.wait_for_ready_callbacks(
+[odom_relay_node-6]                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[odom_relay_node-6]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 799, in wait_for_ready_callbacks
+[odom_relay_node-6]     return next(self._cb_iter)
+[odom_relay_node-6]            ^^^^^^^^^^^^^^^^^^^
+[odom_relay_node-6]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/executors.py", line 703, in _wait_for_ready_callbacks
+[odom_relay_node-6]     wait_set.wait(timeout_nsec)
+[odom_relay_node-6] KeyboardInterrupt
+[odom_tf_publisher-5] Traceback (most recent call last):
+[odom_tf_publisher-5]   File "/ws/install/lib/curiosity_gazebo/odom_tf_publisher", line 74, in <module>
+[odom_tf_publisher-5]     main()
+[odom_tf_publisher-5]   File "/ws/install/lib/curiosity_gazebo/odom_tf_publisher", line 70, in main
+[odom_tf_publisher-5]     rclpy.shutdown()
+[odom_tf_publisher-5]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/__init__.py", line 134, in shutdown
+[odom_tf_publisher-5]     _shutdown(context=context)
+[odom_tf_publisher-5]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/utilities.py", line 82, in shutdown
+[odom_tf_publisher-5]     context.shutdown()
+[odom_tf_publisher-5]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/context.py", line 129, in shutdown
+[odom_tf_publisher-5]     self.__context.shutdown()
+[odom_tf_publisher-5] rclpy._rclpy_pybind11.RCLError: failed to shutdown: rcl_shutdown already called on the given context, at /spaceros_ws/src/rcl/rcl/src/rcl/init.c:333
+[image_bridge-4] [INFO] [1775903522.315900568] [rclcpp]: signal_handler(signum=2)
+[parameter_bridge-3] [INFO] [1775903522.318947483] [rclcpp]: signal_handler(signum=2)
+[robot_state_publisher-2] [INFO] [1775903522.321486409] [rclcpp]: signal_handler(signum=2)
+[gz-1] [INFO] [1775903522.561942736] [controller_manager.pal_statistics]: Async messages lost 0
+[gz-1] [INFO] [1775903522.561988315] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[gz-1] [INFO] [1775903522.564997034] [controller_manager.pal_statistics]: Async messages lost 0
+[gz-1] [INFO] [1775903522.565025739] [controller_manager.pal_statistics]: publish_async_failures_ 0
+[battery_manager-7] Traceback (most recent call last):
+[battery_manager-7]   File "/ws/install/lib/spacetry_battery/battery_manager", line 33, in <module>
+[battery_manager-7]     sys.exit(load_entry_point('spacetry-battery==0.0.0', 'console_scripts', 'battery_manager')())
+[battery_manager-7]              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[battery_manager-7]   File "/ws/install/lib/python3.12/site-packages/spacetry_battery/battery_manager_node.py", line 248, in main
+[battery_manager-7]     rclpy.shutdown()
+[battery_manager-7]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/__init__.py", line 134, in shutdown
+[battery_manager-7]     _shutdown(context=context)
+[battery_manager-7]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/utilities.py", line 82, in shutdown
+[battery_manager-7]     context.shutdown()
+[battery_manager-7]   File "/opt/ros/spaceros/lib/python3.12/site-packages/rclpy/context.py", line 129, in shutdown
+[battery_manager-7]     self.__context.shutdown()
+[battery_manager-7] rclpy._rclpy_pybind11.RCLError: failed to shutdown: rcl_shutdown already called on the given context, at /spaceros_ws/src/rcl/rcl/src/rcl/init.c:333
+[INFO] [spacetry_bt_runner-20]: process has finished cleanly [pid 1626]
+[INFO] [copilot-9]: process has finished cleanly [pid 1207]
+[INFO] [robot_state_publisher-2]: process has finished cleanly [pid 1200]
+[INFO] [image_bridge-4]: process has finished cleanly [pid 1202]
+[ERROR] [move_wheel-10]: process has died [pid 1208, exit code -2, cmd '/ws/install/lib/curiosity_rover_demo/move_wheel --ros-args -r __node:=move_wheel_adapter -p use_sim_time:=True --params-file /tmp/launch_params_02ungxq8'].
+[ERROR] [battery_manager-7]: process has died [pid 1205, exit code 1, cmd '/ws/install/lib/spacetry_battery/battery_manager --ros-args -r __node:=battery_manager -p use_sim_time:=True --params-file /ws/install/share/spacetry_battery/config/battery_manager.yaml --params-file /tmp/launch_params_5akuf7mz'].
+[ERROR] [odom_tf_publisher-5]: process has died [pid 1203, exit code 1, cmd '/ws/install/lib/curiosity_gazebo/odom_tf_publisher --ros-args -r __node:=odom_tf_publisher -p use_sim_time:=True'].
+[ERROR] [odom_relay_node-6]: process has died [pid 1204, exit code -2, cmd '/ws/install/lib/spacetry_perception/odom_relay_node --ros-args -r __node:=odom_relay -p use_sim_time:=True --params-file /tmp/launch_params_6c94tsqe'].
+[ERROR] [obstacle_direction_node-8]: process has died [pid 1206, exit code -2, cmd '/ws/install/lib/spacetry_perception/obstacle_direction_node --ros-args -r __node:=obstacle_direction -p use_sim_time:=True --params-file /tmp/launch_params_1edq8bsm'].
+[INFO] [gz-1]: process has finished cleanly [pid 1199]
