@@ -71,13 +71,13 @@ The scenario drivers subscribe to or derive runtime ROS signals and convert them
 
 | Artifact Type | Location | Purpose |
 | --- | --- | --- |
-| Scenario config & design | `scenario_X/final_answer.md` | Generation rationale, injected uncertainty specs, reference mission |
+| Scenario prompt answer | `scenario_X/final_answer.md` | Generation rationale, injected uncertainty specs, reference mission |
 | ROS bag files (raw messages) | `records/*/rosbags/` or subdirectories | Replay topics: odometry, obstacle state, sensor data, battery, cmd_vel |
 | Derived metrics | `records/*/metrics/` or embedded in report | Detection latency, route deviation, recovery behavior, safety checks |
 | BT runtime trace | `records/*/runtime/` or `full_run_bt_runtime_*/` | Tick logs, node state transitions, execution timeline |
 | Launcher logs | `records/*/launch_*.log` | Node startup, parameter binding, ROS2 initialization |
 | Execution report | `records/*/scenario_*_report.md` or `records/*/` | Summary findings, attribution status, PASS/FAIL outcome |
-| LLM workflow logs | `scenario_X/codex_autoring_workflow_logs.jsonl` | Scenario generation conversation trace (Scenario 1 only) |
+| Authoring workflow logs | `scenario_X/codex_autoring_workflow_logs.jsonl` | Scenario generation conversation trace (Scenario 1 only) |
 | Rollout execution log | `scenario_X/rollout-*.jsonl` | Timestamped event stream during driver execution (Scenarios 2 & 3) |
 
 All three scenarios can be replayed using their rosbag files and re-evaluated using the corresponding scenario driver package in their `spacetry_scenario_*` directories.
