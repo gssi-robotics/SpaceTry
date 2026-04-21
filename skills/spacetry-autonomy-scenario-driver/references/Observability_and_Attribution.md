@@ -27,6 +27,7 @@ Write scenario outputs to the bind-mounted host `log/` folder using the followin
 - A credited detection should be supported by both event timing and scenario-specific attribution checks.
 - When the autonomy logic consumes interpreted perception outputs such as BT-facing obstacle topics, detection metrics should be keyed to the first attributable autonomy-facing obstacle signal rather than delayed until a raw sensor fallback changes state.
 - In multi-uncertainty scenarios, log which injected uncertainty a credited event is associated with when that is knowable, and do not imply an interaction hypothesis unless the scenario explicitly states one.
+- Only treat monitor state as report-worthy when it actually changed trigger gating, attribution, or how the run results were interpreted.
 
 ## Required Logging Content
 
@@ -40,7 +41,7 @@ Keep scenario logic observable:
 - log whether any baseline monitor was already active at injection
 - log the rover response signal
 - write metrics that match the scenario contract
-- keep the runtime logs consistent with the scenario contract's `monitor_usage_map`, so each consumed monitor topic is visibly classified as gating, attribution, or report-only context
+- if a monitor actually influenced trigger gating, attribution, or report interpretation during the run, log that influence consistently with the scenario contract's `monitor_handling`
 - log the injected fault pose, time, and unique identifier
 - log rover pose at every credited detection and credited reaction event
 - log rover-to-fault distance when detection or reaction is credited
@@ -58,6 +59,7 @@ Keep scenario logic observable:
 - log whether the run satisfied the `meaningful_evaluation_rule`
 - log whether any baseline obstacle, monitor violation, or other confounding condition was active when a detection or reaction candidate was evaluated
 - if a detection or reaction candidate is rejected, log the rejection reason
+- avoid cluttering the final report with a full monitor inventory when monitors never influenced the run
 
 ## Recommended Event Names
 

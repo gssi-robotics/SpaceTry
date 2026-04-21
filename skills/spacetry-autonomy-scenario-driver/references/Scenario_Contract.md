@@ -22,7 +22,7 @@ Write the scenario in terms of these fields:
 - `injected_outcome_assessment`: PASS, DEGRADED, FAIL, UNTESTED, or INCONCLUSIVE for autonomy exercised by scenario-injected uncertainties
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 - `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
-- `monitor_usage_map`: explicit map of which monitor topics are subscribed and whether each one affects trigger gating, attribution logic, or report-only accounting
+- `monitor_handling`: internal normalized structure for the monitors that can affect trigger gating, attribution logic, or report interpretation for the scenario
 - `fault_attribution_rule`: explicit rule for deciding whether a detection or reaction is attributable to the injected uncertainty rather than baseline hazards, nominal behavior, or unrelated monitor violations
 - `reaction_scope_rule`: explicit rule for deciding whether a real rover reaction counts as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - `control_rationale_rule`: explicit rule for how the scenario records and classifies observed control-command changes such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`, independently from whether the injected uncertainty receives attribution credit
@@ -62,29 +62,27 @@ The `runtime_parameter_interface` must at minimum include:
 
 where `transport` should be `inline_launch_dict` for scenario-driver ROS parameters in this skill.
 
-## Monitor Usage Map
+## Monitor Handling
 
-The contract must explicitly say how the scenario uses monitor topics at runtime.
+The internal contract must explicitly say how the scenario uses monitor topics at runtime.
 
-The `monitor_usage_map` must list every monitor topic that is relevant to baseline safety interpretation for the scenario, including monitors that are intentionally report-only.
+The `monitor_handling` structure is an internal planning artifact for reproducibility and attribution. It should be derived from the user prompt's free-form monitor notes, plus any monitor behavior discovered while inspecting the monitors package, launch wiring, or runtime evidence.
+
+Use `monitor_handling` only for monitors that are material to the scenario design or to interpreting the run. Do not turn it into a full catalog of all baseline monitors unless they genuinely affect the scenario.
 
 Each entry should include at minimum:
 
 - `monitor_name`
 - `topic`
 - `consumer_node`
-- `usage`
-- `reason_if_unused`
+- `affects_trigger_gating`
+- `affects_attribution`
+- `affects_report_interpretation`
+- `rationale`
 
-Use the following `usage` values:
+Use explicit booleans for the three `affects_*` fields rather than a single enum.
 
-- `gating` when the monitor can block or delay injection
-- `attribution` when the monitor state changes how detection or reaction evidence is interpreted
-- `gating_and_attribution` when both are true
-- `report_only` when the monitor is logged and reported but does not directly change trigger or attribution logic
-- `unused_with_reason` when the monitor exists in the baseline system but is intentionally not consumed by the scenario beyond an explicit rationale
-
-If the scenario subscribes to a monitor topic but does not let that topic affect trigger gating or attribution, say so directly instead of leaving the topic unclassified.
+If a monitor is a plausible confound or was reviewed during planning but is intentionally not consumed by the scenario, you may still keep an internal entry with all `affects_*` fields set to `false` and a short rationale. Do not surface those non-influential entries in the final report unless they actually affected runtime interpretation.
 
 When multiple injected uncertainties are present:
 
@@ -167,7 +165,8 @@ Before execution, validate the contract against the launch design:
 - every ROS parameter consumed by the scenario driver appears in `runtime_parameter_interface`
 - every parameter listed in `runtime_parameter_interface` is passed via inline launch dict parameters
 - no contract or config artifact is ambiguous about whether it is parsed by the driver or by ROS
-- every relevant monitor topic appears in `monitor_usage_map` with one of the allowed usage classes
-- any baseline monitor that is intentionally not consumed by trigger gating or attribution is recorded as `report_only` or `unused_with_reason`
+- every monitor that can affect trigger gating, attribution, or report interpretation appears in `monitor_handling`
+- each `monitor_handling` entry uses explicit `affects_*` fields plus a rationale instead of enum shorthand
+- the final report and runtime logs mention only the monitors that actually influenced trigger gating, attribution, or result interpretation during the run
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception, and world packages, ask the user for clarification instead of making assumptions.

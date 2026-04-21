@@ -63,7 +63,7 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
 10. Define at design time how each scenario artifact is consumed by ROS:
    - keep scenario contract and scenario config YAML as plain files
    - pass file paths and runtime toggles to the scenario node only through inline launch dict ROS parameters
-11. Define the contract's `monitor_usage_map` before implementation so every relevant baseline monitor topic is explicitly classified as gating, attribution, report-only, or intentionally unused with reason.
+11. Define the contract's internal `monitor_handling` structure before implementation so any monitor that can affect trigger gating, attribution, or report interpretation is normalized even when the user prompt only mentions monitors informally or not at all.
 12. When the prompt includes one or more injected uncertainties, identify:
    - the primary evaluation target
    - any secondary injected uncertainties

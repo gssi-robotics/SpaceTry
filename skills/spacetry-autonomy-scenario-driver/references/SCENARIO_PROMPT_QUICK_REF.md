@@ -10,6 +10,7 @@ For the parametrizable template, see [SCENARIO_PROMPT_TEMPLATE.md](../assets/SCE
 
 - Keep mission description focused on mission intent, environment, and capabilities.
 - Fill every placeholder you keep. Delete lines that are not relevant to the scenario.
+- If a monitor materially affects trigger timing, safety interpretation, or attribution, add a short free-form note. Skip monitor notes when they are not central to the scenario.
 ---
 
 ## Reference Scenario Examples (Template-Conformant)
@@ -41,6 +42,9 @@ iii) **Monitors**:
     - Safety Constraints:
       - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
       - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
+    - [Optional] Monitor notes:
+      - If `/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY` becomes active, reduced speed may need to be interpreted as monitor enforcement rather than obstacle-only response.
+      - `/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY` is baseline context unless the run also drifts into low-battery handling.
 
 iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
@@ -106,6 +110,9 @@ iii) **Monitors**:
     - Safety Constraints:
       - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
       - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
+    - [Optional] Monitor notes:
+      - `/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY` is important because low-battery handling is part of the intended decision logic under injected battery stress.
+      - `/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY` may be logged as supporting context but is not expected to drive the main scenario interpretation.
 
 iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
@@ -172,6 +179,9 @@ iii) **Monitors**:
     - Safety Constraints:
       - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
       - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
+    - [Optional] Monitor notes:
+      - If `/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY` becomes active, reduced speed may reflect monitor enforcement as well as cautious navigation under degraded sensing.
+      - `/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY` only matters if the run also drifts into battery-related handling.
 
 iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
@@ -238,6 +248,9 @@ iii) **Monitors**:
     - Safety Constraints:
       - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
       - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
+    - [Optional] Monitor notes:
+      - If `/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY` becomes active, reduced-speed behavior may be partly monitor-driven rather than purely caused by the coupled obstacle and sensing disturbance.
+      - `/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY` is only relevant if the disturbance spills into low-battery handling.
 
 iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
@@ -308,6 +321,9 @@ iii) **Monitors**:
     - Safety Constraints:
       - MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY: Ensures rover returns to outpost when battery state of charge drops below threshold. Monitors `/battery/soc` and `/battery/near_outpost` topics to trigger handler when low battery detected and rover is not near outpost.
       - MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY: Ensures rover maintains full linear velocity when battery is fully charged. Monitors `/battery/soc` and `/cmd_vel` topics to trigger handler when battery is full but linear velocity command falls below full speed threshold.
+    - [Optional] Monitor notes:
+      - `/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY` is central because combined terrain and battery stress may force a continue-versus-return decision.
+      - `/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY` may help explain whether reduced speed comes from terrain effects, monitor enforcement, or both.
 
 iv) **Mission Goals Description**:
      Location: REF_SCENARIO.md
@@ -370,6 +386,7 @@ Before using a scenario prompt to generate or implement a driver:
 - [ ] Scenario can run in docker compose environment
 - [ ] Autonomy aspect being tested is clearly documented
 - [ ] Detection-latency metrics are defined on the autonomy-consumed perception interface, with any raw-sensor latency tracked separately if needed
+- [ ] Monitor notes are included when monitor behavior materially affects trigger timing, safety interpretation, or attribution
 
 ---
 
@@ -382,6 +399,7 @@ Use this table to customize the template for your specific scenario:
 | **Uncertainty Type** | Sensor degradation, dynamic obstacles, resource constraints, environmental change | "LIDAR fails at 50% confidence" |
 | **Evaluation Target** | One primary target plus optional secondary injected uncertainties | "Primary: obstacle avoidance, Secondary: LiDAR degradation" |
 | **Interaction Hypothesis** | Optional reason why multiple injected uncertainties may interact | "Reduced sensing delays obstacle avoidance" |
+| **Monitor Notes (Optional)** | Add short free-form notes only for monitors that could materially affect trigger timing, safety interpretation, or attribution | "If `/monitor/handlerMR_011...` activates, reduced speed may reflect monitor enforcement as well as obstacle avoidance" |
 | **Injection Timing** | At decision point, mid-action, during contingency | "When rover commits to navigate_to (waypoint 3)" |
 | **Additional Metrics** | Mission-specific metrics with units or boolean status | "Obstacle detection latency (ms)" |
 | **Intensity Increase** | Gradual, sudden, cascading | "LIDAR quality: 100% → 80% → 50% → 0% over 10 minutes" |

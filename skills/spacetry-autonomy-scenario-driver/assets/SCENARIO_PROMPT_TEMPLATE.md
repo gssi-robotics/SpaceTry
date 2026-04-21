@@ -26,8 +26,9 @@ iii) **Monitors**:
     Description: ROS 2 package with the monitors for safety constraints
     - Safety Constraints:
       - {CONSTRAINT_ID}: {SAFETY_CONSTRAINT_DESCRIPTION}
-    - Monitor usage map:
-      - {MONITOR_TOPIC}: {GATING_OR_ATTRIBUTION_OR_REPORT_ONLY_OR_UNUSED_WITH_REASON}
+    - [Optional] Monitor notes:
+      - {FREE_FORM_NOTE_ABOUT_MONITORS_THAT_MATTER_FOR_THIS_SCENARIO}
+      - {FREE_FORM_NOTE_ABOUT_MONITORS_THAT_MATTER_FOR_THIS_SCENARIO}
 
 iv) **Mission Goals Description**:
      Location: {MISSION_GOAL_FILE}
@@ -81,6 +82,8 @@ Choose one or more patterns that match the primary target and any secondary inje
 ---
 
 For a completed example that matches this template, see [SCENARIO_PROMPT_QUICK_REF.md](../references/SCENARIO_PROMPT_QUICK_REF.md).
+
+Keep monitor notes free-form and optional in the user prompt. If monitors matter for trigger timing, attribution, or result interpretation, the scenario contract will normalize that information internally during planning.
 
 **Last Updated:** April 8, 2026  
 **Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Testbed
