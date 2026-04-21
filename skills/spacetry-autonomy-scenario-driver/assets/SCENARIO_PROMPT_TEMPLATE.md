@@ -26,6 +26,8 @@ iii) **Monitors**:
     Description: ROS 2 package with the monitors for safety constraints
     - Safety Constraints:
       - {CONSTRAINT_ID}: {SAFETY_CONSTRAINT_DESCRIPTION}
+    - Monitor usage map:
+      - {MONITOR_TOPIC}: {GATING_OR_ATTRIBUTION_OR_REPORT_ONLY_OR_UNUSED_WITH_REASON}
 
 iv) **Mission Goals Description**:
      Location: {MISSION_GOAL_FILE}

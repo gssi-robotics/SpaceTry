@@ -6,6 +6,25 @@ Use Docker for all build, validation, and execution steps.
 
 Rebuild the scenario driver related packages if scenario components have changed or new ones were added.
 
+Before running a `full_run` that should count as the main trusted result for the current scenario iteration, prefer the maintained readiness check:
+
+```bash
+scripts/scenario_preflight.sh \
+  --scenario-package spacetry_scenario_{scenario_name} \
+  --run-class full_run \
+  --required-skill-commit <skill-commit> \
+  --require-main-run-ready
+```
+
+This preflight checks:
+
+- Docker registry auth health for the base image path
+- whether the local `spacetry:dev` image exists
+- whether the image is older than the latest committed Docker/dependency input change
+- whether the scenario container is running
+- whether the skill is pinned to the required commit when a commit pin was requested
+- whether the host scenario package matches the copy under `/ws/src` in the running container
+
 During iterative tuning, when only files inside the scenario package changed, agents may use a lighter validation loop:
 
 - copy the updated scenario package into the running container
@@ -56,7 +75,22 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Use Docker for all execution. This ensures consistency and reproducibility across host machines.
 - Agents must rebuild the container image with `bash scripts/build.sh` before scenario execution unless the user explicitly says to reuse an existing image.
 - Before executing a scenario launch, confirm the scenario package has been copied into `/ws/src` and that the workspace has already been built so `/ws/install/setup.bash` exists.
+- Scenario launches intended for maintained execution tooling should expose `output_root`, `run_label`, and `record_rosbag` launch arguments. Trusted `full_run` executions should use host-visible paths under `/ws/log`.
 - Validate incrementally, starting with the launch and adjusting launch configuration and parameters if needed. Then move into the full scenario uninterrupted execution.
+- Prefer the maintained wrapper for labeled execution:
+
+```bash
+scripts/run_scenario_full.sh \
+  --launch-package spacetry_scenario_{scenario_name} \
+  --launch-file scenario_{scenario_name}.launch.py \
+  --scenario-package spacetry_scenario_{scenario_name} \
+  --required-skill-commit <skill-commit> \
+  --require-main-run-ready
+```
+
+- Use `--run-class smoke` or `--run-class tuning` for intentionally shortened runs. Those runs are labeled as non-main results by design and must not be reported as the primary experiment outcome.
+- `full_run` executions must not use `--interrupt-after`. Any intentionally shortened execution belongs in `smoke` or `tuning`.
+- A `full_run` counts as a main-result candidate only when the launch exits naturally and the metrics report an allowed natural termination reason such as `goal_reached` or `timeout`.
 - During incremental launch validation, confirm that contract/config file paths arrive as ordinary string ROS parameters and that the node does not receive those YAML files via `--params-file`.
 - Before claiming injected-autonomy results, confirm from runtime artifacts that the rover actually encountered the injected uncertainty according to the scenario contract's `encounter_rule`.
 - Before classifying injected-autonomy failure, confirm from runtime artifacts that the run also satisfied the scenario contract's `meaningful_evaluation_rule` and that the report includes `evaluation_window_after_encounter_s`.

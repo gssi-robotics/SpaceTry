@@ -22,6 +22,7 @@ Write the scenario in terms of these fields:
 - `injected_outcome_assessment`: PASS, DEGRADED, FAIL, UNTESTED, or INCONCLUSIVE for autonomy exercised by scenario-injected uncertainties
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 - `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
+- `monitor_usage_map`: explicit map of which monitor topics are subscribed and whether each one affects trigger gating, attribution logic, or report-only accounting
 - `fault_attribution_rule`: explicit rule for deciding whether a detection or reaction is attributable to the injected uncertainty rather than baseline hazards, nominal behavior, or unrelated monitor violations
 - `reaction_scope_rule`: explicit rule for deciding whether a real rover reaction counts as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - `control_rationale_rule`: explicit rule for how the scenario records and classifies observed control-command changes such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`, independently from whether the injected uncertainty receives attribution credit
@@ -60,6 +61,30 @@ The `runtime_parameter_interface` must at minimum include:
 - `transport`
 
 where `transport` should be `inline_launch_dict` for scenario-driver ROS parameters in this skill.
+
+## Monitor Usage Map
+
+The contract must explicitly say how the scenario uses monitor topics at runtime.
+
+The `monitor_usage_map` must list every monitor topic that is relevant to baseline safety interpretation for the scenario, including monitors that are intentionally report-only.
+
+Each entry should include at minimum:
+
+- `monitor_name`
+- `topic`
+- `consumer_node`
+- `usage`
+- `reason_if_unused`
+
+Use the following `usage` values:
+
+- `gating` when the monitor can block or delay injection
+- `attribution` when the monitor state changes how detection or reaction evidence is interpreted
+- `gating_and_attribution` when both are true
+- `report_only` when the monitor is logged and reported but does not directly change trigger or attribution logic
+- `unused_with_reason` when the monitor exists in the baseline system but is intentionally not consumed by the scenario beyond an explicit rationale
+
+If the scenario subscribes to a monitor topic but does not let that topic affect trigger gating or attribution, say so directly instead of leaving the topic unclassified.
 
 When multiple injected uncertainties are present:
 
@@ -142,5 +167,7 @@ Before execution, validate the contract against the launch design:
 - every ROS parameter consumed by the scenario driver appears in `runtime_parameter_interface`
 - every parameter listed in `runtime_parameter_interface` is passed via inline launch dict parameters
 - no contract or config artifact is ambiguous about whether it is parsed by the driver or by ROS
+- every relevant monitor topic appears in `monitor_usage_map` with one of the allowed usage classes
+- any baseline monitor that is intentionally not consumed by trigger gating or attribution is recorded as `report_only` or `unused_with_reason`
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception, and world packages, ask the user for clarification instead of making assumptions.

@@ -17,6 +17,7 @@ Load the reference documents below when you reach the relevant step:
 - `references/Observability_and_Attribution.md` for logging requirements, event naming, `cmd_vel` rationale tracking, and fault attribution evidence
 - `references/Validation_and_Execution.md` for Docker build, validation, execution, interrupted-run validation, and final reporting expectations
 - `references/repo-map.md` for the usual repository files and scenario-driver decision points
+- `references/Dependency_and_Runtime_Provenance.md` for how `deps/spacetry.repos` becomes runtime-visible code inside the container and how to reason about stale-image versus stale-workspace issues
 - `references/Uncertainty_Taxonomy.md` for uncertainty-to-fault mapping
 - `references/Gazebo.md` when the scenario depends on Gazebo object, world, or simulator behavior details
 - `references/SCENARIO_PROMPT_QUICK_REF.md` when the user is providing or refining a scenario prompt
@@ -43,6 +44,7 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
    - monitor definitions
    - world SDF files and related models files
    - project documentation at `docs/`
+   - `references/Dependency_and_Runtime_Provenance.md` when the scenario depends on code imported through `deps/spacetry.repos` or when image freshness versus `/ws/src` sync could change what runs
 6. Build a baseline world-and-mission map before designing uncertainty injection:
    - compare the prompt or reference scenario goals against the existing mission waypoints and the active world SDF
    - identify which goals, landmarks, obstacles, and hazards already exist in the baseline world
@@ -61,12 +63,13 @@ Define the scenario before implementing it. Load `references/Scenario_Driver_Pol
 10. Define at design time how each scenario artifact is consumed by ROS:
    - keep scenario contract and scenario config YAML as plain files
    - pass file paths and runtime toggles to the scenario node only through inline launch dict ROS parameters
-11. When the prompt includes one or more injected uncertainties, identify:
+11. Define the contract's `monitor_usage_map` before implementation so every relevant baseline monitor topic is explicitly classified as gating, attribution, report-only, or intentionally unused with reason.
+12. When the prompt includes one or more injected uncertainties, identify:
    - the primary evaluation target
    - any secondary injected uncertainties
    - whether the scenario is single-uncertainty or multi-uncertainty
    - whether any stated interaction hypothesis is intentional or omitted
-12. When the scenario measures obstacle or perception detection latency:
+13. When the scenario measures obstacle or perception detection latency:
    - define detection on the perception interface actually consumed by the autonomy logic under test
    - if the scenario injects, overrides, or degrades BT-facing obstacle topics or other interpreted perception outputs, treat the first attributable autonomy-facing obstacle signal as the primary detection event
    - do not force `obstacle_detection_latency_ms` to wait for a raw sensor fallback such as `/scan` when the autonomy stack is already reacting to fresher obstacle-state topics
@@ -84,6 +87,7 @@ Follow the implementation, code-style, and observability guidance in this file a
    - use inline launch dict parameters for the scenario driver node
    - pass paths like `scenario_config_file` and `scenario_contract_file` as string parameters
    - treat scenario YAML files as driver-parsed artifacts, not ROS params files
+   - expose `output_root`, `run_label`, and `record_rosbag` as launch-facing controls so the repo-maintained execution wrappers can classify runs and write host-visible artifacts deterministically
    - when including baseline bringup, do not override BT-runner-related launch arguments or parameters from the scenario launch; evaluate the developer-configured BT runner settings as-is unless the user explicitly approves a baseline bug fix
 6. Preserve the policy gate during implementation:
    - do not open, grep, or copy from `log/` or `logs/` to scaffold code
@@ -96,28 +100,31 @@ Validate the implementation before execution by loading `skills/spacetry-autonom
 1. Sync the scenario package from the host repository into `/ws/src` inside the running container before rebuilding.
 2. Rebuild scenario packages with Docker using the validation reference.
 3. If changes were made to `src/spacetry_world`, run world verification using the validation reference.
-4. Run an intentionally interrupted validation run using an in-container PID-targeted `SIGINT` method, and confirm that the required report artifacts are written.
-5. During iterative tuning, if only the scenario package changed, use the lighter scenario-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
+4. Run `scripts/scenario_preflight.sh` before any `full_run` whose output should count as the main trusted result for the current scenario iteration so Docker auth, image freshness, optional skill pinning, and host-versus-container package sync are checked explicitly.
+5. Run an intentionally interrupted validation run using an in-container PID-targeted `SIGINT` method, and confirm that the required report artifacts are written.
+6. During iterative tuning, if only the scenario package changed, use the lighter scenario-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
 
 ### 4. Scenario Execution and Reporting
 
 Execute the scenario driver to generate the report with metrics and logging signals using `references/Validation_and_Execution.md` and `references/Observability_and_Attribution.md`.
 
 1. Follow `references/Validation_and_Execution.md` to verify Docker setup and build the project.
-2. Launch the scenario driver and ensure logging signals are captured per `references/Observability_and_Attribution.md`.
-3. Generate and write the final report with metrics, logged signals, and separate baseline-vs-injected outcomes per `references/Validation_and_Execution.md`.
-4. Report important confounders explicitly when they affect interpretation, such as baseline hazard avoidance, monitor dominance, launch-time settling delays, or other baseline conditions that plausibly explain the observed behavior.
-5. Treat `UNTESTED` as a valid early iteration outcome during scenario tuning when the rover never meaningfully encounters the injected uncertainty. This is part of refining scenario reachability and attribution, not automatically a scenario-driver defect.
-6. Treat `encountered` and `meaningfully evaluable` as separate outcome gates. If the injected uncertainty is encountered too close to timeout to support fair interpretation, use `INCONCLUSIVE` or `UNTESTED` per the scenario contract rather than automatically reporting `FAIL`.
-7. Only after implementation is complete may `log/` or `logs/` be inspected, and then only for current-run result reporting.
+2. Use `scripts/run_scenario_full.sh` for any primary `full_run` execution so `full_run`, `smoke`, and `tuning` are labeled explicitly and only natural `full_run` completions are eligible to count as the main trusted result for that scenario iteration.
+3. Launch the scenario driver and ensure logging signals are captured per `references/Observability_and_Attribution.md`.
+4. Generate and write the final report with metrics, logged signals, and separate baseline-vs-injected outcomes per `references/Validation_and_Execution.md`.
+5. Report important confounders explicitly when they affect interpretation, such as baseline hazard avoidance, monitor dominance, launch-time settling delays, or other baseline conditions that plausibly explain the observed behavior.
+6. Treat `UNTESTED` as a valid early iteration outcome during scenario tuning when the rover never meaningfully encounters the injected uncertainty. This is part of refining scenario reachability and attribution, not automatically a scenario-driver defect.
+7. Treat `encountered` and `meaningfully evaluable` as separate outcome gates. If the injected uncertainty is encountered too close to timeout to support fair interpretation, use `INCONCLUSIVE` or `UNTESTED` per the scenario contract rather than automatically reporting `FAIL`.
+8. Only after implementation is complete may `log/` be inspected, and then only for current-run result reporting.
 
 ## Execution Orchestration
 
 When the validation or execution workflow needs reliable PID tracking, signal delivery, or log polling, temporary helper scripts or shell wrappers are allowed as execution-only tooling.
 
+- Prefer the maintained wrappers in `scripts/scenario_preflight.sh` and `scripts/run_scenario_full.sh` when they fit the task, because they preserve run classification and main-run readiness checks consistently across experiments and developer workflows.
 - Use them only to orchestrate launch, interruption, cleanup, or artifact verification.
 - Do not treat them as scenario implementation artifacts.
-- Keep them short-lived and avoid storing them as maintained repository source unless the user explicitly asks for that.
+- Keep any additional ad hoc wrappers short-lived. Only the repo-maintained wrappers explicitly requested by the user should remain as maintained source.
 
 ## Code Style and Guidelines
 

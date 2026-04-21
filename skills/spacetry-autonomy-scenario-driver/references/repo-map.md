@@ -17,6 +17,8 @@ Policy gate before exploration:
   Mandatory scenario-driver policies, artifact provenance rules, reuse restrictions, and interrupted-run requirements.
 - `skills/spacetry-autonomy-scenario-driver/references/Scenario_Contract.md`
   Required scenario fields, core metrics, attribution rules, ambiguity handling, and control-rationale requirements.
+- `skills/spacetry-autonomy-scenario-driver/references/Dependency_and_Runtime_Provenance.md`
+  Explains how `deps/spacetry.repos` becomes runtime-visible code inside the container and why image freshness differs from `/ws/src` sync freshness.
 - `skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md`
   Full scenario prompt structure and metric vocabulary.
 - `skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md`
@@ -32,6 +34,10 @@ Policy gate before exploration:
 
 ## Runtime and autonomy sources
 
+- `deps/spacetry.repos`
+  Pinned imported dependency repositories that are materialized during the Docker image build.
+- `docker/Dockerfile`
+  Image-time import, dependency caching under `/opt/spacetry_deps`, runtime exposure into `/ws/src`, and `COLCON_IGNORE` filtering.
 - `src/spacetry_bt/trees/`
   Behavior trees and decision points for injection timing.
 - `src/spacetry_mission/`
@@ -46,6 +52,10 @@ Policy gate before exploration:
   Environment-level uncertainty insertion points.
 - `src/spacetry_world/AGENTS.md`
   Extra rules for world edits and validation.
+- `scripts/scenario_preflight.sh`
+  Readiness checks for Docker auth, image freshness, optional skill pinning, and host-versus-container package sync.
+- `scripts/run_scenario_full.sh`
+  Maintained execution wrapper that labels runs as `full_run`, `smoke`, or `tuning` and only treats natural `full_run` completions as primary trusted run candidates.
 
 ## Decision reminders
 

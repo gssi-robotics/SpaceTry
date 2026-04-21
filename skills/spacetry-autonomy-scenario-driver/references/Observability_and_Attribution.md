@@ -40,6 +40,7 @@ Keep scenario logic observable:
 - log whether any baseline monitor was already active at injection
 - log the rover response signal
 - write metrics that match the scenario contract
+- keep the runtime logs consistent with the scenario contract's `monitor_usage_map`, so each consumed monitor topic is visibly classified as gating, attribution, or report-only context
 - log the injected fault pose, time, and unique identifier
 - log rover pose at every credited detection and credited reaction event
 - log rover-to-fault distance when detection or reaction is credited
