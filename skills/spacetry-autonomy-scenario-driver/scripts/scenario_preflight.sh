@@ -12,6 +12,7 @@ BASE_IMAGE="docker.io/osrf/space-ros:jazzy-2025.10.0"
 SKILL_PATH="${SKILL_DIR}"
 SCENARIO_PACKAGE=""
 RUN_CLASS="full_run"
+REQUIRED_SKILL_CHECKSUM=""
 REQUIRED_SKILL_COMMIT=""
 REQUIRE_MAIN_RUN_READY=0
 SKIP_DOCKER_AUTH_CHECK=0
@@ -24,6 +25,7 @@ IMAGE_PRESENT_STATUS="FAIL"
 CONTAINER_RUNNING_STATUS="FAIL"
 DOCKER_AUTH_STATUS="SKIP"
 IMAGE_FRESHNESS_STATUS="WARN"
+SKILL_CHECKSUM_STATUS="FAIL"
 SKILL_COMMIT_STATUS="WARN"
 PACKAGE_SYNC_STATUS="WARN"
 
@@ -38,6 +40,8 @@ scenario-driver run, and whether the run is ready to serve as the main trusted
 Options:
   --scenario-package <name>        ROS 2 scenario package under src/
   --skill-path <path>              Skill directory to validate
+  --required-skill-checksum <sha>  Skill tree checksum required when exact
+                                   skill-state pinning matters
   --required-skill-commit <sha>    Commit hash required when main-run pinning matters
   --run-class <full_run|smoke|tuning>
                                    Run classification to evaluate
@@ -92,6 +96,27 @@ scenario_dir_hash() {
     | awk '{print $1}'
 }
 
+dir_tree_hash() {
+  local dir_path="$1"
+  local parent_dir
+  local base_name
+
+  parent_dir="$(cd "$(dirname "$dir_path")" && pwd)"
+  base_name="$(basename "$dir_path")"
+
+  tar \
+    --sort=name \
+    --mtime='UTC 1970-01-01' \
+    --owner=0 \
+    --group=0 \
+    --numeric-owner \
+    -cf - \
+    -C "$parent_dir" \
+    "$base_name" \
+    | sha256sum \
+    | awk '{print $1}'
+}
+
 scenario_dir_hash_in_container() {
   local container="$1"
   local package_name="$2"
@@ -109,6 +134,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --skill-path)
       SKILL_PATH="$2"
+      shift 2
+      ;;
+    --required-skill-checksum)
+      REQUIRED_SKILL_CHECKSUM="$2"
       shift 2
       ;;
     --required-skill-commit)
@@ -235,8 +264,20 @@ else
 fi
 
 skill_rel_path="$(relative_to_root "$SKILL_PATH")"
+skill_checksum="$(dir_tree_hash "$SKILL_PATH")"
 skill_commit="$(git -C "$ROOT_DIR" log -1 --format=%H -- "$skill_rel_path" 2>/dev/null || true)"
 skill_dirty="$(git -C "$ROOT_DIR" status --porcelain -- "$skill_rel_path" 2>/dev/null || true)"
+if [[ -z "$skill_checksum" ]]; then
+  SKILL_CHECKSUM_STATUS="FAIL"
+  record_check "skill_checksum" "FAIL" "Could not compute a canonical checksum for '$skill_rel_path'."
+elif [[ -n "$REQUIRED_SKILL_CHECKSUM" ]] && [[ "$skill_checksum" != "$REQUIRED_SKILL_CHECKSUM" ]]; then
+  SKILL_CHECKSUM_STATUS="WARN"
+  record_check "skill_checksum" "WARN" "Skill tree checksum is '$skill_checksum', expected '$REQUIRED_SKILL_CHECKSUM'."
+else
+  SKILL_CHECKSUM_STATUS="PASS"
+  record_check "skill_checksum" "PASS" "Skill tree checksum is '$skill_checksum'."
+fi
+
 if [[ -z "$skill_commit" ]]; then
   SKILL_COMMIT_STATUS="FAIL"
   record_check "skill_commit" "FAIL" "Could not determine a git commit for '$skill_rel_path'."
@@ -293,6 +334,11 @@ fi
 if [[ "$IMAGE_FRESHNESS_STATUS" != "PASS" ]]; then
   main_run_ready=0
   main_run_reasons+=("image freshness check did not pass")
+fi
+
+if [[ -n "$REQUIRED_SKILL_CHECKSUM" ]] && [[ "$SKILL_CHECKSUM_STATUS" != "PASS" ]]; then
+  main_run_ready=0
+  main_run_reasons+=("required skill checksum pinning did not pass")
 fi
 
 if [[ -n "$REQUIRED_SKILL_COMMIT" ]] && [[ "$SKILL_COMMIT_STATUS" != "PASS" ]]; then

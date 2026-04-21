@@ -15,6 +15,7 @@ RECORD_ROSBAG="true"
 HEADLESS="1"
 BATTERY=""
 INTERRUPT_AFTER=""
+REQUIRED_SKILL_CHECKSUM=""
 REQUIRED_SKILL_COMMIT=""
 REQUIRE_MAIN_RUN_READY=0
 SKIP_PREFLIGHT=0
@@ -42,6 +43,8 @@ Options:
   --interrupt-after <seconds>         Intentionally interrupt smoke/tuning runs after N seconds
   --launch-arg <name:=value>          Additional launch arg, repeat as needed
   --allowed-full-run-reason <name>    Additional termination reason accepted for full_run
+  --required-skill-checksum <sha>     Skill tree checksum required when exact
+                                      skill-state pinning matters
   --required-skill-commit <sha>       Commit hash required when main-run pinning matters
   --require-main-run-ready            Require main-run-ready preflight before launch
   --skip-preflight                    Skip skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh
@@ -139,6 +142,10 @@ while [[ $# -gt 0 ]]; do
       ALLOWED_FULL_RUN_REASONS+=("$2")
       shift 2
       ;;
+    --required-skill-checksum)
+      REQUIRED_SKILL_CHECKSUM="$2"
+      shift 2
+      ;;
     --required-skill-commit)
       REQUIRED_SKILL_COMMIT="$2"
       shift 2
@@ -222,6 +229,9 @@ if (( ! SKIP_PREFLIGHT )); then
   )
   if [[ -n "$SCENARIO_PACKAGE" ]]; then
     preflight_cmd+=(--scenario-package "$SCENARIO_PACKAGE")
+  fi
+  if [[ -n "$REQUIRED_SKILL_CHECKSUM" ]]; then
+    preflight_cmd+=(--required-skill-checksum "$REQUIRED_SKILL_CHECKSUM")
   fi
   if [[ -n "$REQUIRED_SKILL_COMMIT" ]]; then
     preflight_cmd+=(--required-skill-commit "$REQUIRED_SKILL_COMMIT")

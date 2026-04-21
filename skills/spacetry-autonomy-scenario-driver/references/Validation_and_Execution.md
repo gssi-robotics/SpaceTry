@@ -12,7 +12,7 @@ Before running a `full_run` that should count as the main trusted result for the
 scripts/scenario_preflight.sh \
   --scenario-package spacetry_scenario_{scenario_name} \
   --run-class full_run \
-  --required-skill-commit <skill-commit> \
+  --required-skill-checksum <skill-tree-sha256> \
   --require-main-run-ready
 ```
 
@@ -22,7 +22,9 @@ This preflight checks:
 - whether the local `spacetry:dev` image exists
 - whether the image is older than the latest committed Docker/dependency input change
 - whether the scenario container is running
-- whether the skill is pinned to the required commit when a commit pin was requested
+- the current canonical checksum of the skill tree by default
+- whether the skill is pinned to the required checksum when exact skill-state pinning was requested
+- the latest skill commit and whether the tracked skill files are dirty
 - whether the host scenario package matches the copy under `/ws/src` in the running container
 
 During iterative tuning, when only files inside the scenario package changed, agents may use a lighter validation loop:
@@ -84,7 +86,7 @@ scripts/run_scenario_full.sh \
   --launch-package spacetry_scenario_{scenario_name} \
   --launch-file scenario_{scenario_name}.launch.py \
   --scenario-package spacetry_scenario_{scenario_name} \
-  --required-skill-commit <skill-commit> \
+  --required-skill-checksum <skill-tree-sha256> \
   --require-main-run-ready
 ```
 

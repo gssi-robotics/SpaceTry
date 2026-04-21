@@ -72,5 +72,5 @@ An experiment can be stale in two different ways:
 
 Use the maintained skill-local helper scripts to make this visible:
 
-- `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` checks image freshness, Docker auth health, optional skill commit pinning, and host-versus-container package sync
+- `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` records the canonical skill-tree checksum by default and checks image freshness, Docker auth health, optional skill checksum or commit pinning, and host-versus-container package sync
 - `skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh` labels runs as `full_run`, `smoke`, or `tuning` and prevents shortened executions from being treated as the main trusted run

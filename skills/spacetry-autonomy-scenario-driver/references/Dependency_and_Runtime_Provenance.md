@@ -52,7 +52,7 @@ These are different problems and need different checks.
 
 ## Operational Guidance
 
-- Use `scripts/scenario_preflight.sh` to check image freshness, optional skill commit pinning, Docker auth health, and host-versus-container scenario package sync before a `full_run` that should count as the main trusted result.
+- Use `scripts/scenario_preflight.sh` to record the current skill-tree checksum by default and to check image freshness, optional skill checksum or commit pinning, Docker auth health, and host-versus-container scenario package sync before a `full_run` that should count as the main trusted result.
 - Treat imported dependencies from `deps/spacetry.repos` as image-owned inputs. If they must change, rebuild the image.
 - Treat repo-local scenario packages under `src/` as runtime-copied inputs. If they change, refresh `/ws/src/<package>` inside the running container before build or launch.
 - When a run behaves unexpectedly, inspect both the image provenance and the `/ws/src` sync state before assuming the scenario logic itself is wrong.

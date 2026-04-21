@@ -100,7 +100,7 @@ Validate the implementation before execution by loading `skills/spacetry-autonom
 1. Sync the scenario package from the host repository into `/ws/src` inside the running container before rebuilding.
 2. Rebuild scenario packages with Docker using the validation reference.
 3. If changes were made to `src/spacetry_world`, run world verification using the validation reference.
-4. Run `scripts/scenario_preflight.sh` before any `full_run` whose output should count as the main trusted result for the current scenario iteration so Docker auth, image freshness, optional skill pinning, and host-versus-container package sync are checked explicitly.
+4. Run `scripts/scenario_preflight.sh` before any `full_run` whose output should count as the main trusted result for the current scenario iteration so Docker auth, image freshness, the current skill-tree checksum, optional skill pinning, and host-versus-container package sync are checked explicitly.
 5. Run an intentionally interrupted validation run using an in-container PID-targeted `SIGINT` method, and confirm that the required report artifacts are written.
 6. During iterative tuning, if only the scenario package changed, use the lighter scenario-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
 
