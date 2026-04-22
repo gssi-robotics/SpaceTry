@@ -38,6 +38,7 @@ Keep scenario logic observable:
 - log why the injection was allowed at that moment
 - log remaining mission time at injection
 - log progress ratio at injection
+- record explicit trigger events for each runtime or baseline condition that may request adaptation
 - log whether any baseline monitor was already active at injection
 - log the rover response signal
 - write metrics that match the scenario contract
@@ -49,9 +50,12 @@ Keep scenario logic observable:
 - log whether the credited detection came from a raw sensor path or from an autonomy-facing interpreted perception interface
 - log each significant `cmd_vel` change with its command values and an explicit `observed_control_rationale` such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
 - log the scenario state used to classify each `observed_control_rationale`, such as obstacle flags, monitor status, planner state, or BT state when available
+- record every non-nominal rover maneuver as a reaction event rather than collapsing the run to a single reaction record
 - log `reaction_scope` for each reaction candidate as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - log `reaction_attribution_status` separately from `observed_control_rationale`
 - log `active_context_at_reaction` as a structured snapshot of the relevant simulation properties at the reaction point
+- record adaptation events as explicit trigger-to-reaction pairings with `adaptation_latency_ms`, candidate sources, and evidence references
+- if attribution remains unresolved at runtime, keep the adaptation event and mark the attribution fields as ambiguous or unresolved instead of dropping the event
 - log whether each credited detection passed the scenario's `fault_attribution_rule`
 - log whether each credited reaction passed the scenario's `fault_attribution_rule`
 - log the associated injected uncertainty source for each credited detection or reaction when the scenario contains more than one injected uncertainty and the source is knowable

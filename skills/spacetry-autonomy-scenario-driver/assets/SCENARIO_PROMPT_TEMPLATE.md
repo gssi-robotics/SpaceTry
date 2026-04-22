@@ -85,5 +85,7 @@ For a completed example that matches this template, see [SCENARIO_PROMPT_QUICK_R
 
 Keep monitor notes free-form and optional in the user prompt. If monitors matter for trigger timing, attribution, or result interpretation, the scenario contract will normalize that information internally during planning.
 
+Metrics listed in the prompt should be reported through `additional_metrics` unless they already match an existing normalized `summary_metrics` field such as `safety_preservation`, `goal_viability`, or `route_deviation_m`.
+
 **Last Updated:** April 8, 2026  
 **Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Testbed

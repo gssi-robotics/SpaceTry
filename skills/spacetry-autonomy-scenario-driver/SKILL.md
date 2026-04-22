@@ -89,7 +89,8 @@ Follow the implementation, code-style, and observability guidance in this file a
    - treat scenario YAML files as driver-parsed artifacts, not ROS params files
    - expose `output_root`, `run_label`, and `record_rosbag` as launch-facing controls so the repo-maintained execution wrappers can classify runs and write host-visible artifacts deterministically
    - when including baseline bringup, do not override BT-runner-related launch arguments or parameters from the scenario launch; evaluate the developer-configured BT runner settings as-is unless the user explicitly approves a baseline bug fix
-6. Preserve the policy gate during implementation:
+6. Use the shared package `src/spacetry_scenario_metrics/` for metrics bundle creation, JSON serialization, and Markdown report rendering instead of hand-building per-scenario metrics dictionaries and report templates.
+7. Preserve the policy gate during implementation:
    - do not open, grep, or copy from `log/` or `logs/` to scaffold code
    - if you need examples, use only canonical artifacts under `src/`, `skills/`, or `docs/`
 

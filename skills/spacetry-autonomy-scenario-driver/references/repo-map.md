@@ -44,6 +44,8 @@ Policy gate before exploration:
   Mission planning, configs, and expected waypoint or task structure.
 - `src/spacetry_monitors/`
   Safety constraints and monitorable properties.
+- `src/spacetry_scenario_metrics/`
+  Shared event-centric metrics schema, session helpers, JSON serialization, and Markdown report rendering for scenario drivers.
 - `src/spacetry_perception/`
   Sensor-processing entry points and degradation targets.
 - `src/spacetry_battery/`

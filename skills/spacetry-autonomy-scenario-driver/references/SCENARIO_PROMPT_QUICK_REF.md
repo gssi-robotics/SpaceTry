@@ -11,6 +11,7 @@ For the parametrizable template, see [SCENARIO_PROMPT_TEMPLATE.md](../assets/SCE
 - Keep mission description focused on mission intent, environment, and capabilities.
 - Fill every placeholder you keep. Delete lines that are not relevant to the scenario.
 - If a monitor materially affects trigger timing, safety interpretation, or attribution, add a short free-form note. Skip monitor notes when they are not central to the scenario.
+- Treat prompt-listed mission-specific metrics as `additional_metrics` unless they already match a normalized `summary_metrics` field such as `safety_preservation`, `goal_viability`, or `route_deviation_m`.
 ---
 
 ## Reference Scenario Examples (Template-Conformant)
