@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-set -o pipefail
+set -e -o pipefail
+
 source /opt/ros/spaceros/setup.bash
-colcon build --merge-install
+source /etc/profile
 source /ws/install/setup.bash
 
 MODELS_ROOT="$(ros2 pkg prefix spacetry_models)/share/spacetry_models/models"

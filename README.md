@@ -123,7 +123,7 @@ Please follow the instruction [here](https://docs.docker.com/engine/install/) to
 
 ## Quickstart (Docker-only)
 
-Build and run the smoke test (builds the docker image and the workspace, loads the world headless, validates configs).
+Build and run the smoke test (builds the docker image with the workspace precompiled, loads the world headless, validates configs).
 
 ### Build the image and verify your setup
 From the repo root:
@@ -147,6 +147,8 @@ You should see:
    ./scripts/build.sh
    ```
 
+   The Dockerfile runs `colcon build --merge-install --event-handlers console_direct+` during image creation, so `/ws/install` is ready on first start.
+
 </details>
 
 
@@ -168,13 +170,25 @@ You should see:
 </details>
 
 <details>
-<summary> 3. Build the workspace </summary>
+<summary> 3. Copy updated source into the running container and rebuild </summary>
 
-   Inside the container, run:
+   Assume the container from step 2 is already running. Because the repository source tree is not bind-mounted into `/ws/src`, source changes on the host are not automatically visible inside the container.
+
+   To refresh one package after editing it on the host, replace the container copy and rebuild it:
 
    ```bash
-   source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+
+   docker exec docker-spacetry-1 bash -lc 'rm -rf /ws/src/spacetry_bt'
+   docker cp "$(pwd)/src/spacetry_bt" docker-spacetry-1:/ws/src/
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --packages-select spacetry_bt"
    ```
+
+   To rebuild the full workspace after copying one or more updated packages:
+
+   ```bash
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
+   ```
+
+   Replace `spacetry_bt` with the package you changed. If you updated multiple packages under `src/`, repeat the `docker exec ... rm -rf` and `docker cp` pair for each package before rebuilding.
 
 </details>
 

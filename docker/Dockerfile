@@ -8,6 +8,7 @@ ENV ROS_DISTRO=jazzy
 ENV USERNAME=spaceros-user
 ENV HOME=/home/spaceros-user
 ENV GZ_VERSION=harmonic
+ENV COLCON_LOG_PATH=/home/spaceros-user/.colcon/log
 
 USER root
 # Base tools + ros_gz + vcstool + git
@@ -90,7 +91,7 @@ COPY --chown=${USERNAME}:${USERNAME} . /ws
 # Remove any stale colcon artifacts that slipped past .dockerignore
 # (prevents broken package.dsv files from a previous host build)
 RUN rm -rf /ws/build /ws/install /ws/log
-RUN mkdir -p /ws/log
+RUN install -d -o ${USERNAME} -g ${USERNAME} /ws/build /ws/install /ws/log ${COLCON_LOG_PATH}
 
 # Add GitHub host key to known_hosts to avoid interactive prompt
 RUN mkdir -p -m 0700 /root/.ssh && \
@@ -143,6 +144,10 @@ RUN groupadd -f -g ${RENDER_GID} render && usermod -a -G video,render ${USERNAME
 # Drop privileges for runtime
 USER ${USERNAME}
 WORKDIR /ws
+
+# Build the workspace into the image so first-run users do not need a manual colcon step.
+# Use a per-user log directory to avoid failures when /ws/log is bind-mounted from the host.
+RUN bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+"
 
 ENTRYPOINT ["/ws/docker/entrypoint.sh"]
 CMD ["bash", "-lc", "echo SpaceTry container OK && ls -la"]
