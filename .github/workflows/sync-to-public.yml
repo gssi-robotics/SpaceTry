@@ -8,6 +8,8 @@ on:
 
 jobs:
   sync:
+    # Only run in the private repository (rdinizcal/SpaceTry)
+    if: github.repository == 'rdinizcal/SpaceTry'
     runs-on: ubuntu-latest
     permissions:
       contents: write
