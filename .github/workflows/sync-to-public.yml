@@ -32,7 +32,7 @@ jobs:
 
       - name: Fetch public repository
         run: |
-          git fetch public main --allow-unrelated-histories
+          git fetch public main
 
       - name: Checkout all content from public except .github folder
         run: |
