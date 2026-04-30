@@ -374,7 +374,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "tree_file",
-                default_value=str(bt_tree_file_default),
+                default_value=bt_tree_file_default,
                 description="Path to BehaviorTree XML file. Defaults to base_bt.xml. Example: tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml",
             ),
             env_gz_plugin,
