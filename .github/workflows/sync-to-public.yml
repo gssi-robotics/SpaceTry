@@ -10,13 +10,14 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout private repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.SPACETRY_SYNC_TOKEN }}
 
       - name: Configure git
         run: |
@@ -34,4 +35,4 @@ jobs:
       - name: Sync complete notification
         if: success()
         run: |
-          echo "✅ Successfully synced to public repository main branch"
+          echo "Successfully synced to public repository main branch"
