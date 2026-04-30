@@ -40,14 +40,19 @@ jobs:
           git reset HEAD .github/
           git checkout HEAD -- .github/
 
+      - name: Remove sync workflow from being synced to public
+        run: |
+          rm -f .github/workflows/sync-to-public.yml
+          git add .github/
+
       - name: Add and commit synced changes
         run: |
           git add -A
-          git commit -m "Sync content from public repository (excluding .github)" || echo "No changes to commit"
+          git commit -m "Sync content from public repository (excluding .github and sync workflow)" || echo "No changes to commit"
 
       - name: Push merged result to public repository
         run: |
-          git push -u public HEAD:main
+          git push -u public HEAD:main --force-with-lease
 
       - name: Sync complete notification
         if: success()
