@@ -1,4 +1,4 @@
-<h1>SpaceTry 🥐 — <u>Space</u> <u>T</u>raining <u>R</u>over Autonom<u>Y</u></h1>
+# SpaceTry 🥐 — Space Training Rover Autonomy
 
 SpaceTry is an infrastructure to train space rovers autonomy. This repository has a course-grade Mars mission demo pack for Space ROS + Behavior Trees + Autonomy Evaluation Scenario Generation Skill for LLM Agents. 
 
