@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
-set -e -o pipefail
+set -e
 
 source /opt/ros/spaceros/setup.bash
 source /etc/profile
+
+if [ ! -f /ws/install/setup.bash ]; then
+  echo "[smoke_test] /ws/install/setup.bash missing; building workspace..."
+  (
+    cd /ws
+    colcon build \
+      --merge-install \
+      --event-handlers console_direct+ \
+      --base-paths /ws/src /ws/src/space_ros_demos
+  )
+fi
+
 source /ws/install/setup.bash
+set -o pipefail
 
 MODELS_ROOT="$(ros2 pkg prefix spacetry_models)/share/spacetry_models/models"
 CURIOSITY_MODELS="$(ros2 pkg prefix curiosity_gazebo)/share/curiosity_gazebo/models"
