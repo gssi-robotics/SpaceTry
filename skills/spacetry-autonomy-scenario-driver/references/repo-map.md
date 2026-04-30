@@ -27,6 +27,8 @@ Policy gate before exploration:
   Logging requirements, attribution evidence, event naming, and `cmd_vel` rationale guidance.
 - `skills/spacetry-autonomy-scenario-driver/references/Validation_and_Execution.md`
   Docker validation flow, execution steps, interrupted-run checks, and final reporting expectations.
+- `skills/spacetry-autonomy-scenario-driver/references/Execution_Lifecycle.md`
+  Mandatory build handoff, launch shutdown ownership, and clean scenario-driver shutdown rules.
 - `skills/spacetry-autonomy-scenario-driver/references/Uncertainty_Taxonomy.md`
   Uncertainty dimensions, sources and fault subject, domain, trigger, manifestation, and traceability model.
 - `skills/spacetry-autonomy-scenario-driver/references/Gazebo.md`
@@ -54,9 +56,9 @@ Policy gate before exploration:
   Environment-level uncertainty insertion points.
 - `src/spacetry_world/AGENTS.md`
   Extra rules for world edits and validation.
-- `scripts/scenario_preflight.sh`
+- `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh`
   Readiness checks for Docker auth, image freshness, optional skill pinning, and host-versus-container package sync.
-- `scripts/run_scenario_full.sh`
+- `skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh`
   Maintained execution wrapper that labels runs as `full_run`, `smoke`, or `tuning` and only treats natural `full_run` completions as primary trusted run candidates.
 
 ## Decision reminders

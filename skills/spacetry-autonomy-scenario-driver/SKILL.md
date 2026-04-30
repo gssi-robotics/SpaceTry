@@ -16,6 +16,7 @@ Load the reference documents below when you reach the relevant step:
 - `references/Scenario_Contract.md` for required contract fields, metrics, attribution rules, and ambiguity handling
 - `references/Observability_and_Attribution.md` for logging requirements, event naming, `cmd_vel` rationale tracking, and fault attribution evidence
 - `references/Validation_and_Execution.md` for Docker build, validation, execution, interrupted-run validation, and final reporting expectations
+- `references/Execution_Lifecycle.md` for mandatory build handoff, launch shutdown ownership, and clean scenario-driver shutdown behavior
 - `references/repo-map.md` for the usual repository files and scenario-driver decision points
 - `references/Dependency_and_Runtime_Provenance.md` for how `deps/spacetry.repos` becomes runtime-visible code inside the container and how to reason about stale-image versus stale-workspace issues
 - `references/Uncertainty_Taxonomy.md` for uncertainty-to-fault mapping
@@ -90,27 +91,28 @@ Follow the implementation, code-style, and observability guidance in this file a
    - expose `output_root`, `run_label`, and `record_rosbag` as launch-facing controls so the repo-maintained execution wrappers can classify runs and write host-visible artifacts deterministically
    - when including baseline bringup, do not override BT-runner-related launch arguments or parameters from the scenario launch; evaluate the developer-configured BT runner settings as-is unless the user explicitly approves a baseline bug fix
 6. Use the shared package `src/spacetry_scenario_metrics/` for metrics bundle creation, JSON serialization, and Markdown report rendering instead of hand-building per-scenario metrics dictionaries and report templates.
-7. Preserve the policy gate during implementation:
+7. Load `skills/spacetry-autonomy-scenario-driver/references/Execution_Lifecycle.md` before finalizing launch orchestration or shutdown behavior.
+8. Preserve the policy gate during implementation:
    - do not open, grep, or copy from `log/` or `logs/` to scaffold code
    - if you need examples, use only canonical artifacts under `src/`, `skills/`, or `docs/`
 
 ### 3. Scenario Driver Validation
 
-Validate the implementation before execution by loading `skills/spacetry-autonomy-scenario-driver/references/Validation_and_Execution.md`.
+Validate the implementation before execution by loading `skills/spacetry-autonomy-scenario-driver/references/Validation_and_Execution.md` and `skills/spacetry-autonomy-scenario-driver/references/Execution_Lifecycle.md`.
 
 1. Sync the scenario package and any updated repo-local runtime helper packages from the host repository into `/ws/src` inside the running container before rebuilding.
-2. Rebuild the affected runtime packages with Docker using the validation reference.
+2. Treat the execution-lifecycle rebuild handoff rules as a hard gate before validation.
 3. If changes were made to `src/spacetry_world`, run world verification using the validation reference.
-4. Run `scripts/scenario_preflight.sh` before any `full_run` whose output should count as the main trusted result for the current scenario iteration so Docker auth, image freshness, the current skill-tree checksum, optional skill pinning, and host-versus-container package sync are checked explicitly.
+4. Run `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` before any `full_run` whose output should count as the main trusted result for the current scenario iteration so Docker auth, image freshness, the current skill-tree checksum, optional skill pinning, and host-versus-container package sync are checked explicitly.
 5. Run an intentionally interrupted validation run using an in-container PID-targeted `SIGINT` method, and confirm that the required report artifacts are written.
 6. During iterative tuning, if only repo-local runtime packages changed, use the lighter runtime-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
 
 ### 4. Scenario Execution and Reporting
 
-Execute the scenario driver to generate the report with metrics and logging signals using `references/Validation_and_Execution.md` and `references/Observability_and_Attribution.md`.
+Execute the scenario driver to generate the report with metrics and logging signals using `references/Validation_and_Execution.md`, `references/Execution_Lifecycle.md`, and `references/Observability_and_Attribution.md`.
 
 1. Follow `references/Validation_and_Execution.md` to verify Docker setup and build the project.
-2. Use `scripts/run_scenario_full.sh` for any primary `full_run` execution so `full_run`, `smoke`, and `tuning` are labeled explicitly and only natural `full_run` completions are eligible to count as the main trusted result for that scenario iteration.
+2. Use `skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh` for any primary `full_run` execution so `full_run`, `smoke`, and `tuning` are labeled explicitly and only natural `full_run` completions are eligible to count as the main trusted result for that scenario iteration.
 3. Launch the scenario driver and ensure logging signals are captured per `references/Observability_and_Attribution.md`.
 4. Generate and write the final report with metrics, logged signals, and separate baseline-vs-injected outcomes per `references/Validation_and_Execution.md`.
 5. Report important confounders explicitly when they affect interpretation, such as baseline hazard avoidance, monitor dominance, launch-time settling delays, or other baseline conditions that plausibly explain the observed behavior.
@@ -122,7 +124,7 @@ Execute the scenario driver to generate the report with metrics and logging sign
 
 When the validation or execution workflow needs reliable PID tracking, signal delivery, or log polling, temporary helper scripts or shell wrappers are allowed as execution-only tooling.
 
-- Prefer the maintained wrappers in `scripts/scenario_preflight.sh` and `scripts/run_scenario_full.sh` when they fit the task, because they preserve run classification and main-run readiness checks consistently across experiments and developer workflows.
+- Prefer the maintained wrappers in `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` and `skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh` when they fit the task, because they preserve run classification and main-run readiness checks consistently across experiments and developer workflows.
 - Use them only to orchestrate launch, interruption, cleanup, or artifact verification.
 - Do not treat them as scenario implementation artifacts.
 - Keep any additional ad hoc wrappers short-lived. Only the repo-maintained wrappers explicitly requested by the user should remain as maintained source.
