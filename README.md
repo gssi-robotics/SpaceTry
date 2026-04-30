@@ -30,6 +30,7 @@ spacetry/
 │   ├── spacetry_models/            - Gazebo models (target rocks, obstacles, outpost)
 │   ├── spacetry_monitors/          - Safety properties monitoring node
 │   ├── spacetry_perception/        - Perception nodes
+│   ├── spacetry_scenario_metrics/  - Shared scenario metrics, reporting, and artifact schema utilities
 │   └── spacetry_world/             - Gazebo world configurations
 ├── docs/                           - Project structure and implementation details
 └── logs/                           - Scenario execution and test run logs
