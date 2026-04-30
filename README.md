@@ -147,6 +147,8 @@ You should see:
    ./scripts/build.sh
    ```
 
+   Rebuild the image whenever you change `docker/`, `deps/`, or any non-scenario ROS 2 package under `src/`. Those are image-owned baseline inputs.
+
    The Dockerfile runs `colcon build --merge-install --event-handlers console_direct+` during image creation, so `/ws/install` is ready on first start.
 
 </details>
@@ -161,6 +163,10 @@ You should see:
    ./scripts/run.sh
    ```
 
+   `./scripts/run.sh` checks that `log/` is writable on the host, starts the `spacetry` service, and waits until the container reaches a running state.
+
+   For skill-driven scenario execution, rely on `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` to decide whether the image and running container are fresh enough for a trusted `full_run`.
+
    Enter the running container:
 
    ```bash
@@ -170,25 +176,37 @@ You should see:
 </details>
 
 <details>
-<summary> 3. Copy updated source into the running container and rebuild </summary>
+<summary> 3. Rebuild after source changes while the container is already running </summary>
 
-   Assume the container from step 2 is already running. Because the repository source tree is not bind-mounted into `/ws/src`, source changes on the host are not automatically visible inside the container.
+   Assume the container from step 2 is already running.
 
-   To refresh one package after editing it on the host, replace the container copy and rebuild it:
+   If you want to update one or more repo-local runtime packages such as `src/spacetry_scenario_*`, refresh each package inside the running container under `/ws/src` and rebuild it:
 
    ```bash
-   docker exec docker-spacetry-1 bash -lc 'rm -rf /ws/src/spacetry_bt'
-   docker cp "$(pwd)/src/spacetry_bt" docker-spacetry-1:/ws/src/
-   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --packages-select spacetry_bt"
+   docker exec docker-spacetry-1 bash -lc 'rm -rf /ws/src/<package-name>'
+   docker cp "$(pwd)/src/<package-name>" docker-spacetry-1:/ws/src/
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --packages-select <package-name>"
    ```
 
-   To rebuild the full workspace after copying one or more updated packages:
+   The rebuild step matters: a fresh `/ws/src/<package-name>` copy is not enough on its own, because launches run from `/ws/install`.
+
+   If you changed baseline image-owned inputs such as `docker/`, `deps/`, or any non-scenario package under `src/`, rebuild the image first. Then explicitly recreate the `spacetry` container from that image, for example by stopping the existing container and starting it again:
+
+   ```bash
+   ./scripts/build.sh
+   docker compose -f docker/docker-compose.yaml down
+   ./scripts/run.sh
+   ```
+
+   To rebuild the full workspace inside the running container after copying one or more updated packages:
 
    ```bash
    docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
    ```
 
-   Replace `spacetry_bt` with the package you changed. If you updated multiple packages under `src/`, repeat the `docker exec ... rm -rf` and `docker cp` pair for each package before rebuilding.
+   Replace `<package-name>` with the package you changed. If you refreshed multiple runtime packages, repeat the `docker exec ... rm -rf` and `docker cp` pair for each one before rebuilding.
+
+   For skill-driven scenario work, use `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` after the relevant refresh or recreation step to confirm the running container matches the current local `spacetry:dev` image and that every refreshed runtime package is in sync with `/ws/install`.
 
 </details>
 

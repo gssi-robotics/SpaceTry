@@ -85,6 +85,11 @@ This starts:
 
 ### Verify Running and Built Container Images
 
+Treat Docker readiness as two separate checks:
+
+1. **Baseline image freshness** — `spacetry:dev` must be rebuilt whenever `docker/`, `deps/`, or any non-scenario package under `src/` changes.
+2. **Runtime package sync** — changes limited to repo-local runtime packages such as `src/spacetry_scenario_*` do not require an image rebuild, but every updated runtime package must be copied into `/ws/src` and rebuilt inside the running container before launch.
+
 If you need to stop the container, run the command:
 
 ```bash
@@ -109,6 +114,13 @@ Then, verify if the docker container is running with:
 docker compose -f docker/docker-compose.yaml ps
 ```
 
+For scenario-driver `full_run` executions, use `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` as the authoritative freshness check. `scripts/run.sh` is only responsible for starting the container and waiting for it to reach a running state.
+
+A running container is not sufficient evidence by itself. Agents must assume the container is valid only when both of these are true:
+
+- the `spacetry` service is running
+- the running container was created from the current local `spacetry:dev` image, not an older image with the same tag
+
 ### Workspace Sync Model
 
 The project workspace inside the container is prepared during the Docker image build phase so dependency packages are already available under `/ws`. The repository source tree is **not** bind-mounted into `/ws/src` at runtime.
@@ -118,6 +130,13 @@ This means:
 - new or modified host packages are not automatically visible inside `/ws/src`
 - agents must copy new or updated packages into the running container before building or launching them
 - `log/` remains the bind-mounted output location for reports, rosbags, metrics, and runtime logs
+
+In practice:
+
+- rebuild the image for baseline changes
+- copy and rebuild the updated runtime package or packages for `src/spacetry_scenario_*` changes
+- remember that execution uses `/ws/install`, so copying into `/ws/src` without rebuilding still leaves stale runtime code
+- do not treat a successful `docker compose up -d` alone as proof that the container is running the newest code
 
 When you add or update a scenario package or another repo-local package that must exist in `/ws/src`, copy it into the container first:
 
