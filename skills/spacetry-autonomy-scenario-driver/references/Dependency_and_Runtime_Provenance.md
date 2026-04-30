@@ -17,6 +17,11 @@ This means scenario-driver agents must reason about two distinct provenance path
 - **Image-time provenance** for imported dependencies such as `space_ros_demos`
 - **Runtime `/ws/src` provenance** for repo-local packages that are copied into the running container with `docker cp`
 
+For scenario execution, treat those as two different freshness contracts:
+
+- **Baseline image freshness** covers `docker/`, `deps/`, and non-scenario packages under `src/`. Changes there require rebuilding `spacetry:dev`.
+- **Runtime package sync freshness** covers repo-local runtime packages such as `src/spacetry_scenario_*`. Changes there require copying each updated package into `/ws/src` and rebuilding it inside the running container.
+
 ## What The Dockerfile Does
 
 `docker/Dockerfile` establishes the dependency flow in several steps:
@@ -44,7 +49,9 @@ That filtering is deliberate and affects which imported packages are build-visib
 Several stale-state failure modes are possible:
 
 - the local image is old, so imported dependency code and image-copied repository files are old
-- the image is current, but the running container does not yet have the newest repo-local scenario package copied into `/ws/src`
+- the local image tag was rebuilt, but the running container was not recreated and is still using the older image id
+- the image is current, but the running container does not yet have the newest repo-local runtime package copied into `/ws/src`
+- the container source tree under `/ws/src/<package>` is current, but the installed package under `/ws/install` was not rebuilt after that source refresh
 - the host repository changed after the image build, but the experiment reused the existing image anyway
 - the host package was updated, but the container copy under `/ws/src/<package>` was not refreshed before build or launch
 
@@ -52,7 +59,9 @@ These are different problems and need different checks.
 
 ## Operational Guidance
 
-- Use `scripts/scenario_preflight.sh` to record the current skill-tree checksum by default and to check image freshness, optional skill checksum or commit pinning, Docker auth health, and host-versus-container scenario package sync before a `full_run` that should count as the main trusted result.
+- Use `scripts/scenario_preflight.sh` to record the current skill-tree checksum by default and to check Docker daemon access, baseline image freshness, container-versus-image identity, optional skill checksum or commit pinning, Docker auth health, and host-versus-container runtime package sync before a `full_run` that should count as the main trusted result.
 - Treat imported dependencies from `deps/spacetry.repos` as image-owned inputs. If they must change, rebuild the image.
-- Treat repo-local scenario packages under `src/` as runtime-copied inputs. If they change, refresh `/ws/src/<package>` inside the running container before build or launch.
+- Treat repo-local runtime packages under `src/` as runtime-copied inputs. If they change, refresh `/ws/src/<package>` inside the running container before build or launch.
+- After refreshing `/ws/src/<package>`, rebuild every affected runtime package so `/ws/install` is not older than the copied source tree.
+- Do not treat a running container as sufficient proof of freshness. The container must also match the current local `spacetry:dev` image id.
 - When a run behaves unexpectedly, inspect both the image provenance and the `/ws/src` sync state before assuming the scenario logic itself is wrong.

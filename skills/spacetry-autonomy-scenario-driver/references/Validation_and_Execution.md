@@ -6,11 +6,17 @@ Use Docker for all build, validation, and execution steps.
 
 Rebuild the scenario driver related packages if scenario components have changed or new ones were added.
 
+Apply Docker rebuild rules in this order:
+
+- if `docker/`, `deps/`, or any non-scenario package under `src/` changed, rebuild the `spacetry:dev` image with `bash scripts/build.sh` and recreate the container before executing the scenario
+- if only repo-local runtime packages such as `src/spacetry_scenario_*` changed, keep the existing image, copy each updated runtime package into `/ws/src`, and rebuild those packages inside the running container
+
 Before running a `full_run` that should count as the main trusted result for the current scenario iteration, prefer the maintained readiness check:
 
 ```bash
 scripts/scenario_preflight.sh \
   --scenario-package spacetry_scenario_{scenario_name} \
+  --runtime-package spacetry_scenario_metrics \
   --run-class full_run \
   --required-skill-checksum <skill-tree-sha256> \
   --require-main-run-ready
@@ -18,23 +24,26 @@ scripts/scenario_preflight.sh \
 
 This preflight checks:
 
+- whether the current shell can actually reach the Docker daemon
 - Docker registry auth health for the base image path
 - whether the local `spacetry:dev` image exists
-- whether the image is older than the latest committed Docker/dependency input change
+- whether the local image is newer than the latest baseline image-owned source change
 - whether the scenario container is running
+- whether the running container matches the current local `spacetry:dev` image
 - the current canonical checksum of the skill tree by default
 - whether the skill is pinned to the required checksum when exact skill-state pinning was requested
 - the latest skill commit and whether the tracked skill files are dirty
-- whether the host scenario package matches the copy under `/ws/src` in the running container
+- whether every declared runtime package matches the copy under `/ws/src` in the running container
+- whether every declared runtime package under `/ws/install` is at least as new as the current `/ws/src` copy
 
-During iterative tuning, when only files inside the scenario package changed, agents may use a lighter validation loop:
+During iterative tuning, when only files inside repo-local runtime packages changed, agents may use a lighter validation loop:
 
-- copy the updated scenario package into the running container
-- rebuild only the scenario package instead of the full workspace
-- rerun the scenario launch or targeted validation needed to check the modified scenario-package behavior
+- copy the updated runtime package or packages into the running container
+- rebuild only those runtime packages instead of the full workspace
+- rerun the scenario launch or targeted validation needed to check the modified runtime-package behavior
 - do not repeat earlier world verification or unrelated package validation unless those artifacts also changed
 
-This lighter loop is allowed only when the edits are confined to the scenario package and do not change baseline autonomy packages, world files, or cross-package interfaces.
+This lighter loop is allowed only when the edits are confined to repo-local runtime packages and do not change baseline autonomy packages, world files, or cross-package interfaces.
 
 Before Docker execution, validate the scenario's ROS-consumption design:
 
@@ -48,7 +57,7 @@ Before any validation search or file inspection step, keep result-reporting outp
 - when checking build inputs, inspect only canonical source directories
 - when checking execution outputs, inspect only current-run artifacts and do not feed them back into implementation design as source templates
 
-If the scenario related package is new or has changed on the host, copy it into the running container first:
+If a runtime-related package is new or has changed on the host, copy it into the running container first:
 
 ```bash
 docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/
@@ -75,8 +84,9 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 ## Execution Guidelines
 
 - Use Docker for all execution. This ensures consistency and reproducibility across host machines.
-- Agents must rebuild the container image with `bash scripts/build.sh` before scenario execution unless the user explicitly says to reuse an existing image.
-- Before executing a scenario launch, confirm the scenario package has been copied into `/ws/src` and that the workspace has already been built so `/ws/install/setup.bash` exists.
+- Agents must rebuild the container image with `bash scripts/build.sh` before scenario execution whenever baseline image-owned inputs changed, unless the user explicitly says to reuse an existing image.
+- Before executing a scenario launch, confirm every updated runtime package has been copied into `/ws/src` and that the workspace has already been built so `/ws/install/setup.bash` exists.
+- Before trusting a running container, confirm it is running from the current local `spacetry:dev` image, not a stale older image with the same tag.
 - Scenario launches intended for maintained execution tooling should expose `output_root`, `run_label`, and `record_rosbag` launch arguments. Trusted `full_run` executions should use host-visible paths under `/ws/log`.
 - Validate incrementally, starting with the launch and adjusting launch configuration and parameters if needed. Then move into the full scenario uninterrupted execution.
 - Prefer the maintained wrapper for labeled execution:
@@ -86,9 +96,12 @@ scripts/run_scenario_full.sh \
   --launch-package spacetry_scenario_{scenario_name} \
   --launch-file scenario_{scenario_name}.launch.py \
   --scenario-package spacetry_scenario_{scenario_name} \
+  --runtime-package spacetry_scenario_metrics \
   --required-skill-checksum <skill-tree-sha256> \
   --require-main-run-ready
 ```
+
+- For `full_run`, the maintained wrapper now treats main-run readiness as mandatory by default. If preflight reports stale baseline image inputs, a running container from the wrong image, or out-of-sync `/ws/src` or `/ws/install` runtime package content, fix that state before launching.
 
 - Use `--run-class smoke` or `--run-class tuning` for intentionally shortened runs. Those runs are labeled as non-main results by design and must not be reported as the primary experiment outcome.
 - `full_run` executions must not use `--interrupt-after`. Any intentionally shortened execution belongs in `smoke` or `tuning`.

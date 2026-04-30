@@ -8,6 +8,7 @@ SERVICE="spacetry"
 LAUNCH_PACKAGE=""
 LAUNCH_FILE=""
 SCENARIO_PACKAGE=""
+RUNTIME_PACKAGES=()
 RUN_CLASS="full_run"
 RUN_LABEL=""
 OUTPUT_ROOT=""
@@ -33,7 +34,10 @@ termination reason may count as a main result.
 Options:
   --launch-package <name>             ROS 2 package passed to ros2 launch
   --launch-file <name>                Launch file passed to ros2 launch
-  --scenario-package <name>           Scenario package used for preflight sync checks
+  --scenario-package <name>           Primary scenario package used for preflight
+                                      sync checks
+  --runtime-package <name>            Additional repo-local runtime package to
+                                      validate in preflight, repeat as needed
   --run-class <full_run|smoke|tuning> Run classification
   --run-label <label>                 User label to include after the run class prefix
   --output-root <path>                Container-visible output root, default /ws/log/<scenario-or-launch-package>
@@ -47,6 +51,7 @@ Options:
                                       skill-state pinning matters
   --required-skill-commit <sha>       Commit hash required when main-run pinning matters
   --require-main-run-ready            Require main-run-ready preflight before launch
+                                      (already implied for full_run)
   --skip-preflight                    Skip skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh
   --service <name>                    Docker Compose service name
   --compose-file <path>               Compose file to use
@@ -92,6 +97,17 @@ for required_cmd in docker python3 date find; do
   fi
 done
 
+append_unique_runtime_package() {
+  local package_name="$1"
+  local existing_name
+  for existing_name in "${RUNTIME_PACKAGES[@]}"; do
+    if [[ "$existing_name" == "$package_name" ]]; then
+      return 0
+    fi
+  done
+  RUNTIME_PACKAGES+=("$package_name")
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --launch-package)
@@ -104,6 +120,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --scenario-package)
       SCENARIO_PACKAGE="$2"
+      shift 2
+      ;;
+    --runtime-package)
+      append_unique_runtime_package "$2"
       shift 2
       ;;
     --run-class)
@@ -192,6 +212,10 @@ if [[ -z "$LAUNCH_PACKAGE" || -z "$LAUNCH_FILE" ]]; then
   exit 2
 fi
 
+if [[ -n "$SCENARIO_PACKAGE" ]]; then
+  append_unique_runtime_package "$SCENARIO_PACKAGE"
+fi
+
 if [[ -n "$INTERRUPT_AFTER" && "$RUN_CLASS" == "full_run" ]]; then
   echo "--interrupt-after is only allowed for smoke or tuning runs." >&2
   exit 2
@@ -230,13 +254,16 @@ if (( ! SKIP_PREFLIGHT )); then
   if [[ -n "$SCENARIO_PACKAGE" ]]; then
     preflight_cmd+=(--scenario-package "$SCENARIO_PACKAGE")
   fi
+  for runtime_package in "${RUNTIME_PACKAGES[@]}"; do
+    preflight_cmd+=(--runtime-package "$runtime_package")
+  done
   if [[ -n "$REQUIRED_SKILL_CHECKSUM" ]]; then
     preflight_cmd+=(--required-skill-checksum "$REQUIRED_SKILL_CHECKSUM")
   fi
   if [[ -n "$REQUIRED_SKILL_COMMIT" ]]; then
     preflight_cmd+=(--required-skill-commit "$REQUIRED_SKILL_COMMIT")
   fi
-  if (( REQUIRE_MAIN_RUN_READY )); then
+  if [[ "$RUN_CLASS" == "full_run" ]] || (( REQUIRE_MAIN_RUN_READY )); then
     preflight_cmd+=(--require-main-run-ready)
   fi
   "${preflight_cmd[@]}"

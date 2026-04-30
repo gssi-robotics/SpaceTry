@@ -98,12 +98,12 @@ Follow the implementation, code-style, and observability guidance in this file a
 
 Validate the implementation before execution by loading `skills/spacetry-autonomy-scenario-driver/references/Validation_and_Execution.md`.
 
-1. Sync the scenario package from the host repository into `/ws/src` inside the running container before rebuilding.
-2. Rebuild scenario packages with Docker using the validation reference.
+1. Sync the scenario package and any updated repo-local runtime helper packages from the host repository into `/ws/src` inside the running container before rebuilding.
+2. Rebuild the affected runtime packages with Docker using the validation reference.
 3. If changes were made to `src/spacetry_world`, run world verification using the validation reference.
 4. Run `scripts/scenario_preflight.sh` before any `full_run` whose output should count as the main trusted result for the current scenario iteration so Docker auth, image freshness, the current skill-tree checksum, optional skill pinning, and host-versus-container package sync are checked explicitly.
 5. Run an intentionally interrupted validation run using an in-container PID-targeted `SIGINT` method, and confirm that the required report artifacts are written.
-6. During iterative tuning, if only the scenario package changed, use the lighter scenario-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
+6. During iterative tuning, if only repo-local runtime packages changed, use the lighter runtime-package-only validation loop from `references/Validation_and_Execution.md` instead of repeating unrelated earlier validation steps.
 
 ### 4. Scenario Execution and Reporting
 
@@ -204,7 +204,7 @@ Prefer the least invasive path:
 3. The scenario driver ROS 2 nodes should be launched from a new launch file inside its package sub-folder named `launch`, and the launch file should be named `scenario_<scenario_name>.launch.py`.  The launch file can also include the baseline bringup unchanged launch file as a component. If the scenario requires changes to the mission structure, add a new mission config file and use it in the scenario launch file instead of the baseline one.
 4. When including baseline bringup or depending on its launch arguments, follow `src/spacetry_bringup/AGENTS.md` for launch-integration, `use_sim_time`, BT runner, parameter-wiring, and topic QoS compatibility rules.
 5. The scenario launch must not override BT-runner-related bringup inputs such as `tree_file`, BT parameter files, tick rate, or equivalent runner configuration. Those values belong to the baseline autonomy owned by the developers and must remain unchanged during evaluation unless the user explicitly approves a baseline bug fix.
-6. Before any Dockerized build or launch of the scenario package, copy it into the running container:
+6. Before any Dockerized build or launch of the scenario package, and before rebuilding any updated repo-local runtime helper packages, copy those packages into the running container:
 
 ```bash
 docker cp $(pwd)/src/spacetry_scenario_{scenario_name} docker-spacetry-1:/ws/src/

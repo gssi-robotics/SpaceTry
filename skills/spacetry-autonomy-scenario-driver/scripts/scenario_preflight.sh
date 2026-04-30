@@ -11,6 +11,7 @@ IMAGE="spacetry:dev"
 BASE_IMAGE="docker.io/osrf/space-ros:jazzy-2025.10.0"
 SKILL_PATH="${SKILL_DIR}"
 SCENARIO_PACKAGE=""
+RUNTIME_PACKAGES=()
 RUN_CLASS="full_run"
 REQUIRED_SKILL_CHECKSUM=""
 REQUIRED_SKILL_COMMIT=""
@@ -21,13 +22,16 @@ CHECK_NAMES=()
 CHECK_STATUSES=()
 CHECK_MESSAGES=()
 
-IMAGE_PRESENT_STATUS="FAIL"
-CONTAINER_RUNNING_STATUS="FAIL"
+DOCKER_ACCESS_STATUS="FAIL"
+IMAGE_PRESENT_STATUS="SKIP"
+CONTAINER_RUNNING_STATUS="SKIP"
+CONTAINER_IMAGE_STATUS="SKIP"
 DOCKER_AUTH_STATUS="SKIP"
-IMAGE_FRESHNESS_STATUS="WARN"
+IMAGE_FRESHNESS_STATUS="SKIP"
 SKILL_CHECKSUM_STATUS="FAIL"
 SKILL_COMMIT_STATUS="WARN"
-PACKAGE_SYNC_STATUS="WARN"
+PACKAGE_SYNC_STATUS="SKIP"
+PACKAGE_BUILD_STATUS="SKIP"
 
 usage() {
   cat <<'EOF'
@@ -38,7 +42,10 @@ scenario-driver run, and whether the run is ready to serve as the main trusted
 `full_run` for the current scenario iteration.
 
 Options:
-  --scenario-package <name>        ROS 2 scenario package under src/
+  --scenario-package <name>        Primary ROS 2 scenario package under src/
+                                   (also included in runtime package checks)
+  --runtime-package <name>         Additional repo-local runtime package under
+                                   src/, repeat as needed
   --skill-path <path>              Skill directory to validate
   --required-skill-checksum <sha>  Skill tree checksum required when exact
                                    skill-state pinning matters
@@ -72,12 +79,61 @@ record_check() {
   CHECK_MESSAGES+=("$3")
 }
 
+append_unique_runtime_package() {
+  local package_name="$1"
+  local existing_name
+  for existing_name in "${RUNTIME_PACKAGES[@]}"; do
+    if [[ "$existing_name" == "$package_name" ]]; then
+      return 0
+    fi
+  done
+  RUNTIME_PACKAGES+=("$package_name")
+}
+
+summarize_output() {
+  local text="$1"
+  text="${text//$'\n'/ }"
+  printf '%s\n' "$text"
+}
+
+docker_daemon_probe() {
+  timeout 30 docker version 2>&1
+}
+
 container_ref() {
   if [[ -n "$CONTAINER_NAME" ]]; then
     printf '%s\n' "$CONTAINER_NAME"
     return 0
   fi
-  docker compose -f "$COMPOSE_FILE" ps -q "$SERVICE" 2>/dev/null | head -n 1
+  docker compose -f "$COMPOSE_FILE" ps -q "$SERVICE" | head -n 1
+}
+
+running_container_ref() {
+  local attempt ref
+  for attempt in 1 2 3 4 5; do
+    ref="$(container_ref || true)"
+    if [[ -n "$ref" ]] && docker inspect -f '{{.State.Running}}' "$ref" 2>/dev/null | grep -qx 'true'; then
+      printf '%s\n' "$ref"
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
+
+baseline_input_latest_epoch() {
+  local search_roots=("${ROOT_DIR}/docker" "${ROOT_DIR}/deps")
+  while IFS= read -r -d '' package_dir; do
+    package_name="$(basename "$package_dir")"
+    if [[ "$package_name" == spacetry_scenario_* ]]; then
+      continue
+    fi
+    search_roots+=("$package_dir")
+  done < <(
+    find "${ROOT_DIR}/src" -mindepth 1 -maxdepth 1 -type d -print0 | LC_ALL=C sort -z
+  )
+
+  find "${search_roots[@]}" -type f -printf '%T@\n' | sort -n | tail -1
 }
 
 scenario_dir_hash() {
@@ -126,10 +182,28 @@ scenario_dir_hash_in_container() {
     | awk '{print $1}'
 }
 
+package_latest_mtime_in_container() {
+  local container="$1"
+  local package_name="$2"
+  docker exec "$container" bash -lc \
+    "find /ws/src/'$package_name' -type f -printf '%T@\n' | sort -n | tail -1"
+}
+
+package_install_marker_mtime_in_container() {
+  local container="$1"
+  local package_name="$2"
+  docker exec "$container" bash -lc \
+    "find /ws/install/share/'$package_name' -maxdepth 1 -type f \\( -name package.dsv -o -name package.xml \\) -printf '%T@\n' | sort -n | tail -1"
+}
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --scenario-package)
       SCENARIO_PACKAGE="$2"
+      shift 2
+      ;;
+    --runtime-package)
+      append_unique_runtime_package "$2"
       shift 2
       ;;
     --skill-path)
@@ -197,6 +271,10 @@ case "$RUN_CLASS" in
     ;;
 esac
 
+if [[ -n "$SCENARIO_PACKAGE" ]]; then
+  append_unique_runtime_package "$SCENARIO_PACKAGE"
+fi
+
 for required_cmd in docker git sha256sum tar date timeout; do
   if ! command -v "$required_cmd" >/dev/null 2>&1; then
     echo "Missing required command: $required_cmd" >&2
@@ -214,22 +292,41 @@ if [[ ! -d "$SKILL_PATH" ]]; then
   exit 1
 fi
 
-if docker image inspect "$IMAGE" >/dev/null 2>&1; then
+if docker_probe_output="$(docker_daemon_probe)"; then
+  DOCKER_ACCESS_STATUS="PASS"
+  record_check "docker_access" "PASS" "Docker daemon is reachable from this shell."
+else
+  docker_probe_output="$(summarize_output "$docker_probe_output")"
+  record_check "docker_access" "FAIL" "Docker daemon probe failed: ${docker_probe_output}"
+fi
+
+CONTAINER_REF=""
+if [[ "$DOCKER_ACCESS_STATUS" == "PASS" ]] && docker image inspect "$IMAGE" >/dev/null 2>&1; then
   IMAGE_PRESENT_STATUS="PASS"
   record_check "image_present" "PASS" "Local image '$IMAGE' exists."
-else
+elif [[ "$DOCKER_ACCESS_STATUS" == "PASS" ]]; then
+  IMAGE_PRESENT_STATUS="FAIL"
   record_check "image_present" "FAIL" "Local image '$IMAGE' is missing."
+else
+  record_check "image_present" "SKIP" "Image presence was not checked because Docker daemon access failed."
 fi
 
-CONTAINER_REF="$(container_ref || true)"
-if [[ -n "$CONTAINER_REF" ]] && docker inspect -f '{{.State.Running}}' "$CONTAINER_REF" 2>/dev/null | grep -qx 'true'; then
+if [[ "$DOCKER_ACCESS_STATUS" == "PASS" ]]; then
+  CONTAINER_REF="$(running_container_ref || true)"
+fi
+if [[ -n "$CONTAINER_REF" ]]; then
   CONTAINER_RUNNING_STATUS="PASS"
   record_check "container_running" "PASS" "Container '$CONTAINER_REF' is running."
-else
+elif [[ "$DOCKER_ACCESS_STATUS" == "PASS" ]]; then
+  CONTAINER_RUNNING_STATUS="FAIL"
   record_check "container_running" "FAIL" "No running container found for service '$SERVICE'."
+else
+  record_check "container_running" "SKIP" "Container status was not checked because Docker daemon access failed."
 fi
 
-if (( SKIP_DOCKER_AUTH_CHECK )); then
+if [[ "$DOCKER_ACCESS_STATUS" != "PASS" ]]; then
+  record_check "docker_auth" "SKIP" "Registry auth probe was skipped because Docker daemon access failed."
+elif (( SKIP_DOCKER_AUTH_CHECK )); then
   DOCKER_AUTH_STATUS="SKIP"
   record_check "docker_auth" "SKIP" "Skipped Docker registry auth probe for '$BASE_IMAGE'."
 else
@@ -238,29 +335,46 @@ else
     record_check "docker_auth" "PASS" "Registry metadata for '$BASE_IMAGE' is readable."
   else
     DOCKER_AUTH_STATUS="WARN"
-    auth_output="${auth_output//$'\n'/ }"
+    auth_output="$(summarize_output "$auth_output")"
     record_check "docker_auth" "WARN" "Registry metadata probe failed: ${auth_output}"
   fi
 fi
 
 if [[ "$IMAGE_PRESENT_STATUS" == "PASS" ]]; then
-  image_created="$(docker image inspect --format '{{.Created}}' "$IMAGE")"
-  image_created_epoch="$(date -d "$image_created" +%s)"
-  latest_image_input_epoch="$(
-    git -C "$ROOT_DIR" log -1 --format=%ct -- docker deps scripts/build.sh 2>/dev/null || true
-  )"
-  if [[ -n "$latest_image_input_epoch" ]] && (( image_created_epoch >= latest_image_input_epoch )); then
+  image_created="$(docker image inspect --format '{{.Created}}' "$IMAGE" 2>/dev/null || true)"
+  image_created_epoch="$(date -d "$image_created" +%s 2>/dev/null || true)"
+  latest_baseline_input_epoch="$(baseline_input_latest_epoch || true)"
+  latest_baseline_input_epoch="${latest_baseline_input_epoch%%.*}"
+  if [[ -n "$image_created_epoch" && -n "$latest_baseline_input_epoch" ]] && (( image_created_epoch >= latest_baseline_input_epoch )); then
     IMAGE_FRESHNESS_STATUS="PASS"
-    record_check "image_freshness" "PASS" "Image '$IMAGE' is newer than the latest committed Docker/deps change."
-  elif [[ -n "$latest_image_input_epoch" ]]; then
-    IMAGE_FRESHNESS_STATUS="WARN"
-    record_check "image_freshness" "WARN" "Image '$IMAGE' is older than the latest committed Docker/deps change."
+    record_check "image_freshness" "PASS" "Image '$IMAGE' is newer than the latest baseline image-owned source change."
+  elif [[ -n "$image_created_epoch" && -n "$latest_baseline_input_epoch" ]]; then
+    IMAGE_FRESHNESS_STATUS="FAIL"
+    record_check "image_freshness" "FAIL" "Image '$IMAGE' is older than the latest baseline image-owned source change. Rebuild the image before running."
   else
     IMAGE_FRESHNESS_STATUS="WARN"
-    record_check "image_freshness" "WARN" "Could not determine the latest committed Docker/deps change."
+    record_check "image_freshness" "WARN" "Could not determine whether image '$IMAGE' is newer than the latest baseline image-owned source change."
   fi
+elif [[ "$DOCKER_ACCESS_STATUS" == "PASS" ]]; then
+  record_check "image_freshness" "SKIP" "Image freshness was not checked because '$IMAGE' is missing."
 else
-  record_check "image_freshness" "WARN" "Image freshness was not checked because '$IMAGE' is missing."
+  record_check "image_freshness" "SKIP" "Image freshness was not checked because Docker daemon access failed."
+fi
+
+if [[ "$IMAGE_PRESENT_STATUS" == "PASS" && "$CONTAINER_RUNNING_STATUS" == "PASS" ]]; then
+  local_image_id="$(docker image inspect --format '{{.Id}}' "$IMAGE")"
+  container_image_id="$(docker inspect --format '{{.Image}}' "$CONTAINER_REF")"
+  if [[ "$local_image_id" == "$container_image_id" ]]; then
+    CONTAINER_IMAGE_STATUS="PASS"
+    record_check "container_image" "PASS" "Running container matches the current local image '$IMAGE'."
+  else
+    CONTAINER_IMAGE_STATUS="FAIL"
+    record_check "container_image" "FAIL" "Running container does not match the current local image '$IMAGE'. Recreate the container after rebuilding or retagging."
+  fi
+elif [[ "$DOCKER_ACCESS_STATUS" != "PASS" ]]; then
+  record_check "container_image" "SKIP" "Container-image match was not checked because Docker daemon access failed."
+else
+  record_check "container_image" "SKIP" "Container-image match was not checked because the image or running container is unavailable."
 fi
 
 skill_rel_path="$(relative_to_root "$SKILL_PATH")"
@@ -292,30 +406,68 @@ else
   record_check "skill_commit" "PASS" "Skill commit is '$skill_commit' and the tracked files are clean."
 fi
 
-if [[ -n "$SCENARIO_PACKAGE" ]]; then
-  host_package_dir="${ROOT_DIR}/src/${SCENARIO_PACKAGE}"
-  if [[ ! -d "$host_package_dir" ]]; then
-    PACKAGE_SYNC_STATUS="FAIL"
-    record_check "package_sync" "FAIL" "Host package '${SCENARIO_PACKAGE}' does not exist under src/."
-  elif [[ "$CONTAINER_RUNNING_STATUS" != "PASS" ]]; then
-    PACKAGE_SYNC_STATUS="FAIL"
-    record_check "package_sync" "FAIL" "Cannot verify /ws/src sync because the container is not running."
-  elif ! docker exec "$CONTAINER_REF" bash -lc "test -d /ws/src/'$SCENARIO_PACKAGE'" >/dev/null 2>&1; then
-    PACKAGE_SYNC_STATUS="WARN"
-    record_check "package_sync" "WARN" "Package '${SCENARIO_PACKAGE}' is not present inside /ws/src."
-  else
-    host_hash="$(scenario_dir_hash "${ROOT_DIR}/src" "$SCENARIO_PACKAGE")"
-    container_hash="$(scenario_dir_hash_in_container "$CONTAINER_REF" "$SCENARIO_PACKAGE")"
-    if [[ "$host_hash" == "$container_hash" ]]; then
-      PACKAGE_SYNC_STATUS="PASS"
-      record_check "package_sync" "PASS" "Host and container copies of '${SCENARIO_PACKAGE}' match."
+if (( ${#RUNTIME_PACKAGES[@]} > 0 )); then
+  PACKAGE_SYNC_STATUS="PASS"
+  PACKAGE_BUILD_STATUS="PASS"
+  for runtime_package in "${RUNTIME_PACKAGES[@]}"; do
+    package_sync_check_name="package_sync:${runtime_package}"
+    package_build_check_name="package_build_sync:${runtime_package}"
+    package_sync_result="SKIP"
+    package_build_result="SKIP"
+    host_package_dir="${ROOT_DIR}/src/${runtime_package}"
+
+    if [[ ! -d "$host_package_dir" ]]; then
+      package_sync_result="FAIL"
+      record_check "$package_sync_check_name" "FAIL" "Host package '${runtime_package}' does not exist under src/."
+    elif [[ "$DOCKER_ACCESS_STATUS" != "PASS" ]]; then
+      record_check "$package_sync_check_name" "SKIP" "Package sync was not checked because Docker daemon access failed."
+    elif [[ "$CONTAINER_RUNNING_STATUS" != "PASS" ]]; then
+      package_sync_result="FAIL"
+      record_check "$package_sync_check_name" "FAIL" "Cannot verify /ws/src sync because the container is not running."
+    elif ! docker exec "$CONTAINER_REF" bash -lc "test -d /ws/src/'$runtime_package'" >/dev/null 2>&1; then
+      package_sync_result="FAIL"
+      record_check "$package_sync_check_name" "FAIL" "Package '${runtime_package}' is not present inside /ws/src."
     else
-      PACKAGE_SYNC_STATUS="WARN"
-      record_check "package_sync" "WARN" "Host and container copies of '${SCENARIO_PACKAGE}' differ."
+      host_hash="$(scenario_dir_hash "${ROOT_DIR}/src" "$runtime_package")"
+      container_hash="$(scenario_dir_hash_in_container "$CONTAINER_REF" "$runtime_package")"
+      if [[ "$host_hash" == "$container_hash" ]]; then
+        package_sync_result="PASS"
+        record_check "$package_sync_check_name" "PASS" "Host and container copies of '${runtime_package}' match."
+      else
+        package_sync_result="FAIL"
+        record_check "$package_sync_check_name" "FAIL" "Host and container copies of '${runtime_package}' differ. Copy the package into the container again before building or launching."
+      fi
     fi
-  fi
+
+    if [[ "$package_sync_result" != "PASS" ]]; then
+      record_check "$package_build_check_name" "SKIP" "Installed-package freshness was not checked because /ws/src package sync did not pass."
+    else
+      if ! docker exec "$CONTAINER_REF" bash -lc "test -f /ws/install/share/'$runtime_package'/package.dsv -o -f /ws/install/share/'$runtime_package'/package.xml" >/dev/null 2>&1; then
+        package_build_result="FAIL"
+        record_check "$package_build_check_name" "FAIL" "Installed package markers for '${runtime_package}' are missing under /ws/install/share. Rebuild the package before launching."
+      else
+        package_source_mtime="$(package_latest_mtime_in_container "$CONTAINER_REF" "$runtime_package")"
+        package_install_mtime="$(package_install_marker_mtime_in_container "$CONTAINER_REF" "$runtime_package")"
+        if awk -v source_time="$package_source_mtime" -v install_time="$package_install_mtime" 'BEGIN { exit !(install_time + 0 >= source_time + 0) }'; then
+          package_build_result="PASS"
+          record_check "$package_build_check_name" "PASS" "Installed package markers for '${runtime_package}' are at least as new as the container source tree."
+        else
+          package_build_result="FAIL"
+          record_check "$package_build_check_name" "FAIL" "Container source for '${runtime_package}' is newer than its installed package markers. Rebuild the package after copying it into /ws/src."
+        fi
+      fi
+    fi
+
+    if [[ "$package_sync_result" != "PASS" ]]; then
+      PACKAGE_SYNC_STATUS="FAIL"
+    fi
+    if [[ "$package_build_result" != "PASS" ]]; then
+      PACKAGE_BUILD_STATUS="FAIL"
+    fi
+  done
 else
-  record_check "package_sync" "WARN" "No scenario package was provided, so /ws/src sync was not checked."
+  record_check "package_sync" "WARN" "No runtime package was provided, so /ws/src sync was not checked."
+  record_check "package_build_sync" "WARN" "No runtime package was provided, so installed-package freshness was not checked."
 fi
 
 main_run_ready=1
@@ -326,7 +478,12 @@ if [[ "$RUN_CLASS" != "full_run" ]]; then
   main_run_reasons+=("run_class=${RUN_CLASS} is not eligible to serve as the primary full_run result")
 fi
 
-if [[ "$IMAGE_PRESENT_STATUS" != "PASS" ]]; then
+if [[ "$DOCKER_ACCESS_STATUS" != "PASS" ]]; then
+  main_run_ready=0
+  main_run_reasons+=("docker daemon access did not pass")
+fi
+
+if [[ "$IMAGE_PRESENT_STATUS" == "FAIL" ]]; then
   main_run_ready=0
   main_run_reasons+=("local image '${IMAGE}' is missing")
 fi
@@ -346,17 +503,27 @@ if [[ -n "$REQUIRED_SKILL_COMMIT" ]] && [[ "$SKILL_COMMIT_STATUS" != "PASS" ]]; 
   main_run_reasons+=("required skill commit pinning did not pass")
 fi
 
-if [[ "$CONTAINER_RUNNING_STATUS" != "PASS" ]]; then
+if [[ "$CONTAINER_RUNNING_STATUS" == "FAIL" ]]; then
   main_run_ready=0
   main_run_reasons+=("scenario container is not running")
 fi
 
-if [[ -z "$SCENARIO_PACKAGE" ]]; then
+if [[ "$CONTAINER_IMAGE_STATUS" == "FAIL" ]]; then
   main_run_ready=0
-  main_run_reasons+=("scenario package was not provided, so sync eligibility could not be checked")
+  main_run_reasons+=("running container does not match the current local image")
+fi
+
+if (( ${#RUNTIME_PACKAGES[@]} == 0 )); then
+  main_run_ready=0
+  main_run_reasons+=("no runtime package was provided, so sync eligibility could not be checked")
 elif [[ "$PACKAGE_SYNC_STATUS" != "PASS" ]]; then
   main_run_ready=0
-  main_run_reasons+=("host-vs-container scenario package sync did not pass")
+  main_run_reasons+=("host-vs-container runtime package sync did not pass")
+fi
+
+if (( ${#RUNTIME_PACKAGES[@]} > 0 )) && [[ "$PACKAGE_BUILD_STATUS" != "PASS" ]]; then
+  main_run_ready=0
+  main_run_reasons+=("one or more installed runtime packages are older than the current /ws/src copies")
 fi
 
 printf 'Scenario preflight summary\n'
@@ -366,6 +533,9 @@ printf '  image: %s\n' "$IMAGE"
 printf '  service: %s\n' "$SERVICE"
 if [[ -n "$SCENARIO_PACKAGE" ]]; then
   printf '  scenario_package: %s\n' "$SCENARIO_PACKAGE"
+fi
+if (( ${#RUNTIME_PACKAGES[@]} > 0 )); then
+  printf '  runtime_packages: %s\n' "${RUNTIME_PACKAGES[*]}"
 fi
 printf '\nChecks\n'
 for idx in "${!CHECK_NAMES[@]}"; do
