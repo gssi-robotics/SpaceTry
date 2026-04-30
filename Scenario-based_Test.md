@@ -11,7 +11,7 @@ The workflow consists of:
 | 5 | **Autonomy Evaluation Report** | Analyze the output report from the agent to assess the rover's self-adaptation capabilities in the uncertainty test scenario. | User Input |
 
 ## IDE and agent compatibility
-This skill has been tested with VS Code and the agents Codex and Copilot. 
+This skill has been tested with VS Code and the agents [Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt) and [Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat). 
 Compatibility with additional IDEs and agents are not guaranteed.
 
 ## Install the agent scenario driver skill
