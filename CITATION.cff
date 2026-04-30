@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "D. Caldas"
+  given-names: "Ricardo"
+  orcid: "https://orcid.org/0000-0001-9997-8487"
+- family-names: "Lima"
+  given-names: "Keila"
+  orcid: "https://orcid.org/0000-0002-6625-4199"
+title: "SpaceTry Testbed for Self-Adaptive Space Exploration Missions"
+version: 1.0.1
+doi: 10.5281/zenodo.19921736
+date-released: 2026-04-30
+url: "https://github.com/gssi-robotics/SpaceTry"
