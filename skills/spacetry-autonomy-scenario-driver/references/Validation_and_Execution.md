@@ -4,6 +4,8 @@ Use Docker for all build, validation, and execution steps.
 
 ## Validation
 
+For skill-driven scenario execution, rely on `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` to decide whether the image and running container are fresh enough for a trusted `full_run`.
+
 Rebuild the scenario driver related packages if scenario components have changed or new ones were added.
 
 Apply Docker rebuild rules in this order:
@@ -14,7 +16,7 @@ Apply Docker rebuild rules in this order:
 Before running a `full_run` that should count as the main trusted result for the current scenario iteration, prefer the maintained readiness check:
 
 ```bash
-scripts/scenario_preflight.sh \
+skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh \
   --scenario-package spacetry_scenario_{scenario_name} \
   --runtime-package spacetry_scenario_metrics \
   --run-class full_run \
@@ -92,7 +94,7 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Prefer the maintained wrapper for labeled execution:
 
 ```bash
-scripts/run_scenario_full.sh \
+skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh \
   --launch-package spacetry_scenario_{scenario_name} \
   --launch-file scenario_{scenario_name}.launch.py \
   --scenario-package spacetry_scenario_{scenario_name} \

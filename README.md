@@ -164,11 +164,7 @@ You should see:
    ./scripts/run.sh
    ```
 
-   `./scripts/run.sh` checks that `log/` is writable on the host, starts the `spacetry` service, and waits until the container reaches a running state.
-
-   For skill-driven scenario execution, rely on `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` to decide whether the image and running container are fresh enough for a trusted `full_run`.
-
-   Enter the running container:
+   For entering into the running container:
 
    ```bash
    docker exec -it docker-spacetry-1 bash 
@@ -181,7 +177,15 @@ You should see:
 
    Assume the container from step 2 is already running.
 
-   If you want to update one or more repo-local runtime packages such as `src/spacetry_scenario_*`, refresh each package inside the running container under `/ws/src` and rebuild it:
+   **Option A: Rebuild the full workspace inside the running container**
+
+   To rebuild the full workspace inside the running container after copying one or more updated packages:
+
+   ```bash
+   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
+   ```
+
+   If you want to update a specific repo-local package such as `src/<package-name>`, refresh each package inside the running container under `/ws/src` and rebuild it:
 
    ```bash
    docker exec docker-spacetry-1 bash -lc 'rm -rf /ws/src/<package-name>'
@@ -191,6 +195,8 @@ You should see:
 
    The rebuild step matters: a fresh `/ws/src/<package-name>` copy is not enough on its own, because launches run from `/ws/install`.
 
+   **Option B: Rebuild the docker container image**
+
    If you changed baseline image-owned inputs such as `docker/`, `deps/`, or any non-scenario package under `src/`, rebuild the image first. Then explicitly recreate the `spacetry` container from that image, for example by stopping the existing container and starting it again:
 
    ```bash
@@ -199,16 +205,6 @@ You should see:
    ./scripts/run.sh
    ```
 
-   To rebuild the full workspace inside the running container after copying one or more updated packages:
-
-   ```bash
-   docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && colcon build --merge-install --event-handlers console_direct+"
-   ```
-
-   Replace `<package-name>` with the package you changed. If you refreshed multiple runtime packages, repeat the `docker exec ... rm -rf` and `docker cp` pair for each one before rebuilding.
-
-   For skill-driven scenario work, use `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` after the relevant refresh or recreation step to confirm the running container matches the current local `spacetry:dev` image and that every refreshed runtime package is in sync with `/ws/install`.
-
 </details>
 
 <details>
@@ -216,26 +212,34 @@ You should see:
 
    SpaceTry 🥐 bringup launches the `mars_outpost` world, spawns the Curiosity rover (with proper simulation clock synchronization), starts ROS↔Gazebo bridges, loads the ros2_control controller chain, and **automatically** starts the behavior tree mission runner.
 
+   Launch configurations:
+    - Use `battery:=0.75` to set initial battery state (example: 75%)
+    - Use `enable_bt_runner:=false` to launch without the behavior tree
+    - Use `tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml` to specify a custom BT tree
+    - Use `headless:=1` to run the simulation in headless mode without Gazebo GUI
+
+   The launch will:
+    1. Start Gazebo with mars_outpost world
+    2. Publish ROS↔Gazebo bridges (including `/clock` for simulation time)
+    3. Spawn Curiosity rover (with 2-second delay to ensure clock is available)
+    4. Load ros2_control controller chain
+    5. Automatically start the behavior tree runner to execute [base_bt.xml](src/spacetry_bt/trees/base_bt.xml) automatically (when enabled)
+
    **Option A: Run from inside the running container**
 
    From inside the container (see step 2.), simply launch the rover:
    ```bash
-   source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py
+   source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75
    ```
-
-   The launch will:
-   1. Start Gazebo with mars_outpost world
-   2. Publish ROS↔Gazebo bridges (including `/clock` for simulation time)
-   3. Spawn Curiosity rover (with 2-second delay to ensure clock is available)
-   4. Load ros2_control controller chain
-   5. Automatically start the behavior tree runner to execute the mission
-
+  
    To use a different BT tree file:
    ```bash
    source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml
    ```
 
-   **Option B: Run from a new terminal window**
+   **Option B: Run using the running docker container**
+
+   Simply launch the rover:
 
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75'
@@ -246,44 +250,29 @@ You should see:
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75 tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml'
    ```
 
-   **Option C: Run in Headless Mode (no Gazebo GUI)**
-
-   ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1'
-   ```
-
-   To specify a custom BT tree:
-   ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.5 headless:=1 tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_custom_tree.xml'
-   ```
-
-   **Option D: Launch without the Behavior Tree**
+   **Option C: Launch the rover without the Behavior Tree**
 
    To launch the rover without the BT runner (for manual testing or debugging):
    ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py enable_bt_runner:=false'
+   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py battery:=0.75 enable_bt_runner:=false'
    ```
 
    This starts the full simulation stack without the autonomous mission runner. Useful for:
-   - Manual rover control via command-line or external controllers
-   - Testing individual components (perception, battery manager, etc.)
-   - Debugging without BT execution overhead
+    - Manual rover control via command-line or external controllers
+    - Testing individual components (perception, battery manager, etc.)
+    - Debugging without BT execution overhead
 
-   **Option E: Run the Behavior Tree separately on a new terminal**
+   **Option D: Run the Behavior Tree separately on a new terminal**
 
-   First, launch the rover without the BT runner:
-   ```bash
-   docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 launch spacetry_bringup spacetry_curiosity_outpost.launch.py enable_bt_runner:=false'
-   ```
+  After running the command in **Option C**, in another terminal, run the behavior tree runner:
 
-   Then in another terminal, run the behavior tree runner:
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && source /ws/install/setup.bash && ros2 run spacetry_bt spacetry_bt_runner --ros-args -p tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/base_bt.xml --params-file /ws/src/spacetry_bt/bt_params.yaml'
    ```
 
    This allows you to start the BT independently, giving you fine-grained control over when the mission execution begins.
 
-   **Option F: Verify the rover and BT are running**
+   **Useful checks**
 
    Check if Curiosity nodes are active:
    ```bash
@@ -294,14 +283,6 @@ You should see:
    ```bash
    docker exec -it docker-spacetry-1 bash -lc 'source /opt/ros/spaceros/setup.bash && ros2 node list | grep spacetry_bt_runner'
    ```
-
-   You should see:
-   - Gazebo window with mars_outpost scene and rover spawned near `dock_pad_01`
-   - Console output from rover nodes and BT runner showing mission execution (if BT enabled)
-   - Use `battery:=0.5` to set initial battery state (example: 50%)
-   - Use `enable_bt_runner:=false` to launch without the behavior tree
-   - Use `tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml` to specify a custom BT tree
-   - The BT executes the mission from [base_bt.xml](src/spacetry_bt/trees/base_bt.xml) automatically (when enabled)
 
 </details>
 
@@ -351,26 +332,12 @@ SpaceTry 🥐 includes an LLM-Agent [Skill](skills) for generating and running t
 ### Overview
 
 Test scenarios inject uncertainty into the rover's mission execution to evaluate:
-- **Perceptual Adaptation** — Can the rover adapt when sensors degrade or fail?
+- **Perception Adaptation** — Can the rover adapt when sensors degrade or fail?
 - **Behavioral Flexibility** — Does the behavior tree transition to contingencies appropriately?
 - **Resource-Aware Autonomy** — Can the rover adapt goals to energy constraints?
 - **Obstacle Intelligence** — Can the rover discover and avoid dynamic obstacles?
 - **Mission Resilience** — Can the rover recover from failures or replanning challenges?
 - **Safety Under Autonomy** — Does self-adaptation maintain safety constraints?
 
+For a deeper understanding of the test scenario process and how to create custom scenarios, see [Scenario-based_Test.md](Scenario-based_Test.md), [Autonomy Test Scenario Generation and Evaluation Workflow](AGENTS.md#autonomy-test-scenario-generation-and-evaluation-workflow) section on [AGENTS.md](AGENTS.md), and the [Scenario Generation Prompt Template](skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md).
 
-### Autonomy Test Scenario Workflow
-
-For a deeper understanding of the test scenario process and how to create custom scenarios, see the [AGENTS.md](AGENTS.md) section on [Autonomy Test Scenario Generation and Evaluation Workflow](AGENTS.md#autonomy-test-scenario-generation-and-evaluation-workflow) and the [Scenario Generation Prompt Template](skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md).
-
-The workflow consists of:
-
-| Step | Task | Description | Workflow |
-|------|------|-------------|----------|
-| 1 | **Scenario Prompt Template** | Specify the autonomy under text and mission context and objectives using the prompt template. | User Input |
-| 2 | **Scenario Driver Generation** | Use the LLM agent custom Skill to generate and parametrize the evaluation scenario from the prompt. | Automated |
-| 3 | **Scenario Driver Parametrization** | Configure and fine-tune scenario parameters before execution. | Automated |
-| 4 | **Scenario Driver Execution** | Execute the generated scenario in the simulation environment. | Automated |
-| 5 | **Autonomy Evaluation Report** | Analyze the output report from the agent to assess the rover's self-adaptation capabilities in the uncertainty test scenario. | User Input |
-
-A quick reference guide with examples is available at [SCENARIO_PROMPT_QUICK_REF.md](skills/spacetry-autonomy-scenario-driver/references/SCENARIO_PROMPT_QUICK_REF.md).
