@@ -75,7 +75,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 
 - Safety preservation (boolean per constraint): Boolean status for each relevant monitor or safety condition, for example `MR_009=true`, `MR_011=true`, `collision_with_dynamic_obstacle=false`
 - Goal viability (boolean per goal): Boolean status for each mission objective, for example `science_rock_01_reached=true`, `mission_deadline_met=true`
-- Recovery rate (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
+- Recovery duration (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
 - Obstacle detection latency (ms): Time from obstacle injection to the first attributable obstacle evidence on the autonomy-facing perception interface used by the autonomy stack
 - Detour distance (m): Extra path length traveled relative to the nominal route after replanning around the obstacle
 - Route deviation (m): Maximum or average lateral distance between the full executed path and the nominal planned path; if needed, add a separate post-injection route-deviation metric
@@ -279,7 +279,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 - Goal viability (boolean per goal): Boolean status for each mission objective, for example `science_rock_01_reached=true`, `mission_deadline_met=true`
 - Obstacle detection latency (ms): Time from obstacle injection to the first attributable obstacle evidence available to the autonomy stack under degraded sensing
 - False obstacle rate (count or %): Rate of unsupported obstacle classifications during the sensing degradation window
-- Recovery rate (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
+- Recovery duration (ms): Time from the first avoidance maneuver, after obstacle detection, to resumed collision-free progress
 - Route deviation (m): Maximum or average lateral distance between the full executed path and the nominal planned path; if needed, add a separate post-injection route-deviation metric
 ```
 

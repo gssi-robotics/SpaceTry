@@ -54,7 +54,7 @@ The scenario drivers subscribe to or derive runtime ROS signals and convert them
 | Obstacle detection latency (ms) | `8000.0` | `8600.0` | `1900.0` |
 | Raw scan detection latency (ms) | `n/a` | `n/a` | `n/a` |
 | Adaptation speed (ms) | `6364.0` | `n/a` | `n/a` |
-| Recovery rate (ms) | `3044.0` | `11900.0` | `n/a` |
+| Recovery duration (ms) | `3044.0` | `11900.0` | `n/a` |
 | Route deviation (m) | `10.039` | `9.913` | `10.249` |
 | Post-injection route deviation (m) | `7.643` | `9.913` | `7.817` |
 | False obstacle rate | `43.45%` | `0.0%` | `30.56%` |

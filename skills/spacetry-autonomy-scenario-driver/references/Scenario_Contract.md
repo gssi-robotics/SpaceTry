@@ -82,7 +82,7 @@ Define measurable metrics for autonomy evaluation:
 - **Control rationale at reaction**: Optional legacy compatibility field. If present, it must match `observed_control_rationale` and must not be used as a proxy for injected-fault attribution
 - **Safety preservation**: Key-value pairs with safety constraints from monitors and boolean preservation state
 - **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
-- **Recovery rate**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
+- **Recovery duration**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
 - **Route deviation**: Maximum or average lateral deviation between the full executed route and the nominal route over the whole run. If the scenario also needs disturbance-scoped deviation, report it separately as an additional metric such as `post_injection_route_deviation_m`
 - **Detection attribution status**: Boolean indicating whether the credited detection can be distinguished from baseline hazards, unrelated obstacle signals, or other confounding runtime events
 - **Minimum fault distance at detection**: Rover-to-injected-fault distance in meters when detection is credited
