@@ -1,0 +1,12 @@
+{
+  "scenario_name": "spacetry_scenario_navigation_obstacle_degraded_perception",
+  "run_label": "full_run_shared_metrics_refactor_retry3__20260422T105138Z",
+  "contract_file": "/ws/install/share/spacetry_scenario_navigation_obstacle_degraded_perception/config/scenario_contract.yaml",
+  "config_file": "/ws/install/share/spacetry_scenario_navigation_obstacle_degraded_perception/config/scenario_config.yaml",
+  "output_root": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception",
+  "report_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_shared_metrics_refactor_retry3__20260422T105138Z/spacetry_scenario_navigation_obstacle_degraded_perception_report.md",
+  "metrics_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_shared_metrics_refactor_retry3__20260422T105138Z/metrics/spacetry_scenario_navigation_obstacle_degraded_perception_metrics.json",
+  "timeline_path": "/ws/log/spacetry_scenario_navigation_obstacle_degraded_perception/full_run_shared_metrics_refactor_retry3__20260422T105138Z/runtime/spacetry_scenario_navigation_obstacle_degraded_perception_timeline.jsonl",
+  "termination_reason": "goal_reached",
+  "injection_status": "verified"
+}
