@@ -17,7 +17,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure git
         run: |
@@ -32,7 +31,7 @@ jobs:
         run: |
           git push -u public HEAD:main --force
 
-      - name: Create GitHub release notification (optional)
+      - name: Sync complete notification
         if: success()
         run: |
-          echo "Successfully synced to public repository main branch"
+          echo "✅ Successfully synced to public repository main branch"
