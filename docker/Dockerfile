@@ -108,7 +108,8 @@ RUN --mount=type=ssh,required=false \
     fi && \
     rm -rf /ws/src/space_ros_demos && \
     mkdir -p /ws/src && \
-    vcs import /ws/src < /ws/deps/spacetry.repos
+    vcs import /ws/src < /ws/deps/spacetry.repos && \
+    bash /ws/docker/patch_imported_space_ros_demos.sh /ws/src/space_ros_demos
 
 # Cache imported deps outside /ws so bind-mounting /ws won't hide them.
 # Permanently ignore the duplicate packages inside the cached copy.
