@@ -7,7 +7,7 @@ authors:
 - family-names: "Lima"
   given-names: "Keila"
   orcid: "https://orcid.org/0000-0002-6625-4199"
-title: "SpaceTry Testbed for Self-Adaptive Space Exploration Missions"
+title: "SpaceTry An LLM-Assisted Simulation Testbed for Space Mission Autonomy Engineering"
 version: 1.0.1
 doi: 10.5281/zenodo.19921736
 date-released: 2026-04-30
