@@ -7,8 +7,16 @@ The workflow consists of:
 | 1 | **Scenario Prompt Template** | Specify the autonomy under text and mission context and objectives using the prompt template. | User Input |
 | 2 | **Scenario Driver Generation** | Use the LLM agent custom Skill to generate and parametrize the evaluation scenario from the prompt. | Authoring |
 | 3 | **Scenario Driver Parametrization** | Configure and fine-tune scenario parameters before execution. | Authoring |
-| 4 | **Scenario Driver Execution** | Execute the generated scenario in the simulation environment. | Authoring |
+| 4 | **Scenario Driver Execution** | Execute the generated scenario in the simulation environment, collect metrics, and generate the report. | Authoring |
 | 5 | **Autonomy Evaluation Report** | Analyze the output report from the agent to assess the rover's self-adaptation capabilities in the uncertainty test scenario. | User Input |
+
+As a user of the skill, you just need to follow the steps that concern the `User Input` workflow: 
+ 1. Setup the skill in your development enviroment, e.g. the coding agent in your IDE
+ 2. Create a mission description prompt based on the template in [SCENARIO_PROMPT_TEMPLATE.md](skills/spacetry-autonomy-scenario-driver/assets/SCENARIO_PROMPT_TEMPLATE.md)
+ 3. Supervise the generation and execution of the scenario driver
+ 4. Analyse the outputted report and collected metrics from the scenario execution in simulation
+
+Below there are instructions and examples of going through the workflow.
 
 ## IDE and agent compatibility
 This skill has been tested with VS Code and the agents [Codex](https://marketplace.visualstudio.com/items?itemName=openai.chatgpt) and [Copilot](https://marketplace.visualstudio.com/items?itemName=GitHub.copilot-chat). 
@@ -105,7 +113,7 @@ Design, implement, and execute a **Autonomy Test Scenario Driver Software Compon
 
 The skill should be automatically used by the agent, even if not explicitly selected or mentioned.
 
-As a result the agent will follow the skill workflow by:
+As a result the agent will follow the skill `Authoring` workflow to:
  1. Generate the scenario driver ROS 2 source code. 
  2. Parametrize the generated code via configuration files and validated. 
  3. Execute the generated scenario and adjusted depending on the fine-tunning stage.
