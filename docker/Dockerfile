@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 FROM osrf/space-ros:jazzy-2025.10.0
 
 ARG DEBIAN_FRONTEND=noninteractive
@@ -11,52 +12,42 @@ ENV GZ_VERSION=harmonic
 ENV COLCON_LOG_PATH=/home/spaceros-user/.colcon/log
 
 USER root
-# Base tools + ros_gz + vcstool + git
+# Base tools needed to add external apt repositories.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash ca-certificates \
     git python3-vcstool python3-yaml \
-    ros-${ROS_DISTRO}-ros-gz \
-    ros-${ROS_DISTRO}-gz-ros2-control \
-    ros-${ROS_DISTRO}-ros2-control \
-    ros-${ROS_DISTRO}-ros2-controllers \
-    ros-${ROS_DISTRO}-controller-manager \
-    ros-${ROS_DISTRO}-control-msgs \
-    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
-    ros-${ROS_DISTRO}-rosbag2 \
     lsb-release wget gnupg \
  && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg\
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 
-# Install Gazebo
+# Install SpaceTry runtime + build dependencies in one layer to avoid
+# repeated apt metadata downloads on cold builds.
 RUN apt-get update -qq && \
-    apt-get install -y \
-      gz-${GZ_VERSION} \
+    apt-get install -y --no-install-recommends \
       build-essential \
-      ros-${ROS_DISTRO}-rcl-interfaces\
-      ros-${ROS_DISTRO}-rclcpp\
-      ros-${ROS_DISTRO}-builtin-interfaces\
-      ros-${ROS_DISTRO}-ros-gz\
-      ros-${ROS_DISTRO}-sdformat-urdf\
-      ros-${ROS_DISTRO}-vision-msgs\
-      ros-${ROS_DISTRO}-actuator-msgs\
-      ros-${ROS_DISTRO}-image-transport\
-      ros-${ROS_DISTRO}-xacro\
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Rviz2
-RUN apt-get update -qq && \
-    apt-get install -y \
-      ros-${ROS_DISTRO}-rviz2 \
+      gz-${GZ_VERSION} \
+      ros-${ROS_DISTRO}-actuator-msgs \
+      ros-${ROS_DISTRO}-behaviortree-cpp \
+      ros-${ROS_DISTRO}-builtin-interfaces \
+      ros-${ROS_DISTRO}-control-msgs \
+      ros-${ROS_DISTRO}-controller-manager \
+      ros-${ROS_DISTRO}-gz-ros2-control \
+      ros-${ROS_DISTRO}-image-transport \
       ros-${ROS_DISTRO}-moveit-ros-visualization \
-      ros-${ROS_DISTRO}-nav2-rviz-plugins && \
-    rm -rf /var/lib/apt/lists/*
-
-# Install BehaviorTree.CPP
-RUN apt-get update -qq && \
-    apt-get install -y \
-      ros-${ROS_DISTRO}-behaviortree-cpp\
+      ros-${ROS_DISTRO}-nav2-rviz-plugins \
+      ros-${ROS_DISTRO}-rcl-interfaces \
+      ros-${ROS_DISTRO}-rclcpp \
+      ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+      ros-${ROS_DISTRO}-ros-gz \
+      ros-${ROS_DISTRO}-ros2-control \
+      ros-${ROS_DISTRO}-ros2-controllers \
+      ros-${ROS_DISTRO}-rosbag2 \
+      ros-${ROS_DISTRO}-rviz2 \
+      ros-${ROS_DISTRO}-sdformat-urdf \
+      ros-${ROS_DISTRO}-vision-msgs \
+      ros-${ROS_DISTRO}-xacro \
     && rm -rf /var/lib/apt/lists/*
 
 # Make every login shell (bash -l / bash -lc) see BOTH Jazzy (apt) and Space ROS
@@ -85,8 +76,11 @@ RUN mkdir -p /ws/src
 
 WORKDIR /ws
 
-# Copy repo into image. Chown so runtime user can work in /ws when not bind-mounted.
-COPY --chown=${USERNAME}:${USERNAME} . /ws
+# Copy build inputs in cache-friendly order.
+# Dependency manifests and docker scripts rarely change compared to src/,
+# so this keeps external fetch layers warm across normal code edits.
+COPY --chown=${USERNAME}:${USERNAME} deps /ws/deps
+COPY --chown=${USERNAME}:${USERNAME} docker /ws/docker
 
 # Remove any stale colcon artifacts that slipped past .dockerignore
 # (prevents broken package.dsv files from a previous host build)
@@ -136,6 +130,10 @@ RUN for d in /opt/spacetry_deps/space_ros_demos/*; do \
 # Ensure runtime user can read cached deps and work in /ws.
 RUN chown -R ${USERNAME}:${USERNAME} /opt/spacetry_deps /ws
 RUN install -m 0644 /ws/docker/spacetry_ws_overlay.sh /etc/profile.d/spacetry_ws_overlay.sh
+
+# Copy the workspace sources only after dependency import so normal code edits
+# do not force a re-clone of the external demos repository.
+COPY --chown=${USERNAME}:${USERNAME} src /ws/src
 
 # Add runtime user to video and render groups for GPU device access (/dev/dri)
 # Use host's render GID (default 109) so container user can access /dev/dri/renderD*

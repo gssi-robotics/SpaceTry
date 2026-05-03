@@ -21,8 +21,14 @@
 .dockerignore
 
 # Log files
+log/
 logs/
 **/*.log
+**/*.mcap
+
+# Python cache
+**/__pycache__/
+**/*.pyc
 
 # Templates
 **/*.template
