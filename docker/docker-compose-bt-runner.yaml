@@ -1,0 +1,18 @@
+services:
+  bt_runner:
+    image: spacetry:bt-runner
+    environment:
+      - PYTHONUNBUFFERED=1
+      - ROS_DOMAIN_ID=${ROS_DOMAIN_ID:-0}
+      - ROS_LOCALHOST_ONLY=0
+      - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+      # For connecting to rover on another machine, ensure network access
+      - ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
+    volumes:
+      - ../log:/ws/log:rw # for accessing logs in host
+    network_mode: host
+    entrypoint: []
+    command:
+      - bash
+      - -lc
+      - 'source /opt/ros/jazzy/setup.bash && source /opt/ros/spaceros/setup.bash && source /etc/profile && source /ws/install/setup.bash && ros2 run spacetry_bt spacetry_bt_runner --ros-args -p tree_file:=/ws/src/spacetry_bt/trees/base_bt.xml --params-file /ws/src/spacetry_bt/bt_params.yaml'

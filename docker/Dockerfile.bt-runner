@@ -1,0 +1,86 @@
+# Minimal BT Runner Dockerfile
+# Only includes ROS 2 dependencies necessary to run spacetry_bt_runner
+# Much smaller image size compared to full spacetry:dev
+#
+# Build:
+#   docker build -f docker/Dockerfile.bt-runner -t spacetry:bt-runner .
+#
+# Run:
+#   docker run --rm --network host \
+#     -e ROS_DOMAIN_ID=0 \
+#     -e ROS_LOCALHOST_ONLY=0 \
+#     spacetry:bt-runner
+
+ARG ROS_DISTRO=jazzy
+ARG SPACE_ROS_VERSION=jazzy-2025.10.0
+
+FROM osrf/space-ros:${SPACE_ROS_VERSION}
+
+ARG ROS_DISTRO
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
+ENV ROS_DISTRO=${ROS_DISTRO}
+ENV USERNAME=spaceros-user
+ENV HOME=/home/${USERNAME}
+
+USER root
+
+# Install minimal build and runtime dependencies for BT runner
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-vcstool \
+    python3-yaml \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install only ROS 2 packages needed for spacetry_bt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ros-${ROS_DISTRO}-behaviortree-cpp \
+    ros-${ROS_DISTRO}-rclcpp \
+    ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
+    ros-${ROS_DISTRO}-ros2-control \
+    ros-${ROS_DISTRO}-geometry-msgs \
+    ros-${ROS_DISTRO}-std-msgs \
+    ros-${ROS_DISTRO}-rcl-interfaces \
+    ros-${ROS_DISTRO}-builtin-interfaces \
+    && rm -rf /var/lib/apt/lists/*
+
+# Prepare workspace
+RUN mkdir -p /ws/src
+WORKDIR /ws
+
+# Copy only spacetry_bt and minimal dependencies (not the full src/)
+# Copy just the bt package and its direct dependencies
+COPY src/spacetry_bt /ws/src/spacetry_bt
+COPY src/spacetry_mission /ws/src/spacetry_mission
+COPY src/spacetry_monitors /ws/src/spacetry_monitors
+
+# Set up source environment for builds
+RUN echo "source /opt/ros/spaceros/setup.bash" > /etc/profile.d/spacetry_env.sh && \
+    chmod 0644 /etc/profile.d/spacetry_env.sh
+
+# Build workspace in overlay mode
+# CRITICAL: Source BOTH space-ros AND regular jazzy ROS to get all cmake files
+RUN bash -lc ". /opt/ros/jazzy/setup.bash && \
+    . /opt/ros/spaceros/setup.bash && \
+    . /etc/profile && \
+    colcon build --merge-install --packages-select spacetry_bt \
+    --event-handlers console_direct+"
+
+# Switch to non-root user for runtime
+USER ${USERNAME}
+
+# Set up ROS environment for runtime
+ENV PATH="/ws/install/bin:${PATH}"
+
+# Default: run the BT runner with base_bt.xml
+ENTRYPOINT ["bash", "-lc"]
+CMD ["source /opt/ros/jazzy/setup.bash && \
+     source /opt/ros/spaceros/setup.bash && \
+     source /etc/profile && \
+     source /ws/install/setup.bash && \
+     ros2 run spacetry_bt spacetry_bt_runner \
+     --ros-args \
+     -p tree_file:=/ws/install/share/spacetry_bt/trees/base_bt.xml \
+     --params-file /ws/install/share/spacetry_bt/bt_params.yaml"]
