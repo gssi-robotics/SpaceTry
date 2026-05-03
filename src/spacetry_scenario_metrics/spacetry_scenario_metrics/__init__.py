@@ -3,6 +3,7 @@ from .report import render_markdown_report, write_markdown_report
 from .schema import (
     ArtifactPaths,
     DetectionEvent,
+    Event,
     RecoveryEvent,
     ReactionEvent,
     ScenarioMetricsBundle,
@@ -17,6 +18,7 @@ __all__ = [
     "AdaptationEvent",
     "ArtifactPaths",
     "DetectionEvent",
+    "Event",
     "RecoveryEvent",
     "ReactionEvent",
     "ScenarioMetricsBundle",

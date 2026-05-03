@@ -68,6 +68,8 @@ def test_adaptation_event_latency_and_summary_counts() -> None:
     metrics_dict = bundle_to_dict(bundle)
     adaptation_event = metrics_dict["adaptation_events"][0]
     assert adaptation_event["adaptation_latency_ms"] == 2500.0
+    assert adaptation_event["time_s"] == 12.5
+    assert adaptation_event["event_id"] == "adaptation_001"
     assert metrics_dict["summary_metrics"]["autonomy_reaction_status"] is True
     assert metrics_dict["summary_metrics"]["autonomy_reaction_count"] == 1
     assert metrics_dict["summary_metrics"]["adaptation_event_count"] == 1
@@ -75,6 +77,8 @@ def test_adaptation_event_latency_and_summary_counts() -> None:
     assert metrics_dict["summary_metrics"]["injected_uncertainty_source"] == [
         "runtime_blocking_rock"
     ]
+    assert metrics_dict["trigger_events"][0]["event_id"] == "trigger_001"
+    assert metrics_dict["reaction_events"][0]["event_id"] == "reaction_001"
 
 
 def test_report_summarizes_events_instead_of_dumping_raw_sections() -> None:

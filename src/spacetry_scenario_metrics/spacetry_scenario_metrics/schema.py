@@ -9,65 +9,54 @@ JSONScalar = None | bool | int | float | str
 JSONValue = JSONScalar | list["JSONValue"] | dict[str, "JSONValue"]
 
 
-@dataclass
-class TriggerEvent:
-    trigger_id: str
+@dataclass(kw_only=True)
+class Event:
+    event_id: str
     time_s: Optional[float]
-    kind: str
-    source: Optional[str] = None
-    description: Optional[str] = None
     evidence_refs: list[str] = field(default_factory=list)
     metadata: dict[str, JSONValue] = field(default_factory=dict)
 
 
-@dataclass
-class DetectionEvent:
-    detection_id: str
-    time_s: Optional[float]
+@dataclass(kw_only=True)
+class TriggerEvent(Event):
+    kind: str
+    source: Optional[str] = None
+    description: Optional[str] = None
+
+
+@dataclass(kw_only=True)
+class DetectionEvent(Event):
     source: Optional[str] = None
     attribution_status: str = "unresolved"
     candidate_sources: list[str] = field(default_factory=list)
     linked_trigger_ids: list[str] = field(default_factory=list)
-    evidence_refs: list[str] = field(default_factory=list)
     minimum_fault_distance_m: Optional[float] = None
-    metadata: dict[str, JSONValue] = field(default_factory=dict)
 
 
-@dataclass
-class ReactionEvent:
-    reaction_id: str
-    time_s: Optional[float]
+@dataclass(kw_only=True)
+class ReactionEvent(Event):
     observed_control_rationale: str
     reaction_scope: str = "indeterminate"
     attribution_status: str = "unresolved"
     active_context_at_reaction: dict[str, JSONValue] = field(default_factory=dict)
     candidate_sources: list[str] = field(default_factory=list)
     linked_trigger_ids: list[str] = field(default_factory=list)
-    evidence_refs: list[str] = field(default_factory=list)
-    metadata: dict[str, JSONValue] = field(default_factory=dict)
 
 
-@dataclass
-class RecoveryEvent:
-    recovery_id: str
-    time_s: Optional[float]
+@dataclass(kw_only=True)
+class RecoveryEvent(Event):
     linked_reaction_ids: list[str] = field(default_factory=list)
     recovery_latency_ms: Optional[float] = None
-    evidence_refs: list[str] = field(default_factory=list)
-    metadata: dict[str, JSONValue] = field(default_factory=dict)
 
 
-@dataclass
-class AdaptationEvent:
-    adaptation_event_id: str
+@dataclass(kw_only=True)
+class AdaptationEvent(Event):
     trigger_id: str
     reaction_id: str
     adaptation_latency_ms: Optional[float]
     attribution_scope: str = "indeterminate"
     attribution_confidence: str = "unresolved"
     candidate_sources: list[str] = field(default_factory=list)
-    evidence_refs: list[str] = field(default_factory=list)
-    metadata: dict[str, JSONValue] = field(default_factory=dict)
 
 
 @dataclass

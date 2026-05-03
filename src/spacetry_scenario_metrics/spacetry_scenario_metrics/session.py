@@ -75,7 +75,7 @@ class ScenarioMetricsSession:
     ) -> str:
         trigger_id = trigger_id or self._next_id("trigger")
         self._trigger_events[trigger_id] = TriggerEvent(
-            trigger_id=trigger_id,
+            event_id=trigger_id,
             time_s=_round_or_none(time_s),
             kind=kind,
             source=source,
@@ -102,7 +102,7 @@ class ScenarioMetricsSession:
         self._require_trigger_ids(linked_trigger_ids)
         detection_id = detection_id or self._next_id("detection")
         self._detection_events[detection_id] = DetectionEvent(
-            detection_id=detection_id,
+            event_id=detection_id,
             time_s=_round_or_none(time_s),
             source=source,
             attribution_status=attribution_status,
@@ -132,7 +132,7 @@ class ScenarioMetricsSession:
         self._require_trigger_ids(linked_trigger_ids)
         reaction_id = reaction_id or self._next_id("reaction")
         self._reaction_events[reaction_id] = ReactionEvent(
-            reaction_id=reaction_id,
+            event_id=reaction_id,
             time_s=_round_or_none(time_s),
             observed_control_rationale=observed_control_rationale,
             reaction_scope=reaction_scope,
@@ -162,7 +162,7 @@ class ScenarioMetricsSession:
             recovery_latency_ms = _duration_ms(reaction.time_s, time_s)
         recovery_id = recovery_id or self._next_id("recovery")
         self._recovery_events[recovery_id] = RecoveryEvent(
-            recovery_id=recovery_id,
+            event_id=recovery_id,
             time_s=_round_or_none(time_s),
             linked_reaction_ids=linked_reaction_ids,
             recovery_latency_ms=_round_or_none(recovery_latency_ms),
@@ -189,7 +189,8 @@ class ScenarioMetricsSession:
         reaction = self._reaction_events[reaction_id]
         adaptation_event_id = adaptation_event_id or self._next_id("adaptation")
         self._adaptation_events[adaptation_event_id] = AdaptationEvent(
-            adaptation_event_id=adaptation_event_id,
+            event_id=adaptation_event_id,
+            time_s=reaction.time_s,
             trigger_id=trigger_id,
             reaction_id=reaction_id,
             adaptation_latency_ms=_duration_ms(trigger.time_s, reaction.time_s),
@@ -216,23 +217,23 @@ class ScenarioMetricsSession:
     ) -> ScenarioMetricsBundle:
         ordered_trigger_events = sorted(
             self._trigger_events.values(),
-            key=lambda item: (item.time_s is None, item.time_s, item.trigger_id),
+            key=lambda item: (item.time_s is None, item.time_s, item.event_id),
         )
         ordered_detection_events = sorted(
             self._detection_events.values(),
-            key=lambda item: (item.time_s is None, item.time_s, item.detection_id),
+            key=lambda item: (item.time_s is None, item.time_s, item.event_id),
         )
         ordered_reaction_events = sorted(
             self._reaction_events.values(),
-            key=lambda item: (item.time_s is None, item.time_s, item.reaction_id),
+            key=lambda item: (item.time_s is None, item.time_s, item.event_id),
         )
         ordered_recovery_events = sorted(
             self._recovery_events.values(),
-            key=lambda item: (item.time_s is None, item.time_s, item.recovery_id),
+            key=lambda item: (item.time_s is None, item.time_s, item.event_id),
         )
         ordered_adaptation_events = sorted(
             self._adaptation_events.values(),
-            key=lambda item: (item.adaptation_latency_ms is None, item.adaptation_latency_ms, item.adaptation_event_id),
+            key=lambda item: (item.time_s is None, item.time_s, item.event_id),
         )
 
         summary_metrics = replace(summary_metrics or ScenarioSummaryMetrics())
