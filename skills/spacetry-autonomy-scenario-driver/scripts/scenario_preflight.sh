@@ -32,6 +32,7 @@ SKILL_CHECKSUM_STATUS="FAIL"
 SKILL_COMMIT_STATUS="WARN"
 PACKAGE_SYNC_STATUS="SKIP"
 PACKAGE_BUILD_STATUS="SKIP"
+SCENARIO_TIMEOUT_STATUS="SKIP"
 
 usage() {
   cat <<'EOF'
@@ -194,6 +195,28 @@ package_install_marker_mtime_in_container() {
   local package_name="$2"
   docker exec "$container" bash -lc \
     "find /ws/install/share/'$package_name' -maxdepth 1 -type f \\( -name package.dsv -o -name package.xml \\) -printf '%T@\n' | sort -n | tail -1"
+}
+
+first_numeric_yaml_field() {
+  local yaml_file="$1"
+  local field_name="$2"
+  python3 - "$yaml_file" "$field_name" <<'PY'
+import re
+import sys
+
+yaml_file = sys.argv[1]
+field_name = sys.argv[2]
+pattern = re.compile(r"^\s*" + re.escape(field_name) + r"\s*:\s*([0-9]+(?:\.[0-9]+)?)\s*$")
+
+with open(yaml_file, encoding="utf-8") as handle:
+    for raw_line in handle:
+        match = pattern.match(raw_line)
+        if match:
+            print(match.group(1))
+            raise SystemExit(0)
+
+raise SystemExit(1)
+PY
 }
 
 while [[ $# -gt 0 ]]; do
@@ -470,6 +493,41 @@ else
   record_check "package_build_sync" "WARN" "No runtime package was provided, so installed-package freshness was not checked."
 fi
 
+if [[ -n "$SCENARIO_PACKAGE" ]]; then
+  scenario_config_path="${ROOT_DIR}/src/${SCENARIO_PACKAGE}/config/scenario_config.yaml"
+  bt_params_path="${ROOT_DIR}/src/spacetry_bt/bt_params.yaml"
+  if [[ ! -f "$scenario_config_path" ]]; then
+    SCENARIO_TIMEOUT_STATUS="WARN"
+    record_check "scenario_timeout_budget" "WARN" "Scenario config '${scenario_config_path}' is missing, so timeout-vs-BT-horizon could not be checked."
+  elif [[ ! -f "$bt_params_path" ]]; then
+    SCENARIO_TIMEOUT_STATUS="WARN"
+    record_check "scenario_timeout_budget" "WARN" "BT params file '${bt_params_path}' is missing, so timeout-vs-BT-horizon could not be checked."
+  else
+    scenario_timeout_s="$(first_numeric_yaml_field "$scenario_config_path" timeout_s || true)"
+    scenario_bt_horizon_s="$(first_numeric_yaml_field "$scenario_config_path" baseline_bt_evaluation_horizon_s || true)"
+    bt_max_runtime_s="$(first_numeric_yaml_field "$bt_params_path" max_runtime_s || true)"
+    required_horizon_s="$scenario_bt_horizon_s"
+    required_horizon_source="scenario baseline_bt_evaluation_horizon_s"
+    if [[ -z "$required_horizon_s" ]]; then
+      required_horizon_s="$bt_max_runtime_s"
+      required_horizon_source="baseline BT max_runtime_s"
+    fi
+
+    if [[ -z "$scenario_timeout_s" || -z "$required_horizon_s" ]]; then
+      SCENARIO_TIMEOUT_STATUS="WARN"
+      record_check "scenario_timeout_budget" "WARN" "Could not parse both scenario timeout and the required BT evaluation horizon for comparison."
+    elif awk -v scenario_timeout="$scenario_timeout_s" -v bt_timeout="$required_horizon_s" 'BEGIN { exit !(scenario_timeout + 0 >= bt_timeout + 0) }'; then
+      SCENARIO_TIMEOUT_STATUS="PASS"
+      record_check "scenario_timeout_budget" "PASS" "Scenario timeout ${scenario_timeout_s}s is at least the required BT evaluation horizon ${required_horizon_s}s from ${required_horizon_source}."
+    else
+      SCENARIO_TIMEOUT_STATUS="FAIL"
+      record_check "scenario_timeout_budget" "FAIL" "Scenario timeout ${scenario_timeout_s}s is shorter than the required BT evaluation horizon ${required_horizon_s}s from ${required_horizon_source}. Increase the scenario timeout or declare the correct scenario-specific baseline BT evaluation horizon before trusting a full_run."
+    fi
+  fi
+else
+  record_check "scenario_timeout_budget" "WARN" "No scenario package was provided, so timeout-vs-BT-horizon could not be checked."
+fi
+
 main_run_ready=1
 main_run_reasons=()
 
@@ -524,6 +582,11 @@ fi
 if (( ${#RUNTIME_PACKAGES[@]} > 0 )) && [[ "$PACKAGE_BUILD_STATUS" != "PASS" ]]; then
   main_run_ready=0
   main_run_reasons+=("one or more installed runtime packages are older than the current /ws/src copies")
+fi
+
+if [[ "$SCENARIO_TIMEOUT_STATUS" == "FAIL" ]]; then
+  main_run_ready=0
+  main_run_reasons+=("scenario timeout budget is shorter than the baseline BT horizon")
 fi
 
 printf 'Scenario preflight summary\n'

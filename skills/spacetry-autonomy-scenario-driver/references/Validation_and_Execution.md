@@ -39,6 +39,7 @@ This preflight checks:
 - the latest skill commit and whether the tracked skill files are dirty
 - whether every declared runtime package matches the copy under `/ws/src` in the running container
 - whether every declared runtime package under `/ws/install` is at least as new as the current `/ws/src` copy
+- whether the scenario timeout budget is at least as long as the required baseline BT evaluation horizon, using `baseline_bt_evaluation_horizon_s` from the scenario config when present and falling back to BT `max_runtime_s` otherwise
 
 During iterative tuning, when only files inside repo-local runtime packages changed, agents may use a lighter validation loop:
 
@@ -128,7 +129,7 @@ skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh \
 - If necessary, mount the `log/` folder as a volume in Docker, for example `-v $(pwd)/log:/ws/log`, to ensure that rosbags, metrics files, runtime logs, and the final report are saved to the host machine.
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario.
 - The created or updated scenario driver package should be copied into the running Docker container before it is built or executed.
-- The scenario runtime budget must not be shorter than the baseline BT evaluation horizon. If the baseline mission or BT configuration expects a longer run to express its nominal autonomy behavior, the scenario timeout must be at least that long.
+- The scenario runtime budget must not be shorter than the baseline BT evaluation horizon. When the scenario defines a scenario-specific `baseline_bt_evaluation_horizon_s`, use that as the required horizon for trusted `full_run` readiness; otherwise fall back to the baseline BT `max_runtime_s`.
 
 ### Interrupted Runs
 

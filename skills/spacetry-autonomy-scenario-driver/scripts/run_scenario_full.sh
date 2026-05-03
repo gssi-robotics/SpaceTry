@@ -329,8 +329,8 @@ if [[ -n "$interrupter_pid" ]]; then
   kill "$interrupter_pid" 2>/dev/null || true
 fi
 
-if [[ -n "$HOST_RUN_DIR" && -d "${HOST_RUN_DIR}/metrics" ]]; then
-  metrics_file="$(find "${HOST_RUN_DIR}/metrics" -maxdepth 1 -type f -name '*_metrics.json' | sort | head -n 1)"
+if [[ -n "$HOST_RUN_DIR" && -d "$HOST_RUN_DIR" ]]; then
+  metrics_file="$(find "${HOST_RUN_DIR}" -maxdepth 4 -type f -name '*_metrics.json' | sort | head -n 1)"
 fi
 
 if [[ -n "$metrics_file" ]]; then

@@ -19,6 +19,9 @@ Treat the implementation-to-validation handoff as a hard build gate.
 - First copy every updated runtime package into `/ws/src` in the running container.
 - Rebuild those updated packages successfully inside the container before any validation or execution launch.
 - If that rebuild fails, remain in implementation/fix mode instead of treating the scenario as ready for validation.
+- Keep the scenario timeout budget at least as large as the required baseline BT evaluation horizon so a trusted `full_run` can end on `goal_reached` or natural timeout instead of external teardown.
+- If the scenario defines a scenario-specific `baseline_bt_evaluation_horizon_s`, use that value as the required horizon.
+- Otherwise fall back to the baseline BT `max_runtime_s`.
 
 This applies both to the scenario package itself and to any repo-local runtime helper package used by the scenario.
 
