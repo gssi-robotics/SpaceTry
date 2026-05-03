@@ -2,20 +2,24 @@
 
 Use Docker for all build, validation, and execution steps.
 
+Use the authoritative Docker execution order from `AGENTS.md` first. This document adds scenario-driver-specific validation and execution requirements on top of that repo-wide order.
+
 ## Validation
 
 For skill-driven scenario execution, rely on `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` to decide whether the image and running container are fresh enough for a trusted `full_run`.
+
+If the `spacetry` service is not running yet, start it with `./scripts/run.sh` before using preflight. Preflight is a readiness gate for an already started container, not the container starter.
 
 Apply the build-handoff and shutdown rules from `Execution_Lifecycle.md` before validating or executing a generated scenario.
 
 Rebuild the scenario driver related packages whenever scenario components have changed or new ones were added.
 
-Apply Docker rebuild rules in this order:
+Apply Docker rebuild rules in the same order defined by `AGENTS.md`:
 
 - if `docker/`, `deps/`, or any non-scenario package under `src/` changed, rebuild the `spacetry:dev` image with `bash scripts/build.sh` and recreate the container before executing the scenario
 - if only repo-local runtime packages such as `src/spacetry_scenario_*` changed, keep the existing image, copy each updated runtime package into `/ws/src`, and rebuild those packages inside the running container
 
-Before running a `full_run` that should count as the main trusted result for the current scenario iteration, prefer the maintained readiness check:
+Before running a `full_run` that should count as the main trusted result for the current scenario iteration, and only after the container is running plus the updated runtime packages have been copied and rebuilt, prefer the maintained readiness check:
 
 ```bash
 skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh \

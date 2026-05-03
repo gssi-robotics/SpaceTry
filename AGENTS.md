@@ -38,11 +38,7 @@ When modifying ROS2 packages:
 3. **Source code** - Follow the package's language conventions (C++, Python)
 4. **Configuration files** - In `config/` subdirectories as YAML
 
-After modifying any ROS2 files they should be validated by building and running the simulation:
-
-```bash
- source /opt/ros/spaceros/setup.bash && source /etc/profile && colcon build --merge-install --event-handlers console_direct+
- ```
+After modifying any ROS2 files they should be validated by rebuilding and running them in Docker using the workflow defined in this file. Do not use host-side ROS, `colcon` or `python` commands for validation.
 
 ### 2. Running the Simulation
 
@@ -83,38 +79,69 @@ This starts:
 4. **Isolation** - Multiple projects can coexist without interference
 5. **CI/CD Ready** - Same environment as automated testing
 
-### Verify Running and Built Container Images
+### Instruction Scope
 
-Treat Docker readiness as two separate checks:
+`AGENTS.md` is the authoritative source for Docker build, rebuild, container-state, and runtime-package-sync decisions used by coding agents.
+
+- Treat [README.md](README.md) as end-user documentation only.
+- Do not use README execution steps to decide whether an agent should rebuild the image, start the container, copy runtime packages, or trust container freshness.
+- If README and `AGENTS.md` appear to overlap, follow `AGENTS.md`.
+
+### Authoritative Docker Execution Order
+
+Treat Docker readiness as two separate concerns:
 
 1. **Baseline image freshness** — `spacetry:dev` must be rebuilt whenever `docker/`, `deps/`, or any non-scenario package under `src/` changes.
 2. **Runtime package sync** — changes limited to repo-local runtime packages such as `src/spacetry_scenario_*` do not require an image rebuild, but every updated runtime package must be copied into `/ws/src` and rebuilt inside the running container before launch.
 
-If you need to stop the container, run the command:
+Agents must follow this order:
+
+1. **Classify the change**
+   - If `docker/`, `deps/`, or any non-scenario package under `src/` changed, treat it as a baseline image-owned change.
+   - If only repo-local runtime packages such as `src/spacetry_scenario_*` changed, treat it as a runtime-package-only change.
+2. **Rebuild the image when baseline image-owned inputs changed**
+   - Run `bash scripts/build.sh`.
+3. **Ensure the container is running**
+   - If the `spacetry` service is not running, start it with `./scripts/run.sh`.
+   - If the image was rebuilt, recreate the container from that image before continuing.
+4. **Sync runtime packages**
+   - Copy every updated repo-local runtime package into `/ws/src` inside the running container.
+5. **Rebuild runtime packages inside the container**
+   - Rebuild the affected packages so `/ws/install` is not older than `/ws/src`.
+6. **Run trusted readiness checks only after steps 1-5**
+   - For scenario-driver `full_run` executions, use `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` after the container is running and the runtime packages have been copied and rebuilt.
+7. **Launch or validate**
+   - Only after the above steps should agents run scenario validation, `smoke`, `tuning`, `full_run`, rover launches, or other ROS/Gazebo execution commands.
+
+`scenario_preflight.sh` is a readiness gate, not the container starter. A reported “container not running” state means the operational sequence has not reached step 3 yet.
+
+If you need to stop the container, run:
 
 ```bash
 docker compose -f docker/docker-compose.yaml down
 ```
  
-Before running any command, verify if the docker container is built with:
+Useful checks inside that sequence:
+
+- verify the image exists:
 
 ```bash
 docker compose -f docker/docker-compose.yaml images
 ```
 
-If the docker container is not built, build it with:
+- rebuild the image when required:
 
 ```bash
 bash scripts/build.sh
 ```
 
-Then, verify if the docker container is running with:
+- verify whether the service is running:
 
 ```bash
 docker compose -f docker/docker-compose.yaml ps
 ```
 
-For scenario-driver `full_run` executions, use `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` as the authoritative freshness check. `scripts/run.sh` is only responsible for starting the container and waiting for it to reach a running state.
+For scenario-driver `full_run` executions, use `skills/spacetry-autonomy-scenario-driver/scripts/scenario_preflight.sh` as the authoritative freshness check after the container has been started and runtime packages have been rebuilt. `scripts/run.sh` is only responsible for starting the container and waiting for it to reach a running state.
 
 A running container is not sufficient evidence by itself. Agents must assume the container is valid only when both of these are true:
 

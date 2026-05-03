@@ -59,6 +59,8 @@ These are different problems and need different checks.
 
 ## Operational Guidance
 
+Use `AGENTS.md` for the authoritative Docker execution order. This note explains why those steps matter; it does not replace the repo-wide operational sequence.
+
 - Use `scripts/scenario_preflight.sh` to record the current skill-tree checksum by default and to check Docker daemon access, baseline image freshness, container-versus-image identity, optional skill checksum or commit pinning, Docker auth health, and host-versus-container runtime package sync before a `full_run` that should count as the main trusted result.
 - Treat imported dependencies from `deps/spacetry.repos` as image-owned inputs. If they must change, rebuild the image.
 - Treat repo-local runtime packages under `src/` as runtime-copied inputs. If they change, refresh `/ws/src/<package>` inside the running container before build or launch.

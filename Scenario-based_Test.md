@@ -16,6 +16,8 @@ As a user of the skill, you just need to follow the steps that concern the `User
  3. Supervise the generation and execution of the scenario driver
  4. Analyse the outputted report and collected metrics from the scenario execution in simulation
 
+When the agent transitions from generation into validation and execution, it should follow the authoritative Docker execution order in [AGENTS.md](AGENTS.md) plus the scenario-driver execution references under [skills/spacetry-autonomy-scenario-driver/references](skills/spacetry-autonomy-scenario-driver/references). The steps in [README.md](README.md) are end-user oriented and should not be used by the agent as the operational decision source for rebuild, container-state, or freshness checks.
+
 Below there are instructions and examples of going through the workflow.
 
 ## IDE and agent compatibility
