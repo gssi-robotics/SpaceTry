@@ -10,8 +10,13 @@ Write the scenario in terms of these fields:
 - `space_domain`: isolated, contiguous, or scattered when the fault is spatial
 - `time_domain`: transient, permanent, or intermittent when the fault is temporal
 - `trigger`: simulation time or robot-state predicate
-- `core_metrics`: details below under **Core Metrics**
-- `additional_metrics`: mission-specific metrics requested by the user or needed for the scenario
+- `trigger_events`: recorded moments where adaptation may be requested, including injected uncertainties and relevant baseline triggers
+- `detection_events`: recorded detection candidates or attributed detections, including their timing and evidence references
+- `reaction_events`: recorded non-nominal rover reactions, including rationale, scope, attribution status, and active context
+- `recovery_events`: recorded recovery or stable-progress observations linked to one or more reactions
+- `adaptation_events`: recorded trigger-to-reaction pairings with `adaptation_latency_ms` and attribution metadata
+- `summary_metrics`: normalized stable run-level metrics for comparison across scenarios
+- `additional_metrics`: scenario-specific extras, user-requested metrics, or any new metric needed when it is not already covered by the normalized `summary_metrics` schema
 - `baseline_uncertainties`: a short inventory of uncertainties already present in the baseline SpaceTry source code, mission, world, monitors, and launch defaults that can affect the mission without any new scenario injection
 - `primary_evaluation_target`: the main autonomy concern or injected uncertainty the scenario is primarily intended to evaluate
 - `secondary_injected_uncertainties`: zero or more additional injected uncertainties introduced in the same run
@@ -22,6 +27,7 @@ Write the scenario in terms of these fields:
 - `injected_outcome_assessment`: PASS, DEGRADED, FAIL, UNTESTED, or INCONCLUSIVE for autonomy exercised by scenario-injected uncertainties
 - `report`: the generated Markdown file under the bind-mounted host `log/` folder with the results of running the scenario, including metric values and logged signals
 - `baseline_map_assessment`: a short statement of which baseline goals and obstacles already exist in the active world and how they affect route feasibility, deadline realism, and uncertainty placement
+- `monitor_handling`: internal normalized structure for the monitors that can affect trigger gating, attribution logic, or report interpretation for the scenario
 - `fault_attribution_rule`: explicit rule for deciding whether a detection or reaction is attributable to the injected uncertainty rather than baseline hazards, nominal behavior, or unrelated monitor violations
 - `reaction_scope_rule`: explicit rule for deciding whether a real rover reaction counts as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
 - `control_rationale_rule`: explicit rule for how the scenario records and classifies observed control-command changes such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`, independently from whether the injected uncertainty receives attribution credit
@@ -61,38 +67,75 @@ The `runtime_parameter_interface` must at minimum include:
 
 where `transport` should be `inline_launch_dict` for scenario-driver ROS parameters in this skill.
 
+## Monitor Handling
+
+The internal contract must explicitly say how the scenario uses monitor topics at runtime.
+
+The `monitor_handling` structure is an internal planning artifact for reproducibility and attribution. It should be derived from the user prompt's free-form monitor notes, plus any monitor behavior discovered while inspecting the monitors package, launch wiring, or runtime evidence.
+
+Use `monitor_handling` only for monitors that are material to the scenario design or to interpreting the run. Do not turn it into a full catalog of all baseline monitors unless they genuinely affect the scenario.
+
+Each entry should include at minimum:
+
+- `monitor_name`
+- `topic`
+- `consumer_node`
+- `affects_trigger_gating`
+- `affects_attribution`
+- `affects_report_interpretation`
+- `rationale`
+
+Use explicit booleans for the three `affects_*` fields rather than a single enum.
+
+If a monitor is a plausible confound or was reviewed during planning but is intentionally not consumed by the scenario, you may still keep an internal entry with all `affects_*` fields set to `false` and a short rationale. Do not surface those non-influential entries in the final report unless they actually affected runtime interpretation.
+
 When multiple injected uncertainties are present:
 
 - the contract should still identify one `primary_evaluation_target`
 - `secondary_injected_uncertainties` may be related or unrelated to that primary target
 - `interaction_hypothesis` is optional, not required
 
-## Core Metrics
+## Event Collections And Summary Metrics
 
-Define measurable metrics for autonomy evaluation:
+Use an event-centric data model for autonomy evaluation.
 
-- **Adaptation speed**: Time in milliseconds between uncertainty injection and the first attributable rover reaction
-- **Obstacle detection latency**: Time in milliseconds between uncertainty injection and the first attributable obstacle evidence made available on the autonomy-facing perception interface actually consumed by the behavior under test. When the scenario injects or degrades interpreted obstacle topics, use that consumer-facing interface rather than raw sensor fallback
-- **Autonomy reaction status**: Boolean indicating whether the rover performed a genuine non-nominal autonomy reaction during the run, regardless of whether it was attributable to the injected uncertainty
-- **Detection signal source**: Topic, sensor, or interface that produced the credited detection, for example `/obstacle/state`, `/obstacle/front`, or `/scan`
-- **Observed control rationale**: The best classification of the observed rover maneuver at the reaction point, such as `goal_alignment`, `obstacle_avoidance`, `replan_execution`, `monitor_enforcement`, or `unknown`
-- **Reaction scope**: Short string classifying whether the observed reaction is `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
-- **Reaction attribution status**: Boolean indicating whether the injected uncertainty receives causal credit for the observed reaction, separate from whether the maneuver itself is classifiable
-- **Active context at reaction**: Structured snapshot or key-value map of relevant runtime conditions at the reaction point, such as nearby baseline hazards, nearby injected faults, active monitors, obstacle-state signals, planner state, BT state, progress trend, or goal proximity
-- **Control rationale at reaction**: Optional legacy compatibility field. If present, it must match `observed_control_rationale` and must not be used as a proxy for injected-fault attribution
+The scenario driver should record:
+
+- **Trigger events**: Every moment where adaptation may be requested, including runtime injections and any baseline trigger that materially affects interpretation
+- **Detection events**: Detection candidates or attributed detections with timing, linked trigger IDs, evidence references, and optional minimum fault distance
+- **Reaction events**: Every recorded non-nominal rover reaction, with `observed_control_rationale`, `reaction_scope`, `attribution_status`, `active_context_at_reaction`, `candidate_sources`, and `evidence_refs`
+- **Recovery events**: Recovery or stable-progress observations linked to one or more reactions
+- **Adaptation events**: Explicit trigger-to-reaction pairings. Each adaptation event must include `trigger_id`, `reaction_id`, `adaptation_latency_ms`, attribution metadata, candidate sources, and evidence references
+
+The `summary_metrics` section should keep only normalized stable run-level values meant to stay comparable across scenarios, such as:
+
+- **Autonomy reaction status**: Boolean indicating whether the rover performed one or more genuine non-nominal reactions during the run
+- **Autonomy reaction count**: Count of recorded reaction events
+- **Adaptation event count**: Count of recorded adaptation events
+- **Detection event count**: Count of recorded detection events
+- **Recovery event count**: Count of recorded recovery events
+- **Detection signal source**: Topic, sensor, or interface that produced the credited detection summary, for example `/obstacle/state`, `/obstacle/front`, or `/scan`
 - **Safety preservation**: Key-value pairs with safety constraints from monitors and boolean preservation state
 - **Goal viability**: Key-value pairs with mission goal and boolean indicating goal viability
-- **Recovery duration**: Time in milliseconds between rover reaction to triggered uncertainty and reaction outcome
 - **Route deviation**: Maximum or average lateral deviation between the full executed route and the nominal route over the whole run. If the scenario also needs disturbance-scoped deviation, report it separately as an additional metric such as `post_injection_route_deviation_m`
-- **Detection attribution status**: Boolean indicating whether the credited detection can be distinguished from baseline hazards, unrelated obstacle signals, or other confounding runtime events
-- **Minimum fault distance at detection**: Rover-to-injected-fault distance in meters when detection is credited
+- **Detection attribution status**: Boolean indicating whether the credited detection summary can be distinguished from baseline hazards, unrelated obstacle signals, or other confounding runtime events
+- **Minimum fault distance at detection**: Rover-to-injected-fault distance in meters when a credited detection summary is available
 - **Baseline-confound status**: Boolean or short string indicating whether a baseline obstacle, monitor violation, or unrelated runtime condition could explain the credited detection or reaction
 - **Injected-uncertainty encounter status**: Boolean indicating whether the rover reached the spatial, temporal, or state conditions needed for the injected uncertainty to meaningfully affect behavior
 - **Evaluation window after encounter**: Time in seconds between the first confirmed encounter with the injected uncertainty and scenario termination, timeout, or report finalization
 - **Baseline-uncertainty exercised status**: Boolean indicating whether one or more baseline uncertainties materially influenced rover behavior during the run
-- **Attribution scope**: Short string such as `baseline_only`, `injected_only`, `baseline_and_injected`, or `indeterminate`
-- **Injected uncertainty source**: Short string or list indicating which injected uncertainty or uncertainties a credited event is associated with when that is knowable
-- **Additional mission-specific metrics**: Any extra metrics requested by the user or needed for the scenario, each with an explicit unit or boolean status and a short description
+- **Injected uncertainty source**: Short string or list indicating which injected uncertainty or uncertainties were materially involved in the recorded adaptation events when that is knowable
+- **Do not add ad hoc prompt-specific metrics here**: If a metric was requested by the user or introduced by scenario design and it is not already part of the normalized `summary_metrics` schema, place it under `additional_metrics`
+
+Use `additional_metrics` for:
+
+- user-requested metrics from the prompt when they are not already represented by an existing normalized `summary_metrics` field
+- scenario-specific extras that are useful for interpretation but are not part of the shared comparison schema
+- any new metric introduced during development for a specific uncertainty family or observability need
+
+Do not duplicate a metric in both sections just because the user requested it. If a requested metric already matches a normalized `summary_metrics` field such as `safety_preservation`, `goal_viability`, or `route_deviation_m`, satisfy the request through `summary_metrics` and use `additional_metrics` only for the remaining non-canonical items.
+
+Do not collapse all adaptation behavior into a single run-level `adaptation_speed_ms`. Record every adaptation event separately with `adaptation_latency_ms`.
 
 Fault or injected-reaction detections must satisfy scenario-specific attribution checks such as expected sensing range, relative geometry, and consistency with the injected fault subject.
 
@@ -100,7 +143,7 @@ If the autonomy stack consumes interpreted obstacle topics or other processed pe
 
 If raw-sensor timing is also analytically useful, report it as a separate additional metric such as `raw_scan_detection_latency_ms` instead of overloading the core obstacle-detection metric.
 
-Motion reactions must not be credited from `cmd_vel` deviation alone. A credited rover reaction must be supported by a logged observed control rationale and by scenario state.
+Motion reactions must not be credited from `cmd_vel` deviation alone. A recorded reaction event must be supported by a logged observed control rationale and by scenario state.
 
 Use this distinction in the contract and report:
 
@@ -115,6 +158,7 @@ Use the following interpretation rules:
 - `reaction_scope` answers whether the maneuver is explained by baseline conditions, injected conditions, both, or cannot be separated
 - `reaction_attribution_status` answers whether the injected uncertainty receives causal credit
 - `active_context_at_reaction` records the simulation properties that were simultaneously relevant when the maneuver was observed
+- `adaptation_latency_ms` belongs to the `adaptation_events` collection, not to a single run-level scalar
 
 Do not use `unknown` merely because the injected uncertainty did not receive attribution credit. If the maneuver itself is classifiable, record that class in `observed_control_rationale` even when `reaction_scope` is `baseline_only` and `reaction_attribution_status` is `false`.
 
@@ -142,5 +186,9 @@ Before execution, validate the contract against the launch design:
 - every ROS parameter consumed by the scenario driver appears in `runtime_parameter_interface`
 - every parameter listed in `runtime_parameter_interface` is passed via inline launch dict parameters
 - no contract or config artifact is ambiguous about whether it is parsed by the driver or by ROS
+- every monitor that can affect trigger gating, attribution, or report interpretation appears in `monitor_handling`
+- each `monitor_handling` entry uses explicit `affects_*` fields plus a rationale instead of enum shorthand
+- event collections and `summary_metrics` follow the shared schema provided by `src/spacetry_scenario_metrics/`
+- the final report and runtime logs mention only the monitors that actually influenced trigger gating, attribution, or result interpretation during the run
 
 If there is not enough information to infer any of these fields from the mission description, BT, monitors, battery, perception, and world packages, ask the user for clarification instead of making assumptions.

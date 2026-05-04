@@ -277,6 +277,44 @@ def load_jsonl_file(path: Path) -> List[dict]:
     return entries
 
 
+def metrics_section(metrics: Dict[str, object], key: str) -> Dict[str, object]:
+    section = metrics.get(key)
+    return section if isinstance(section, dict) else {}
+
+
+def summary_metric(metrics: Dict[str, object], key: str) -> object:
+    summary = metrics_section(metrics, "summary_metrics")
+    if key in summary:
+        return summary[key]
+
+    core_metrics = metrics.get("core_metrics")
+    if isinstance(core_metrics, dict) and key in core_metrics:
+        return core_metrics[key]
+
+    return metrics.get(key)
+
+
+def additional_metric(metrics: Dict[str, object], key: str) -> object:
+    additional = metrics_section(metrics, "additional_metrics")
+    if key in additional:
+        return additional[key]
+    return metrics.get(key)
+
+
+def outcome_metric(metrics: Dict[str, object], key: str) -> object:
+    outcomes = metrics_section(metrics, "outcomes")
+    if key in outcomes:
+        return outcomes[key]
+    return metrics.get(key)
+
+
+def metadata_metric(metrics: Dict[str, object], key: str) -> object:
+    metadata = metrics_section(metrics, "metadata")
+    if key in metadata:
+        return metadata[key]
+    return metrics.get(key)
+
+
 def load_waypoints(repo_root: Path) -> Dict[str, Tuple[float, float]]:
     waypoints_path = repo_root / "src" / "spacetry_mission" / "config" / "waypoints.yaml"
     if not waypoints_path.exists():
@@ -704,27 +742,11 @@ def event_style(event: Dict[str, object]) -> Optional[Tuple[str, str, str, Optio
     if event_name == "fault_encountered":
         return ("Runtime rock detected", "#bcbd22", "v", None)
     if event_name == "fault_detection_candidate":
-        if "obstacle_override" in source or "obstacle" in source:
-            return ("Obstacle proxy candidate", "#17becf", "s", None)
-        if "/scenario/obstacle" in source:
-            return ("Obstacle proxy candidate", "#17becf", "s", None)
-        if "/scan" in source:
-            return ("Raw scan candidate", "#17becf", "s", None)
-        return ("Detection candidate", "#17becf", "s", None)
+        return None
     if event_name == "fault_detection_attributed":
-        if "/scan" in source:
-            return ("Raw scan detection", "#17becf", "D", None)
-        if (
-            "/scenario/obstacle" in source
-            or "/obstacle/" in source
-            or "obstacle/front" in source
-            or "obstacle/left" in source
-            or "obstacle/right" in source
-        ):
-            return ("Obstacle detected", "#2ca02c", "s", None)
-        return ("Detection attributed", "#2ca02c", "s", None)
+        return None
     if event_name == "raw_scan_detection_attributed":
-        return ("Raw scan detection", "#17becf", "D", None)
+        return None
     if event_name == "reaction_attributed":
         rationale = primary.get("observed_control_rationale") or primary.get("rationale")
         if rationale == "obstacle_avoidance":
@@ -767,6 +789,43 @@ def runtime_rock_pose(
                     "y": float(candidate["y"]),
                     "yaw": float(candidate.get("yaw", 0.0)),
                 }
+    return None
+
+
+def sensor_degradation_injection_time(
+    metrics: Dict[str, object],
+    timeline: List[dict],
+) -> Optional[Tuple[float, str]]:
+    trigger_events = metrics.get("trigger_events")
+    if isinstance(trigger_events, list):
+        for trigger in trigger_events:
+            if not isinstance(trigger, dict):
+                continue
+            if trigger.get("kind") != "uncertainty_injection":
+                continue
+            metadata = trigger.get("metadata")
+            if not isinstance(metadata, dict):
+                continue
+            injected = metadata.get("injected_uncertainties")
+            if not isinstance(injected, list):
+                continue
+            if "degraded_obstacle_interpretation" in injected:
+                time_s = trigger.get("time_s")
+                if isinstance(time_s, (int, float)):
+                    return float(time_s), "degraded_obstacle_interpretation"
+
+    for event in timeline:
+        if not isinstance(event, dict) or event.get("event") != "fault_state_applied":
+            continue
+        fields = event.get("fields")
+        if not isinstance(fields, dict):
+            continue
+        mode = fields.get("mode")
+        if not isinstance(mode, str) or mode == "inactive":
+            continue
+        time_s = event.get("sim_time_s")
+        if isinstance(time_s, (int, float)):
+            return float(time_s), mode
     return None
 
 
@@ -908,6 +967,22 @@ def build_scenario_markers(
             }
         )
 
+    sensor_degradation = sensor_degradation_injection_time(metrics, timeline)
+    if sensor_degradation is not None:
+        event_time_s, degradation_annotation = sensor_degradation
+        xy = nearest_sample_at_time(samples, event_time_s)
+        if xy is not None:
+            append_marker(
+                {
+                    "x": xy[0],
+                    "y": xy[1],
+                    "label": "Sensor degradation injected",
+                    "color": "#e377c2",
+                    "marker": "D",
+                    "annotation": degradation_annotation,
+                }
+            )
+
     for event in timeline:
         if not isinstance(event, dict):
             continue
@@ -1031,30 +1106,37 @@ def scenario_summary_lines(
     if not metrics:
         return []
 
+    runtime_s = metrics.get("runtime_s", metrics.get("elapsed_s", "n/a"))
     lines = [
         f"Scenario: {scenario_root.name}",
-        f"Outcome: {metrics.get('outcome_assessment', 'n/a')}",
+        f"Outcome: {outcome_metric(metrics, 'outcome_assessment')}",
         f"Termination: {metrics.get('termination_reason', 'n/a')}",
-        f"Elapsed: {metrics.get('elapsed_s', 'n/a')} s",
-        f"Injection success: {metrics.get('injection_success', 'n/a')}",
-        f"Encountered: {metrics.get('injected_uncertainty_encounter_status', 'n/a')}",
-        f"Reaction attributed: {metrics.get('reaction_attribution_status', 'n/a')}",
-        f"Detection attributed: {metrics.get('detection_attribution_status', 'n/a')}",
-        f"Route deviation: {metrics.get('route_deviation_m', 'n/a')} m",
-        f"Collision proxy min dist: {metrics.get('collision_proxy_min_distance_m', 'n/a')} m",
+        f"Elapsed: {runtime_s} s",
+        f"Injection status: {metadata_metric(metrics, 'injection_status')}",
+        f"Encountered: {summary_metric(metrics, 'injected_uncertainty_encounter_status')}",
+        f"Reaction attributed: {metadata_metric(metrics, 'primary_reaction_attribution_status')}",
+        f"Detection attributed: {summary_metric(metrics, 'detection_attribution_status')}",
+        f"Route deviation: {summary_metric(metrics, 'route_deviation_m')} m",
+        (
+            "Injected obstacle min dist: "
+            f"{additional_metric(metrics, 'minimum_distance_to_injected_obstacle_m')} m"
+        ),
     ]
 
-    safety = metrics.get("safety_preservation")
+    safety = summary_metric(metrics, "safety_preservation")
     if isinstance(safety, dict):
         lines.extend(
             [
-                f"MR_009: {safety.get('MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY', 'n/a')}",
-                f"MR_011: {safety.get('MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY', 'n/a')}",
-                f"Collision proxy safe: {safety.get('collision_with_dynamic_obstacle', 'n/a')}",
+                f"MR_009: {safety.get('MR_009', safety.get('MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY', 'n/a'))}",
+                f"MR_011: {safety.get('MR_011', safety.get('MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY', 'n/a'))}",
+                (
+                    "Collision safe: "
+                    f"{safety.get('collision_with_obstacle', safety.get('collision_with_dynamic_obstacle', 'n/a'))}"
+                ),
             ]
         )
 
-    goals = metrics.get("goal_viability")
+    goals = summary_metric(metrics, "goal_viability")
     if isinstance(goals, dict):
         lines.extend(
             [
@@ -1073,11 +1155,7 @@ def route_deviation_value(bag_path: Path) -> Optional[float]:
     metrics, _timeline = load_scenario_metrics_and_timeline(scenario_root, bag_path)
     if not metrics:
         return None
-    route_deviation = metrics.get("route_deviation_m")
-    if not isinstance(route_deviation, (int, float)):
-        core_metrics = metrics.get("core_metrics")
-        if isinstance(core_metrics, dict):
-            route_deviation = core_metrics.get("route_deviation_m")
+    route_deviation = summary_metric(metrics, "route_deviation_m")
     if not isinstance(route_deviation, (int, float)):
         return None
     return float(route_deviation)
@@ -1401,7 +1479,11 @@ def plot_overlay_comparison(
         scenario_markers = build_scenario_markers(repo_root, bag_path, samples)
         for marker_info in scenario_markers:
             label = str(marker_info["label"])
-            if label not in {"Rock injected", "Obstacle detected", "Runtime rock injected"}:
+            if label not in {
+                "Rock injected",
+                "Runtime rock injected",
+                "Sensor degradation injected",
+            }:
                 continue
             ax.scatter(
                 [float(marker_info["x"])],
@@ -1485,17 +1567,17 @@ def plot_overlay_comparison(
             Line2D(
                 [0],
                 [0],
-                marker="s",
+                marker="D",
                 linestyle="None",
                 color="#444444",
                 markerfacecolor="#444444",
                 markeredgecolor="#444444",
-                markersize=8,
-                label="Obstacle detected",
+                markersize=7,
+                label="Sensor degradation injected",
             ),
         ]
     )
-    legend_labels.extend(["Rock injected", "Obstacle detected"])
+    legend_labels.extend(["Rock injected", "Sensor degradation injected"])
     ax.legend(
         legend_handles,
         legend_labels,
@@ -1656,7 +1738,7 @@ def parse_args() -> argparse.Namespace:
         "--output",
         type=Path,
         default=None,
-        help="Output PNG path. Defaults to <bag_path>/navigation_2d.png",
+        help="Output plot path. PNG and PDF are both supported via the file extension.",
     )
     parser.add_argument(
         "--title",

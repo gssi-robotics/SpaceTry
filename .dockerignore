@@ -8,6 +8,11 @@
 **/*.gif
 **/*.svg
 
+# Runtime Gazebo model textures must remain in the Docker build context.
+!src/spacetry_models/models/**/materials/**/*.png
+!src/spacetry_models/models/**/materials/**/*.jpeg
+!src/spacetry_models/models/**/materials/**/*.jpg
+
 # Git
 .git
 .gitignore
@@ -16,8 +21,14 @@
 .dockerignore
 
 # Log files
+log/
 logs/
 **/*.log
+**/*.mcap
+
+# Python cache
+**/__pycache__/
+**/*.pyc
 
 # Templates
 **/*.template
