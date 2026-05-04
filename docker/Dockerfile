@@ -13,18 +13,22 @@ ENV COLCON_LOG_PATH=/home/spaceros-user/.colcon/log
 
 USER root
 # Base tools needed to add external apt repositories.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    bash ca-certificates \
-    git python3-vcstool python3-yaml \
-    lsb-release wget gnupg \
- && rm -rf /var/lib/apt/lists/*
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+      bash ca-certificates \
+      git python3-vcstool python3-yaml \
+      lsb-release wget gnupg \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg\
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
 
 # Install SpaceTry runtime + build dependencies in one layer to avoid
 # repeated apt metadata downloads on cold builds.
-RUN apt-get update -qq && \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update -qq && \
     apt-get install -y --no-install-recommends \
       build-essential \
       gz-${GZ_VERSION} \
@@ -35,8 +39,6 @@ RUN apt-get update -qq && \
       ros-${ROS_DISTRO}-controller-manager \
       ros-${ROS_DISTRO}-gz-ros2-control \
       ros-${ROS_DISTRO}-image-transport \
-      ros-${ROS_DISTRO}-moveit-ros-visualization \
-      ros-${ROS_DISTRO}-nav2-rviz-plugins \
       ros-${ROS_DISTRO}-rcl-interfaces \
       ros-${ROS_DISTRO}-rclcpp \
       ros-${ROS_DISTRO}-rmw-cyclonedds-cpp \
@@ -44,7 +46,6 @@ RUN apt-get update -qq && \
       ros-${ROS_DISTRO}-ros2-control \
       ros-${ROS_DISTRO}-ros2-controllers \
       ros-${ROS_DISTRO}-rosbag2 \
-      ros-${ROS_DISTRO}-rviz2 \
       ros-${ROS_DISTRO}-sdformat-urdf \
       ros-${ROS_DISTRO}-vision-msgs \
       ros-${ROS_DISTRO}-xacro \

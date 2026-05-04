@@ -32,6 +32,8 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64 \
+            --cache-from type=gha,scope=spacetry-ci-amd64 \
+            --cache-to type=gha,scope=spacetry-ci-amd64,mode=max \
             -t spacetry:ci \
             -f "${GITHUB_WORKSPACE}/docker/Dockerfile" \
             --load \
