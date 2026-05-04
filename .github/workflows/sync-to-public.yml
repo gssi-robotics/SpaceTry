@@ -34,23 +34,20 @@ jobs:
         run: |
           git fetch public main
 
-      - name: Checkout all content from public except .github folder
+      - name: Merge public changes into private main
         run: |
-          git checkout public/main -- .
-          git reset HEAD .github/
-          git checkout HEAD -- .github/
+          git merge public/main --allow-unrelated-histories -m "Merge public repository changes into private" || true
 
-      - name: Remove sync workflow from being synced to public
+      - name: Remove sync workflow if it exists
         run: |
           rm -f .github/workflows/sync-to-public.yml
-          git add .github/
+          git add .github/workflows/sync-to-public.yml || true
 
-      - name: Add and commit synced changes
+      - name: Commit if there are changes
         run: |
-          git add -A
-          git commit -m "Sync content from public repository (excluding .github and sync workflow)" || echo "No changes to commit"
+          git commit -m "Sync with public repository and remove sync workflow" || echo "No changes to commit"
 
-      - name: Push merged result to public repository
+      - name: Push to public repository
         run: |
           git push -u public HEAD:main --force-with-lease
 
