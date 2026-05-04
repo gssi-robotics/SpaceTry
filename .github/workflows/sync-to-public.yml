@@ -30,27 +30,11 @@ jobs:
         run: |
           git remote add public https://x-access-token:${{ secrets.SPACETRY_SYNC_TOKEN }}@github.com/gssi-robotics/SpaceTry.git
 
-      - name: Fetch public repository
+      - name: Push private main to public repository
         run: |
-          git fetch public main
-
-      - name: Merge public changes into private main
-        run: |
-          git merge public/main --allow-unrelated-histories -m "Merge public repository changes into private" || true
-
-      - name: Resolve conflicts if merge failed
-        run: |
-          if [ -f ".git/MERGE_HEAD" ]; then
-            git checkout --ours .github/workflows/sync-to-public.yml
-            git add .
-            git commit -m "Merge public repository changes into private"
-          fi
-
-      - name: Push to public repository
-        run: |
-          git push -u public HEAD:main --force
+          git push public main --force
 
       - name: Sync complete notification
         if: success()
         run: |
-          echo "✅ Successfully synced with public repository"
+          echo "Successfully synced private repository to public repository"
