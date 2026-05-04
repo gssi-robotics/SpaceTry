@@ -736,6 +736,12 @@ def event_style(event: Dict[str, object]) -> Optional[Tuple[str, str, str, Optio
         source = ""
 
     if event_name == "fault_injected":
+        has_pose_payload = any(
+            {"x", "y"} <= set(candidate) or command_pose_from_payload(candidate) is not None
+            for candidate in event_payload_candidates(event)
+        )
+        if not has_pose_payload:
+            return None
         return ("Rock injected", "#ff7f0e", "^", "runtime rock")
     if event_name in {"fault_injection_verified", "fault_spawn_verification"}:
         return None
@@ -827,6 +833,53 @@ def sensor_degradation_injection_time(
         if isinstance(time_s, (int, float)):
             return float(time_s), mode
     return None
+
+
+def first_timed_event(
+    metrics: Dict[str, object],
+    event_key: str,
+    kind: Optional[str] = None,
+) -> Optional[Dict[str, object]]:
+    events = metrics.get(event_key)
+    if not isinstance(events, list):
+        return None
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        if kind is not None and event.get("kind") != kind:
+            continue
+        if isinstance(event.get("time_s"), (int, float)):
+            return event
+    return None
+
+
+def append_metric_time_marker(
+    append_marker,
+    samples: List[Tuple[float, float, float]],
+    event: Optional[Dict[str, object]],
+    label: str,
+    color: str,
+    marker: str,
+    annotation: str,
+) -> None:
+    if event is None:
+        return
+    time_s = event.get("time_s")
+    if not isinstance(time_s, (int, float)):
+        return
+    xy = nearest_sample_at_time(samples, float(time_s))
+    if xy is None:
+        return
+    append_marker(
+        {
+            "x": xy[0],
+            "y": xy[1],
+            "label": label,
+            "color": color,
+            "marker": marker,
+            "annotation": f"{annotation}\nt={float(time_s):.1f}s",
+        }
+    )
 
 
 def build_scenario_markers(
@@ -982,6 +1035,40 @@ def build_scenario_markers(
                     "annotation": degradation_annotation,
                 }
             )
+
+    trigger_event = first_timed_event(
+        metrics,
+        "trigger_events",
+        kind="uncertainty_injection",
+    )
+    trigger_source = "injected uncertainty"
+    if trigger_event is not None:
+        source = trigger_event.get("source")
+        summary_sources = summary_metric(metrics, "injected_uncertainty_source")
+        if isinstance(summary_sources, list) and summary_sources:
+            trigger_source = str(summary_sources[0])
+        elif isinstance(source, str) and source:
+            trigger_source = source
+    append_metric_time_marker(
+        append_marker,
+        samples,
+        trigger_event,
+        "Injected uncertainty source",
+        "#e377c2",
+        "D",
+        trigger_source,
+    )
+
+    recovery_event = first_timed_event(metrics, "recovery_events")
+    append_metric_time_marker(
+        append_marker,
+        samples,
+        recovery_event,
+        "Recovery complete",
+        "#7f7f7f",
+        "h",
+        "stable progress restored",
+    )
 
     for event in timeline:
         if not isinstance(event, dict):
@@ -1269,7 +1356,7 @@ def plot_path_on_axis(
                 "loc": "center",
                 "bbox_to_anchor": (
                     outpost_xy[0] + 8.0,
-                    (outpost_xy[1] + science_xy[1]) / 2.0,
+                    ((outpost_xy[1] + science_xy[1]) / 2.0) - 7.0,
                 ),
                 "bbox_transform": ax.transData,
             }
