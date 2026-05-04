@@ -36,25 +36,15 @@ jobs:
 
       - name: Merge public changes into private main
         run: |
-          git merge public/main --allow-unrelated-histories -m "Merge public repository changes into private"
+          git merge public/main --allow-unrelated-histories -m "Merge public repository changes into private" || true
 
-      - name: Resolve conflicts in sync workflow (accept private version)
+      - name: Resolve conflicts if merge failed
         run: |
-          git checkout --ours .github/workflows/sync-to-public.yml
-          git add .github/workflows/sync-to-public.yml
-
-      - name: Complete merge if it was incomplete
-        run: |
-          git commit --no-edit || echo "Merge already complete"
-
-      - name: Remove sync workflow before pushing to public
-        run: |
-          rm -f .github/workflows/sync-to-public.yml
-          git add .github/workflows/sync-to-public.yml
-
-      - name: Commit workflow removal if changed
-        run: |
-          git commit -m "Remove sync workflow before syncing to public" || echo "No changes to commit"
+          if [ -f ".git/MERGE_HEAD" ]; then
+            git checkout --ours .github/workflows/sync-to-public.yml
+            git add .
+            git commit -m "Merge public repository changes into private"
+          fi
 
       - name: Push to public repository
         run: |
@@ -63,4 +53,4 @@ jobs:
       - name: Sync complete notification
         if: success()
         run: |
-          echo "Successfully synced with public repository"
+          echo "✅ Successfully synced with public repository"
