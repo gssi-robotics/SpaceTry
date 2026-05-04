@@ -97,6 +97,12 @@ docker compose -f docker/docker-compose.yaml exec spacetry bash -lc "source /opt
 - Before executing a scenario launch, confirm every updated runtime package has been copied into `/ws/src` and that the workspace has already been built so `/ws/install/setup.bash` exists.
 - Before trusting a running container, confirm it is running from the current local `spacetry:dev` image, not a stale older image with the same tag.
 - Scenario launches intended for maintained execution tooling should expose `output_root`, `run_label`, and `record_rosbag` launch arguments. Trusted `full_run` executions should use host-visible paths under `/ws/log`.
+- For maintained wrapper compatibility, write scenario artifacts under one per-run directory rooted at `log/<scenario_name>/<effective_run_label>/`.
+- Keep the required host-visible layout explicit:
+  - `log/<scenario_name>/<effective_run_label>/<scenario_name>_report.md`
+  - `log/<scenario_name>/<effective_run_label>/metrics/`
+  - `log/<scenario_name>/<effective_run_label>/rosbags/`
+  - `log/<scenario_name>/<effective_run_label>/runtime/`
 - Validate incrementally, starting with the launch and adjusting launch configuration and parameters if needed. Then move into the full scenario uninterrupted execution.
 - Prefer the maintained wrapper for labeled execution:
 
@@ -129,7 +135,7 @@ skills/spacetry-autonomy-scenario-driver/scripts/run_scenario_full.sh \
   - classify the injected outcome as `FAIL` only when encounter occurred and the post-encounter observation window was long enough for a fair evaluation
 - If runtime artifacts show that only baseline uncertainties were exercised, report that explicitly and classify the injected-autonomy portion as `UNTESTED`.
 - If a baseline obstacle or monitor clearly explains the observed maneuver, still report the maneuver classification in `observed_control_rationale`; do not force it to `unknown` merely because the injected uncertainty was not the cause.
-- Store the generated report in the bind-mounted host `log/` folder with the name `spacetry_scenario_{scenario_name}_report.md`, ideally inside `log/spacetry_scenario_{scenario_name}/`, so it is accessible from the host machine after running the scenario.
+- Store the generated report in the bind-mounted host `log/` folder at `log/<scenario_name>/<effective_run_label>/<scenario_name>_report.md` so it is accessible from the host machine after running the scenario.
 - If necessary, mount the `log/` folder as a volume in Docker, for example `-v $(pwd)/log:/ws/log`, to ensure that rosbags, metrics files, runtime logs, and the final report are saved to the host machine.
 - Make sure all the folders and files needed for the report are written under bind-mounted Docker volumes so they are accessible from the host machine after running the scenario.
 - The created or updated scenario driver package should be copied into the running Docker container before it is built or executed.
@@ -166,4 +172,4 @@ In the final answer, report the following:
 - whether baseline uncertainty, injected uncertainty, or both were actually exercised during execution
 - any remaining traceability or observability gaps
 
-The generated execution report should be placed under the bind-mounted host `log/` folder, preferably at `log/spacetry_scenario_{scenario_name}/spacetry_scenario_{scenario_name}_report.md`.
+The generated execution report should be placed under the bind-mounted host `log/` folder at `log/<scenario_name>/<effective_run_label>/<scenario_name>_report.md`.

@@ -9,12 +9,12 @@ Use this reference when implementing scenario metrics, event logs, runtime timel
 - If there are any gaps in observability, call them out explicitly instead of inventing nonexistent ROS/Gazebo hooks.
 - Before depending on an existing SpaceTry topic for scenario triggers, derived mission state, or report metrics, confirm that the scenario node subscription QoS matches the publisher QoS used in the stack. In case of doubt, use an explicitly compatible QoS profile instead of the default subscription QoS. If there is a mismatch, treat that as an observability or integration issue to fix before evaluating the autonomy behavior.
 
-Write scenario outputs to the bind-mounted host `log/` folder using the following per-scenario subdirectories:
+Write scenario outputs to the bind-mounted host `log/` folder using the following per-run structure:
 
-- `log/scenario_<scenario_name>/scenario_<scenario_name>_report.md`
-- `log/scenario_<scenario_name>/metrics/`
-- `log/scenario_<scenario_name>/rosbags/`
-- `log/scenario_<scenario_name>/runtime/`
+- `log/<scenario_name>/<effective_run_label>/<scenario_name>_report.md`
+- `log/<scenario_name>/<effective_run_label>/metrics/`
+- `log/<scenario_name>/<effective_run_label>/rosbags/`
+- `log/<scenario_name>/<effective_run_label>/runtime/`
 
 ## Attribution Rules
 
