@@ -1,0 +1,212 @@
+{
+  "adaptation_events": [
+    {
+      "adaptation_latency_ms": 500.0,
+      "attribution_confidence": "supported",
+      "attribution_scope": "injected_only",
+      "candidate_sources": [
+        "lidar_classification_degradation_001"
+      ],
+      "event_id": "adaptation_001",
+      "evidence_refs": [
+        "/cmd_vel",
+        "/obstacle/front",
+        "/scan"
+      ],
+      "metadata": {},
+      "reaction_id": "reaction_001",
+      "time_s": 82.668,
+      "trigger_id": "trigger_001"
+    }
+  ],
+  "additional_metrics": {
+    "degraded_sensing_response_latency_ms": 500.0,
+    "false_obstacle_count": 677,
+    "false_obstacle_rate": 1.0,
+    "injected_true_samples": 677,
+    "missed_detection_count": 0,
+    "missed_detection_rate": null,
+    "post_injection_route_deviation_m": 19.278,
+    "raw_hazard_samples": 0,
+    "recovery_time_ms": 151500.0
+  },
+  "artifact_paths": {
+    "metrics": "/home/keila/robotics/marti/logs/skill_example/full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z/metrics/full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z_metrics.json",
+    "report": "/home/keila/robotics/marti/logs/skill_example/full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z/spacetry_scenario_perception_lidar_degradation_gradual_report.md",
+    "rosbags": "/home/keila/robotics/marti/logs/skill_example/full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z/rosbags",
+    "timeline": "/home/keila/robotics/marti/logs/skill_example/full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z/runtime/full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z_timeline.jsonl"
+  },
+  "detection_events": [
+    {
+      "attribution_status": "supported",
+      "candidate_sources": [
+        "lidar_classification_degradation_001"
+      ],
+      "event_id": "detection_001",
+      "evidence_refs": [
+        "scenario_driver:injected_obstacle_pulse"
+      ],
+      "linked_trigger_ids": [
+        "trigger_001"
+      ],
+      "metadata": {
+        "obstacle_state": "CLEAR",
+        "raw_scan_front_clear": true
+      },
+      "minimum_fault_distance_m": 18.185,
+      "source": "/obstacle/front",
+      "time_s": 82.168
+    }
+  ],
+  "finished_at_sim_s": 308.668,
+  "metadata": {
+    "baseline_map_assessment": "The baseline mission starts at dock_pad_01 (0, 0), targets science_rock_01 at (50.10, -80.0), and already contains block_island near (20, -40.50). The scenario does not add world obstacles; it perturbs scan-derived interpreted obstacle classifications along a route segment the rover should reach before the 1200 s BT horizon.\n",
+    "fault_attribution_rule": "A detection or reaction is attributed to the injected uncertainty only when it occurs during or shortly after an injected obstacle-classification pulse, the raw scan front sector is clear beyond the configured obstacle threshold or no closer baseline hazard explains the response, and no active MR_009 handling is dominating motion.\n",
+    "injection_status": "encountered",
+    "minimum_post_encounter_observation_window_s": 45.0,
+    "monitor_handling": [
+      {
+        "affects_attribution": true,
+        "affects_report_interpretation": true,
+        "affects_trigger_gating": true,
+        "consumer_node": "perception_lidar_degradation_driver",
+        "monitor_name": "MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY",
+        "rationale": "Injection is gated away from active low-battery return handling because battery recovery can dominate navigation behavior.",
+        "topic": "/monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY"
+      },
+      {
+        "affects_attribution": true,
+        "affects_report_interpretation": true,
+        "affects_trigger_gating": false,
+        "consumer_node": "perception_lidar_degradation_driver",
+        "monitor_name": "MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY",
+        "rationale": "Full-battery speed violations can be caused by cautious obstacle handling and must be separated from injected-fault attribution.",
+        "topic": "/monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY"
+      }
+    ],
+    "primary_evaluation_target": "runtime degradation of scan-derived obstacle classification while en route to science_rock_01",
+    "primary_observed_control_rationale": "obstacle_avoidance",
+    "primary_reaction_attribution_status": "supported",
+    "primary_reaction_scope": "injected_only",
+    "scenario_config_file": "/home/keila/robotics/marti/logs/skill_example/spacetry_scenario_perception_lidar_degradation_gradual/config/scenario_config.yaml",
+    "scenario_contract_file": "/home/keila/robotics/marti/logs/skill_example/spacetry_scenario_perception_lidar_degradation_gradual/config/scenario_contract.yaml"
+  },
+  "observability_gaps": [
+    "No dedicated collision topic was found in the baseline stack; collision_with_obstacle is not directly observable and is reported as null.",
+    "The scenario injects BT-facing obstacle classification messages; raw /scan is observed for attribution but not degraded directly."
+  ],
+  "outcomes": {
+    "autonomy_assessment": "PASS",
+    "baseline_outcome_assessment": "NOT_EVALUATED",
+    "goal_status": "PASS",
+    "injected_outcome_assessment": "PASS",
+    "outcome_assessment": "PASS",
+    "safety_status": "DEGRADED"
+  },
+  "reaction_events": [
+    {
+      "active_context_at_reaction": {
+        "cmd_vel_angular_z": 0.84,
+        "cmd_vel_linear_x": 0.8,
+        "mr009_active": false,
+        "mr011_active": true,
+        "near_block_island": false,
+        "obstacle_front": true,
+        "obstacle_left": false,
+        "obstacle_right": true,
+        "raw_scan_front_clear": true
+      },
+      "attribution_status": "supported",
+      "candidate_sources": [
+        "lidar_classification_degradation_001"
+      ],
+      "event_id": "reaction_001",
+      "evidence_refs": [
+        "/cmd_vel",
+        "/obstacle/front",
+        "/scan"
+      ],
+      "linked_trigger_ids": [
+        "trigger_001"
+      ],
+      "metadata": {},
+      "observed_control_rationale": "obstacle_avoidance",
+      "reaction_scope": "injected_only",
+      "time_s": 82.668
+    }
+  ],
+  "recovery_events": [
+    {
+      "event_id": "recovery_001",
+      "evidence_refs": [
+        "/mobile_base_controller/odom",
+        "/cmd_vel"
+      ],
+      "linked_reaction_ids": [
+        "reaction_001"
+      ],
+      "metadata": {
+        "progress_delta": 0.022682384425636637
+      },
+      "recovery_latency_ms": 103056.0,
+      "time_s": 185.724
+    }
+  ],
+  "run_label": "full_run_spacetry_scenario_perception_lidar_degradation_gradual__20260503T223102Z",
+  "runtime_s": 308.612,
+  "scenario_name": "spacetry_scenario_perception_lidar_degradation_gradual",
+  "schema_version": "1.0.0",
+  "started_at_sim_s": 0.056,
+  "summary_metrics": {
+    "adaptation_event_count": 1,
+    "autonomy_reaction_count": 1,
+    "autonomy_reaction_status": true,
+    "baseline_confound_status": {
+      "block_island_near_route": true,
+      "mr009_active": false,
+      "mr011_active": true
+    },
+    "baseline_uncertainty_exercised_status": false,
+    "detection_attribution_status": true,
+    "detection_event_count": 1,
+    "detection_signal_source": "/obstacle/front",
+    "evaluation_window_after_encounter_s": 226.5,
+    "goal_viability": {
+      "mission_deadline_met": true,
+      "science_rock_01_reached": true
+    },
+    "injected_uncertainty_encounter_status": true,
+    "injected_uncertainty_source": [
+      "lidar_classification_degradation_001"
+    ],
+    "meaningful_evaluation_window_satisfied": true,
+    "minimum_fault_distance_at_detection_m": 18.185,
+    "recovery_event_count": 1,
+    "route_deviation_m": 19.278,
+    "safety_preservation": {
+      "MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY": true,
+      "MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY": false,
+      "collision_with_obstacle": null
+    }
+  },
+  "termination_reason": "goal_reached",
+  "trigger_events": [
+    {
+      "description": "Runtime intermittent false obstacle classification pulses started.",
+      "event_id": "trigger_001",
+      "evidence_refs": [
+        "scenario_driver:trigger_gate"
+      ],
+      "kind": "uncertainty_injection",
+      "metadata": {
+        "mr009_active": false,
+        "mr011_active": true,
+        "progress_ratio": 0.3001363760360275,
+        "remaining_mission_time_s": 1117.888,
+        "why_allowed": "progress, forward-motion, and remaining-time gates passed"
+      },
+      "source": "/obstacle/front|left|right",
+      "time_s": 82.168
+    }
+  ]
+}

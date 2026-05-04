@@ -1,0 +1,109 @@
+scenario_name: spacetry_scenario_perception_lidar_degradation_gradual
+autonomy_aspect: perception
+uncertainty_location: managed_system
+fault_subject: rover_perception_scan_derived_obstacle_classification
+fault_attribute: obstacle_front_left_right_boolean_evidence
+manifestation: degrading_noisy_intermittent
+space_domain: contiguous_route_segment
+time_domain: intermittent
+trigger: robot_state_predicate_and_runtime
+primary_evaluation_target: runtime degradation of scan-derived obstacle classification while en route to science_rock_01
+secondary_injected_uncertainties: []
+
+baseline_uncertainties:
+  - baseline block_island hazard intersects the nominal route corridor and may trigger ordinary obstacle avoidance before or during injected sensing degradation.
+  - NavigateWithAvoidance fuses raw /scan sector minima with /obstacle/front|left|right freshness, so either interface may explain avoidance maneuvers.
+  - MR_011 can report low commanded speed while battery is full; this can reflect cautious navigation or monitor-enforced expectations rather than injected perception alone.
+  - MR_009 is only relevant if the run drifts into low-battery handling while away from the outpost.
+
+injected_uncertainties:
+  - id: lidar_classification_degradation_001
+    location: managed_system
+    emerging_time: runtime
+    fault_subject: rover perception classification
+    fault_attribute: /obstacle/front /obstacle/left /obstacle/right interpreted evidence
+    manifestation: noisy degrading intermittent false obstacle pulses
+    trigger_timing: after sustained mission progress and enough remaining scenario time
+
+baseline_map_assessment: >
+  The baseline mission starts at dock_pad_01 (0, 0), targets science_rock_01 at
+  (50.10, -80.0), and already contains block_island near (20, -40.50). The
+  scenario does not add world obstacles; it perturbs scan-derived interpreted
+  obstacle classifications along a route segment the rover should reach before
+  the 1200 s BT horizon.
+
+monitor_handling:
+  - monitor_name: MR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+    topic: /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+    consumer_node: perception_lidar_degradation_driver
+    affects_trigger_gating: true
+    affects_attribution: true
+    affects_report_interpretation: true
+    rationale: Injection is gated away from active low-battery return handling because battery recovery can dominate navigation behavior.
+  - monitor_name: MR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
+    topic: /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
+    consumer_node: perception_lidar_degradation_driver
+    affects_trigger_gating: false
+    affects_attribution: true
+    affects_report_interpretation: true
+    rationale: Full-battery speed violations can be caused by cautious obstacle handling and must be separated from injected-fault attribution.
+
+fault_attribution_rule: >
+  A detection or reaction is attributed to the injected uncertainty only when it
+  occurs during or shortly after an injected obstacle-classification pulse, the
+  raw scan front sector is clear beyond the configured obstacle threshold or no
+  closer baseline hazard explains the response, and no active MR_009 handling is
+  dominating motion.
+reaction_scope_rule: >
+  Reactions are baseline_only when they align with raw scan or known block_island
+  proximity outside injection, injected_only when they align with injected false
+  classification and raw scan is clear, baseline_and_injected when both are
+  active, and indeterminate when evidence is insufficient.
+control_rationale_rule: >
+  Reverse commands or strong angular commands with obstacle evidence are
+  obstacle_avoidance; low forward speed under MR_011 is monitor_enforcement when
+  no obstacle evidence is active; steady forward movement toward the target is
+  goal_alignment; otherwise classify as unknown.
+encounter_rule: >
+  The injected uncertainty is encountered once the driver has started publishing
+  degradation pulses after the robot-state trigger gate passes.
+meaningful_evaluation_rule: >
+  The post-encounter observation window must be at least 45 seconds and must
+  include either an attributed reaction, recovery to stable forward progress, or
+  enough continued motion evidence to judge lack of response.
+minimum_post_encounter_observation_window_s: 45.0
+
+runtime_parameter_interface:
+  - parameter_name: scenario_config_file
+    type: string
+    consumer_node: perception_lidar_degradation_driver
+    source: config/scenario_config.yaml
+    transport: inline_launch_dict
+  - parameter_name: scenario_contract_file
+    type: string
+    consumer_node: perception_lidar_degradation_driver
+    source: config/scenario_contract.yaml
+    transport: inline_launch_dict
+  - parameter_name: output_root
+    type: string
+    consumer_node: perception_lidar_degradation_driver
+    source: launch_argument
+    transport: inline_launch_dict
+  - parameter_name: run_label
+    type: string
+    consumer_node: perception_lidar_degradation_driver
+    source: launch_argument
+    transport: inline_launch_dict
+  - parameter_name: record_rosbag
+    type: bool
+    consumer_node: launch
+    source: launch_argument
+    transport: inline_launch_dict
+
+artifact_consumption_rule: >
+  scenario_config.yaml and scenario_contract.yaml are plain YAML files parsed by
+  the scenario driver via string file paths. They must never be passed as ROS
+  parameter files. output_root, run_label, scenario_config_file, and
+  scenario_contract_file are passed to the driver as inline launch-dict ROS
+  parameters. record_rosbag is a launch argument that controls an optional
+  rosbag ExecuteProcess action.

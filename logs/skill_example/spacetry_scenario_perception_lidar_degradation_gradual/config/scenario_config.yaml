@@ -1,0 +1,67 @@
+scenario_name: spacetry_scenario_perception_lidar_degradation_gradual
+baseline_bt_evaluation_horizon_s: 1200.0
+scenario_timeout_s: 1200.0
+minimum_post_encounter_observation_window_s: 45.0
+
+mission:
+  start:
+    id: dock_pad_01
+    x: 0.0
+    y: 0.0
+    yaw: 0.0
+  goal:
+    id: science_rock_01
+    bt_waypoint: science_rock
+    x: 50.10
+    y: -80.0
+    yaw: 3.07
+    tolerance_m: 1.5
+  nominal_route:
+    start_xy: [0.0, 0.0]
+    goal_xy: [50.10, -80.0]
+  baseline_hazards:
+    - id: block_island
+      x: 20.0
+      y: -40.50
+      approximate_radius_m: 7.5
+
+trigger:
+  min_sim_time_s: 35.0
+  min_progress_ratio: 0.30
+  max_goal_distance_m: 75.0
+  require_forward_motion_s: 5.0
+  minimum_time_remaining_s: 120.0
+
+injection:
+  duration_s: 75.0
+  publish_rate_hz: 18.0
+  pulse_period_s: 3.0
+  true_pulse_s_initial: 0.75
+  true_pulse_s_final: 2.20
+  restore_obstacle_clear_messages: 12
+  topics:
+    front: /obstacle/front
+    left: /obstacle/left
+    right: /obstacle/right
+
+response_detection:
+  stable_reaction_window_s: 2.0
+  speed_drop_fraction: 0.35
+  lateral_cmd_threshold_rad_s: 0.45
+  reverse_threshold_m_s: -0.10
+  normal_progress_speed_m_s: 0.35
+  normal_progress_window_s: 6.0
+  raw_scan_clear_threshold_m: 9.0
+
+topics:
+  odom: /mobile_base_controller/odom
+  scan: /scan
+  cmd_vel: /cmd_vel
+  obstacle_front: /obstacle/front
+  obstacle_left: /obstacle/left
+  obstacle_right: /obstacle/right
+  obstacle_state: /obstacle/state
+  battery_soc: /battery/soc
+  battery_near_outpost: /battery/near_outpost
+  monitor_mr009: /monitor/handlerMR_009_RETURN_TO_OUTPOST_ON_LOW_BATTERY
+  monitor_mr011: /monitor/handlerMR_011_MAINTAIN_SPEED_WHEN_FULL_BATTERY
