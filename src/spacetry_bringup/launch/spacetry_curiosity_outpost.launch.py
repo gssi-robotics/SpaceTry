@@ -374,7 +374,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "tree_file",
-                default_value=str(bt_tree_file_default),
+                default_value=bt_tree_file_default,
                 description="Path to BehaviorTree XML file. Defaults to base_bt.xml. Example: tree_file:=$(ros2 pkg prefix --share spacetry_bt)/trees/my_tree.xml",
             ),
             env_gz_plugin,
@@ -385,8 +385,9 @@ def generate_launch_description():
             # Start bridges early so /clock is available before robot spawns
             ros_gz_bridge,
             image_bridge,
-            # Small delay lets the clock bridge publish before spawn
-            TimerAction(period=2.0, actions=[spawn]),
+            # Longer delay ensures /clock bridge is fully established before spawn
+            # This is critical when enable_bt_runner:=false to prevent controller_manager clock warnings
+            TimerAction(period=3.0, actions=[spawn]),
             odom_node,
             odom_relay,
             battery_manager,

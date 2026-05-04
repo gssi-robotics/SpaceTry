@@ -37,6 +37,7 @@ These policies are mandatory, not advisory.
 - During scenario-driver generation, avoid modifying rover ROS 2 packages unless a genuine implementation bug is found and the user approves the change.
 - Run every ROS2, Gazebo, build, or simulation command in Docker.
 - Because the repository source tree is not bind-mounted into `/ws/src`, copy any new or modified scenario package into the running container before building or launching it.
+- Apply the mandatory execution lifecycle rules from `Execution_Lifecycle.md` before validation or execution. Those build handoff and shutdown requirements are hard gates, not optional guidance.
 - When a scenario touches `src/spacetry_world`, follow `src/spacetry_world/AGENTS.md` for world-specific constraints and validation.
 - Do not assume the world is empty. Before adding obstacles, hazards, or alternate goals, inspect the active world SDF and mission waypoint files to account for mission-relevant objects already present in the baseline map.
 - Do not set deadlines, route expectations, or injection locations without checking that they are realistic for the baseline start pose, existing target placement, and existing obstacle field.
@@ -74,6 +75,7 @@ These policies are mandatory, not advisory.
   - the runtime timeline or equivalent event log
 - Interrupted-run reports must explicitly mark the termination reason as `interrupted`, `signal`, `timeout`, or equivalent.
 - A scenario evaluation is not considered valid unless an interrupted run is tested and confirmed to produce the required report artifacts under the bind-mounted host `log/` folder.
+- Launch completion shutdown and process-clean scenario-driver shutdown remain mandatory lifecycle requirements; use `Execution_Lifecycle.md` for the exact rules.
 
 ## Recovery From Violation
 

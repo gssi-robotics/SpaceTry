@@ -26,6 +26,9 @@ iii) **Monitors**:
     Description: ROS 2 package with the monitors for safety constraints
     - Safety Constraints:
       - {CONSTRAINT_ID}: {SAFETY_CONSTRAINT_DESCRIPTION}
+    - [Optional] Monitor notes:
+      - {FREE_FORM_NOTE_ABOUT_MONITORS_THAT_MATTER_FOR_THIS_SCENARIO}
+      - {FREE_FORM_NOTE_ABOUT_MONITORS_THAT_MATTER_FOR_THIS_SCENARIO}
 
 iv) **Mission Goals Description**:
      Location: {MISSION_GOAL_FILE}
@@ -79,6 +82,10 @@ Choose one or more patterns that match the primary target and any secondary inje
 ---
 
 For a completed example that matches this template, see [SCENARIO_PROMPT_QUICK_REF.md](../references/SCENARIO_PROMPT_QUICK_REF.md).
+
+Keep monitor notes free-form and optional in the user prompt. If monitors matter for trigger timing, attribution, or result interpretation, the scenario contract will normalize that information internally during planning.
+
+Metrics listed in the prompt should be reported through `additional_metrics` unless they already match an existing normalized `summary_metrics` field such as `safety_preservation`, `goal_viability`, or `route_deviation_m`.
 
 **Last Updated:** April 8, 2026  
 **Applies to:** ROS 2 Jazzy, Gazebo Harmonic, SpaceTry Testbed
